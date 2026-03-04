@@ -1,0 +1,31 @@
+# Core
+torch>=2.2.0
+torchvision>=0.17.0
+numpy>=1.26.0
+pandas>=2.1.0
+scipy>=1.12.0
+
+# YOLO
+ultralytics>=8.1.0
+
+# Vision Transformer
+timm>=0.9.12
+
+# Data storage and image processing
+h5py>=3.10.0
+Pillow>=10.2.0
+opencv-python>=4.9.0
+scikit-image>=0.22.0
+shapely>=2.0.0
+
+# Tracking (Hungarian algorithm)
+lap>=0.4.0
+
+# Training
+tensorboard>=2.15.0
+tqdm>=4.66.0
+
+# Evaluation
+scikit-learn>=1.4.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
