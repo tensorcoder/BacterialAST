@@ -14,9 +14,9 @@ from tqdm import tqdm
 
 from ..config import DINOConfig, FullConfig
 from ..data.augmentations import DINOMicroscopyAugmentation
-from ..data.dataset import DINOCropDataset, TemporalPairDataset
+from ..data.dataset import DINOCropDataset
 from ..models.backbone import ViTSmall
-from ..models.dino import DINOHead, DINOLoss, DINOWrapper, TemporalContrastiveLoss
+from ..models.dino import DINOHead, DINOLoss, DINOWrapper
 
 logger = logging.getLogger(__name__)
 
@@ -76,13 +76,6 @@ def train_dino(config: FullConfig) -> Path:
         center_momentum=cfg.center_momentum,
     ).to(device)
 
-    # Temporal contrastive loss
-    temporal_loss_fn = None
-    if cfg.use_temporal_contrastive:
-        temporal_loss_fn = TemporalContrastiveLoss(
-            temperature=cfg.temporal_temperature
-        ).to(device)
-
     # Dataset and dataloader
     transform = DINOMicroscopyAugmentation(
         global_crop_size=cfg.img_size,
@@ -105,9 +98,6 @@ def train_dino(config: FullConfig) -> Path:
         pin_memory=True,
         drop_last=True,
     )
-
-    # Temporal pair dataset (lazy init at epoch 50)
-    temporal_dataloader = None
 
     # Optimizer (only student parameters)
     optimizer = torch.optim.AdamW(
@@ -156,13 +146,10 @@ def train_dino(config: FullConfig) -> Path:
         dino_loss_fn.teacher_temp = teacher_temp_schedule[epoch]
 
         epoch_loss = 0.0
-        epoch_temporal_loss = 0.0
         n_batches = 0
 
         pbar = tqdm(dataloader, desc=f"DINO Epoch {epoch+1}/{cfg.epochs}")
         for batch_idx, (global_crops, local_crops) in enumerate(pbar):
-            # global_crops: list of B tensors, local_crops: list of B tensors
-            # Stack into single tensors
             all_crops = []
             for gc in global_crops:
                 all_crops.append(gc.to(device, non_blocking=True))
@@ -172,76 +159,21 @@ def train_dino(config: FullConfig) -> Path:
             n_global = len(global_crops)
 
             with torch.amp.autocast("cuda"):
-                # Forward student on all crops
                 student_outputs = dino.forward_student(all_crops)
 
-                # Forward teacher on global crops only (no grad)
                 with torch.no_grad():
                     teacher_outputs = dino.forward_teacher(all_crops[:n_global])
 
-                # DINO loss
-                loss = dino_loss_fn(student_outputs, teacher_outputs, epoch)
-
-            # Temporal contrastive loss (after epoch threshold)
-            if (
-                temporal_loss_fn is not None
-                and epoch >= cfg.temporal_loss_start_epoch
-            ):
-                # Initialize temporal dataloader on first use
-                if temporal_dataloader is None:
-                    from torchvision import transforms as T
-
-                    single_transform = T.Compose([
-                        T.RandomHorizontalFlip(),
-                        T.RandomVerticalFlip(),
-                        T.RandomRotation(180),
-                        T.ToTensor(),
-                        T.Normalize(mean=[0.5], std=[0.25]),
-                    ])
-                    temporal_dataset = TemporalPairDataset(
-                        hdf5_dir=config.paths.preprocessed_dir,
-                        track_csv_dir=config.paths.preprocessed_dir,
-                        tau_range=cfg.temporal_tau_range,
-                        transform=single_transform,
-                    )
-                    temporal_dataloader = iter(DataLoader(
-                        temporal_dataset,
-                        batch_size=cfg.batch_size,
-                        shuffle=True,
-                        num_workers=2,
-                        pin_memory=True,
-                        drop_last=True,
-                    ))
-
-                try:
-                    crop_t, crop_tau = next(temporal_dataloader)
-                except StopIteration:
-                    temporal_dataloader = iter(DataLoader(
-                        temporal_dataset,
-                        batch_size=cfg.batch_size,
-                        shuffle=True,
-                        num_workers=2,
-                        pin_memory=True,
-                        drop_last=True,
-                    ))
-                    crop_t, crop_tau = next(temporal_dataloader)
-
-                crop_t = crop_t.to(device, non_blocking=True)
-                crop_tau = crop_tau.to(device, non_blocking=True)
-
-                with torch.amp.autocast("cuda"):
-                    z_t = dino.student_backbone(crop_t)
-                    z_tau = dino.student_backbone(crop_tau)
-                    t_loss = temporal_loss_fn(z_t, z_tau)
-
-                loss = loss + cfg.temporal_loss_weight * t_loss
-                epoch_temporal_loss += t_loss.item()
+                loss = dino_loss_fn(student_outputs, teacher_outputs)
 
             # Backward
             optimizer.zero_grad()
             scaler.scale(loss).backward()
             scaler.unscale_(optimizer)
-            nn.utils.clip_grad_norm_(list(dino.student_backbone.parameters()) + list(dino.student_head.parameters()), cfg.grad_clip)
+            nn.utils.clip_grad_norm_(
+                list(dino.student_backbone.parameters()) + list(dino.student_head.parameters()),
+                cfg.grad_clip,
+            )
             scaler.step(optimizer)
             scaler.update()
 
@@ -260,15 +192,13 @@ def train_dino(config: FullConfig) -> Path:
 
         # Epoch logging
         avg_loss = epoch_loss / max(n_batches, 1)
-        avg_temporal = epoch_temporal_loss / max(n_batches, 1)
         writer.add_scalar("train/dino_loss", avg_loss, epoch)
-        writer.add_scalar("train/temporal_loss", avg_temporal, epoch)
         writer.add_scalar("train/lr", lr_schedule[epoch], epoch)
         writer.add_scalar("train/ema_momentum", momentum_schedule[epoch], epoch)
 
         logger.info(
             f"Epoch {epoch+1}/{cfg.epochs} - Loss: {avg_loss:.4f} "
-            f"Temporal: {avg_temporal:.4f} LR: {lr_schedule[epoch]:.6f}"
+            f"LR: {lr_schedule[epoch]:.6f}"
         )
 
         # Save checkpoint

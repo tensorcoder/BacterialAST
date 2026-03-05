@@ -1,6 +1,19 @@
 __pycache__/
 *.py[cod]
-*.class
+*$py.class
 .env
 .venv/
 venv/
+.DS_Store
+Thumbs.db
+
+# Project-specific data and artifacts
+preprocessed/
+logs/
+results/
+checkpoints/
+features/
+*.h5
+*.npz
+*.pt
+*.pkl

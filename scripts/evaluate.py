@@ -22,19 +22,17 @@ import torch
 
 from ..config import FullConfig
 from ..data.dataset import build_experiment_list, create_splits
-from ..models.classifier import TemporalMILClassifier
-from ..models.early_exit import EarlyExitPolicy, TemperatureScaler
+from ..models.classifier import PopulationTemporalClassifier
+from ..models.early_exit import EarlyExitPolicy, EarlyExitResult, TemperatureScaler
 from ..training.calibrate_exit import evaluate_at_fixed_times
 from ..utils.metrics import (
     compute_metrics,
-    per_antibiotic_analysis,
     time_to_prediction_analysis,
 )
 from ..utils.visualization import (
     plot_accuracy_vs_time,
     plot_exit_time_distribution,
     plot_pareto_front,
-    plot_tsne_embeddings,
 )
 
 logging.basicConfig(
@@ -55,19 +53,15 @@ def evaluate(config: FullConfig, output_dir: Path) -> None:
 
     # Load model
     ckpt_path = Path(config.paths.checkpoints_dir) / "classifier" / "best_classifier.pt"
-    model = TemporalMILClassifier(
+    model = PopulationTemporalClassifier(
         feature_dim=clf_cfg.feature_dim,
         temporal_hidden_dim=clf_cfg.temporal_hidden_dim,
         temporal_num_layers=clf_cfg.temporal_num_layers,
         temporal_num_heads=clf_cfg.temporal_num_heads,
         temporal_ffn_dim=clf_cfg.temporal_ffn_dim,
-        mil_hidden_dim=clf_cfg.mil_hidden_dim,
-        population_feat_dim=clf_cfg.population_feat_dim,
         classifier_hidden_dim=clf_cfg.classifier_hidden_dim,
         num_classes=clf_cfg.num_classes,
         dropout=clf_cfg.dropout,
-        delta_scales=clf_cfg.delta_scales,
-        micro_batch_size=clf_cfg.micro_batch_size,
     ).to(device)
 
     checkpoint = torch.load(ckpt_path, map_location=device, weights_only=True)
@@ -88,7 +82,9 @@ def evaluate(config: FullConfig, output_dir: Path) -> None:
         config.paths.data_root, config.paths.features_dir
     )
     _, _, test_exps = create_splits(
-        experiments, seed=config.data_split.random_seed
+        experiments,
+        data_root=config.paths.data_root,
+        seed=config.data_split.random_seed,
     )
     logger.info(f"Evaluating on {len(test_exps)} test experiments")
 
@@ -104,9 +100,8 @@ def evaluate(config: FullConfig, output_dir: Path) -> None:
         experiments=test_exps,
         feature_dir=config.paths.features_dir,
         time_windows=eval_times,
-        max_tracks=clf_cfg.max_tracks,
-        max_frames=clf_cfg.max_frames_per_track,
-        subsample_rate=clf_cfg.frame_subsample_rate,
+        time_bin_width_sec=clf_cfg.time_bin_width_sec,
+        max_crops_per_bin=clf_cfg.max_crops_per_bin,
         feature_dim=clf_cfg.feature_dim,
         device=device,
     )
@@ -137,12 +132,10 @@ def evaluate(config: FullConfig, output_dir: Path) -> None:
     )
 
     # 3. Simulate early exit on test set
-    # Load calibration result for optimal config
     cal_path = Path(config.paths.checkpoints_dir) / "classifier" / "calibration_result.pkl"
     if cal_path.exists():
         with open(cal_path, "rb") as f:
             cal_result = pickle.load(f)
-        # Use optimal config for 95% target accuracy
         if 0.95 in cal_result.optimal_configs:
             opt = cal_result.optimal_configs[0.95]
             patience = opt["patience"]
@@ -155,14 +148,12 @@ def evaluate(config: FullConfig, output_dir: Path) -> None:
         threshold = exit_cfg.confidence_threshold
 
     # Simulate early exit
-    from ..models.early_exit import EarlyExitResult
-
     exit_results = []
     for exp_idx in range(len(test_exps)):
         consecutive = 0
         last_pred = -1
 
-        for t_idx, t in enumerate(sorted(eval_times)):
+        for t in sorted(eval_times):
             prob = per_window[t]["probs"][exp_idx]
             label = per_window[t]["labels"][exp_idx]
             pred = int(prob > 0.5)
@@ -186,7 +177,6 @@ def evaluate(config: FullConfig, output_dir: Path) -> None:
                 ))
                 break
         else:
-            # Didn't exit early, use final prediction
             prob = per_window[last_t]["probs"][exp_idx]
             exit_results.append(EarlyExitResult(
                 prediction=int(prob > 0.5),
@@ -204,11 +194,7 @@ def evaluate(config: FullConfig, output_dir: Path) -> None:
     exit_probs = np.array([r.confidence for r in exit_results])
     early_exit_metrics = compute_metrics(exit_labels, exit_preds, exit_probs)
 
-    # 6. Per-antibiotic analysis
-    exp_ids = [e.experiment_id for e in test_exps]
-    abx_analysis = per_antibiotic_analysis(exit_results, exp_ids, exit_labels)
-
-    # 7. Plots
+    # 6. Plots
     plot_exit_time_distribution(exit_results, output_dir / "exit_time_distribution.png")
 
     if cal_path.exists():
@@ -217,13 +203,12 @@ def evaluate(config: FullConfig, output_dir: Path) -> None:
             save_path=output_dir / "pareto_front.png",
         )
 
-    # 8. Save results
+    # 7. Save results
     results = {
         "full_metrics_at_60min": asdict(full_metrics),
         "early_exit_metrics": asdict(early_exit_metrics),
         "time_to_prediction": asdict(ttp_metrics),
         "accuracy_vs_time": accuracy_vs_time,
-        "per_antibiotic": abx_analysis,
         "early_exit_config": {
             "patience": patience,
             "threshold": threshold,

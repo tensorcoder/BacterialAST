@@ -1,10 +1,15 @@
 """AST Classifier model components."""
 
 from .backbone import ViTSmall
-from .dino import DINOHead, DINOLoss, DINOWrapper, TemporalContrastiveLoss
-from .temporal_encoder import BacteriumTemporalEncoder, DeltaFeatureComputer
+from .dino import DINOHead, DINOLoss, DINOWrapper
+from .temporal_encoder import (
+    PopulationBinEncoder,
+    PopulationTemporalEncoder,
+    SinusoidalPositionalEncoding,
+    ContinuousTimeEncoding,
+)
 from .mil_aggregator import GatedAttentionMIL, PopulationFeatureExtractor
-from .classifier import TemporalMILClassifier
+from .classifier import PopulationTemporalClassifier, ClassifierHead
 from .early_exit import (
     EarlyExitPolicy,
     EarlyExitResult,
@@ -17,12 +22,14 @@ __all__ = [
     "DINOHead",
     "DINOLoss",
     "DINOWrapper",
-    "TemporalContrastiveLoss",
-    "BacteriumTemporalEncoder",
-    "DeltaFeatureComputer",
+    "PopulationBinEncoder",
+    "PopulationTemporalEncoder",
+    "SinusoidalPositionalEncoding",
+    "ContinuousTimeEncoding",
     "GatedAttentionMIL",
     "PopulationFeatureExtractor",
-    "TemporalMILClassifier",
+    "PopulationTemporalClassifier",
+    "ClassifierHead",
     "EarlyExitPolicy",
     "EarlyExitResult",
     "LearnedHaltingPolicy",

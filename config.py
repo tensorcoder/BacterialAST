@@ -6,30 +6,27 @@ from pathlib import Path
 
 @dataclass
 class PathConfig:
-    data_root: Path = Path("/path/to/MainFolder")  # TODO: Set actual data path
+    data_root: Path = Path("/mnt/f/Data_second_protocol")
     preprocessed_dir: Path = Path("./preprocessed")
     features_dir: Path = Path("./features")
     checkpoints_dir: Path = Path("./checkpoints")
     logs_dir: Path = Path("./logs")
-    yolo_weights: Path = Path("/path/to/yolo11-obb.pt")  # TODO: Set actual YOLO weights path
+    yolo_weights: Path = Path("/mnt/c/users/mkedz/Documents/PhD/PhD_code/yolo11/vertical_obb_100epo_best.pt")
 
 
 @dataclass
 class PreprocessingConfig:
     yolo_confidence: float = 0.5
-    crop_size: int = 96
+    crop_size: int = 128
     yolo_batch_size: int = 16
-    iou_threshold: float = 0.3
-    max_track_age: int = 15  # frames to keep unmatched track (3s at 5fps)
-    min_track_hits: int = 5  # minimum detections to confirm track (1s)
-    min_track_length: int = 150  # minimum frames for usable track (30s)
+    focused_class_name: str = "focused"  # YOLO class name for in-focus bacteria
     fps: float = 5.0
 
 
 @dataclass
 class DINOConfig:
     # Architecture
-    img_size: int = 96
+    img_size: int = 128
     patch_size: int = 16
     embed_dim: int = 384
     depth: int = 12
@@ -64,13 +61,7 @@ class DINOConfig:
     n_local_crops: int = 6
     global_crop_scale: tuple = (0.7, 1.0)
     local_crop_scale: tuple = (0.3, 0.6)
-    local_crop_size: int = 48
-    # Temporal contrastive
-    use_temporal_contrastive: bool = True
-    temporal_loss_weight: float = 0.5
-    temporal_loss_start_epoch: int = 50
-    temporal_temperature: float = 0.3
-    temporal_tau_range: tuple = (5, 150)
+    local_crop_size: int = 64
     # Dataset
     max_crops_per_experiment: int = 5000
 
@@ -83,20 +74,16 @@ class ClassifierConfig:
     temporal_num_layers: int = 4
     temporal_num_heads: int = 4
     temporal_ffn_dim: int = 512
-    mil_hidden_dim: int = 128
     population_feat_dim: int = 64
     classifier_hidden_dim: int = 128
     num_classes: int = 2
     dropout: float = 0.1
-    # Delta features
-    delta_scales: list = field(default_factory=lambda: [1, 5, 25, 125])
+    # Population binning
+    time_bin_width_sec: float = 120.0  # 2-minute bins (configurable)
+    max_crops_per_bin: int = 256
     # Training
     batch_size: int = 16
     gradient_accumulation: int = 2
-    max_tracks: int = 64
-    max_frames_per_track: int = 512
-    frame_subsample_rate: int = 5  # every 5th frame -> effective 1fps
-    micro_batch_size: int = 256  # for temporal encoder
     epochs: int = 200
     lr: float = 1e-3
     weight_decay: float = 0.01
@@ -106,9 +93,8 @@ class ClassifierConfig:
     early_stopping_patience: int = 30
     # Time-aware loss
     time_loss_alpha: float = 2.0
-    temporal_consistency_weight: float = 0.1
     attention_entropy_weight: float = 0.01
-    # Time windows (seconds)
+    # Time windows (seconds) for evaluation
     time_windows: list = field(
         default_factory=lambda: [60, 120, 180, 300, 600, 900, 1800, 3600]
     )
@@ -137,14 +123,9 @@ class EarlyExitConfig:
 
 @dataclass
 class DataSplitConfig:
-    train_ratio: float = 0.7
-    val_ratio: float = 0.15
-    test_ratio: float = 0.15
+    val_ratio: float = 0.15  # fraction of R/S experiments held out for validation
     random_seed: int = 42
-    group_column: str = "experiment_id"
-    stratify_columns: list = field(
-        default_factory=lambda: ["label", "antibiotic_id"]
-    )
+    # Test set comes from the Test/ folder (pre-defined split)
 
 
 @dataclass

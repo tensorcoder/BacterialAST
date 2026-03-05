@@ -1,14 +1,14 @@
-"""Full Temporal MIL Classifier for antimicrobial susceptibility testing."""
+"""Population Temporal Classifier for antimicrobial susceptibility testing."""
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Dict
 
 import torch
 import torch.nn as nn
 
-from .temporal_encoder import BacteriumTemporalEncoder, DeltaFeatureComputer
-from .mil_aggregator import GatedAttentionMIL, PopulationFeatureExtractor
+from .temporal_encoder import PopulationBinEncoder, PopulationTemporalEncoder
+from .mil_aggregator import GatedAttentionMIL
 
 
 class ClassifierHead(nn.Module):
@@ -45,24 +45,36 @@ class ClassifierHead(nn.Module):
         return self.head(x)
 
 
-class TemporalMILClassifier(nn.Module):
-    """End-to-end Temporal Multi-Instance Learning classifier.
+class PopulationTemporalClassifier(nn.Module):
+    """End-to-end Population Temporal classifier.
+
+    Replaces the per-track temporal MIL approach with population-level
+    analysis. Instead of tracking individual bacteria, this model:
+
+    1. Encodes each time bin's population via statistics (mean, std,
+       skewness, kurtosis) of the crop features within that bin.
+    2. Models the temporal evolution of these population snapshots
+       via a Transformer encoder.
+    3. Uses gated attention to pool over time bins.
+    4. Classifies the experiment as resistant or susceptible.
 
     Expected input
     --------------
-    A ``batch_dict`` with the following keys:
+    A ``batch_dict`` with keys:
 
-    * ``track_features``: (B, N, T, 384) – backbone features per track.
-    * ``track_mask``:     (B, N)          – ``True`` for valid tracks.
-    * ``seq_mask``:       (B, N, T)       – ``True`` for valid timesteps.
-    * ``time_fraction``:  (B,)            – normalised elapsed time in [0, 1].
+    * ``bin_features``:  (B, T, N, 384) — crop features per time bin.
+    * ``bin_mask``:      (B, T)         — True for valid time bins.
+    * ``crop_mask``:     (B, T, N)      — True for valid crops within bins.
+    * ``bin_times``:     (B, T)         — bin center times in seconds.
+    * ``bin_counts``:    (B, T)         — number of crops per bin.
+    * ``time_fraction``: (B,)           — normalised elapsed time [0, 1].
 
     Outputs
     -------
     A dict with:
 
-    * ``logits``:            (B, 2) – classification logits.
-    * ``attention_weights``: (B, N) – per-track attention weights.
+    * ``logits``:            (B, 2) — classification logits.
+    * ``attention_weights``: (B, T) — per-bin attention weights.
     """
 
     def __init__(
@@ -72,30 +84,22 @@ class TemporalMILClassifier(nn.Module):
         temporal_num_layers: int = 4,
         temporal_num_heads: int = 4,
         temporal_ffn_dim: int = 512,
-        mil_hidden_dim: int = 128,
-        population_feat_dim: int = 64,
         classifier_hidden_dim: int = 128,
         num_classes: int = 2,
         dropout: float = 0.1,
-        delta_scales: list[int] | None = None,
-        micro_batch_size: int = 256,
-        # Legacy aliases
-        feat_dim: int | None = None,
-        pop_output_dim: int | None = None,
-        temporal_dropout: float | None = None,
+        max_count_normalizer: float = 256.0,
     ) -> None:
         super().__init__()
-        # Support legacy parameter names
-        feature_dim = feat_dim or feature_dim
-        population_feat_dim = pop_output_dim or population_feat_dim
-        dropout = temporal_dropout or dropout
 
-        self.micro_batch_size = micro_batch_size
-
-        # Per-track temporal modelling.
-        self.delta_computer = DeltaFeatureComputer(feat_dim=feature_dim)
-        self.temporal_encoder = BacteriumTemporalEncoder(
+        # Per-bin population encoding
+        self.bin_encoder = PopulationBinEncoder(
             feat_dim=feature_dim,
+            hidden_dim=temporal_hidden_dim,
+            max_count_normalizer=max_count_normalizer,
+        )
+
+        # Temporal evolution across bins
+        self.temporal_encoder = PopulationTemporalEncoder(
             hidden_dim=temporal_hidden_dim,
             num_layers=temporal_num_layers,
             num_heads=temporal_num_heads,
@@ -103,106 +107,89 @@ class TemporalMILClassifier(nn.Module):
             dropout=dropout,
         )
 
-        # Multi-instance learning aggregation.
-        self.mil_aggregator = GatedAttentionMIL(
+        # Attention pooling over time bins
+        self.bin_attention = GatedAttentionMIL(
             input_dim=temporal_hidden_dim,
-            hidden_dim=mil_hidden_dim,
-        )
-        self.pop_features = PopulationFeatureExtractor(
-            input_dim=temporal_hidden_dim,
-            output_dim=population_feat_dim,
+            hidden_dim=temporal_hidden_dim // 2,
         )
 
-        # Classification head.
-        # Input: bag_repr (256) + pop_features (64) + time_fraction (1) = 321
+        # Classification head
+        # Input: bin_attention_repr (256) + time_fraction (1) = 257
         self.classifier = ClassifierHead(
-            in_dim=temporal_hidden_dim + population_feat_dim + 1,
+            in_dim=temporal_hidden_dim + 1,
             num_classes=num_classes,
             hidden_dim=classifier_hidden_dim,
             dropout=dropout,
         )
 
-    # ------------------------------------------------------------------
-    # Temporal encoding with micro-batching
-    # ------------------------------------------------------------------
-
-    def _encode_tracks(
+    def _encode_bins(
         self,
-        track_features: torch.Tensor,
-        seq_mask: torch.Tensor,
+        bin_features: torch.Tensor,
+        crop_mask: torch.Tensor,
+        bin_counts: torch.Tensor,
     ) -> torch.Tensor:
-        """Encode all tracks through the temporal encoder with micro-batching.
+        """Encode each time bin into a population embedding.
 
         Args:
-            track_features: (B, N, T, D) backbone features.
-            seq_mask:       (B, N, T) boolean mask for valid timesteps.
+            bin_features: (B, T, N, D) crop features per bin.
+            crop_mask:    (B, T, N) boolean mask for valid crops.
+            bin_counts:   (B, T) number of crops per bin.
 
         Returns:
-            (B, N, hidden_dim) per-track temporal representations.
+            (B, T, hidden_dim) per-bin population embeddings.
         """
-        B, N, T, D = track_features.shape
-        hidden_dim = self.temporal_encoder.hidden_dim
+        B, T, N, D = bin_features.shape
+        hidden_dim = self.bin_encoder.proj[-1].out_features
 
-        # Flatten batch and track dims → (B*N, T, D).
-        flat_feats = track_features.reshape(B * N, T, D)
-        flat_mask = seq_mask.reshape(B * N, T)
+        # Flatten batch and time dims for bin encoder
+        flat_features = bin_features.reshape(B * T, N, D)
+        flat_crop_mask = crop_mask.reshape(B * T, N)
+        flat_counts = bin_counts.reshape(B * T)
 
-        # Compute deltas.
-        flat_deltas = self.delta_computer(flat_feats)  # (B*N, T, D)
+        flat_embeddings = self.bin_encoder(
+            flat_features, flat_crop_mask, flat_counts
+        )  # (B*T, hidden_dim)
 
-        # Micro-batch through temporal encoder to manage GPU memory.
-        total = B * N
-        outputs: list[torch.Tensor] = []
-        for start in range(0, total, self.micro_batch_size):
-            end = min(start + self.micro_batch_size, total)
-            chunk_feats = flat_feats[start:end]
-            chunk_deltas = flat_deltas[start:end]
-            chunk_mask = flat_mask[start:end]
-            encoded = self.temporal_encoder(
-                chunk_feats, chunk_deltas, mask=chunk_mask
-            )  # (chunk, hidden_dim)
-            outputs.append(encoded)
-
-        # Reassemble → (B, N, hidden_dim).
-        flat_encoded = torch.cat(outputs, dim=0)  # (B*N, hidden_dim)
-        return flat_encoded.reshape(B, N, hidden_dim)
-
-    # ------------------------------------------------------------------
-    # Forward
-    # ------------------------------------------------------------------
+        return flat_embeddings.reshape(B, T, hidden_dim)
 
     def forward(self, batch_dict: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
-        """
-        Args:
-            batch_dict: dictionary with keys ``track_features``, ``track_mask``,
-                ``seq_mask``, and ``time_fraction``.
+        bin_features = batch_dict["bin_features"]    # (B, T, N, 384)
+        bin_mask = batch_dict["bin_mask"]             # (B, T)
+        crop_mask = batch_dict["crop_mask"]           # (B, T, N)
+        bin_times = batch_dict["bin_times"]           # (B, T)
+        bin_counts = batch_dict["bin_counts"]         # (B, T)
+        time_fraction = batch_dict["time_fraction"]   # (B,)
 
-        Returns:
-            Dict with ``logits`` (B, 2) and ``attention_weights`` (B, N).
-        """
-        track_features: torch.Tensor = batch_dict["track_features"]  # (B, N, T, 384)
-        track_mask: torch.Tensor = batch_dict["track_mask"]          # (B, N)
-        seq_mask: torch.Tensor = batch_dict["seq_mask"]              # (B, N, T)
-        time_fraction: torch.Tensor = batch_dict["time_fraction"]    # (B,)
+        # 1. Encode each bin's population
+        bin_embeddings = self._encode_bins(
+            bin_features, crop_mask, bin_counts
+        )  # (B, T, 256)
 
-        # 1. Temporal encoding per track.
-        track_repr = self._encode_tracks(track_features, seq_mask)  # (B, N, 256)
+        # 2. Temporal encoding across bins
+        temporal_repr = self.temporal_encoder(
+            bin_embeddings, bin_times, bin_mask
+        )  # (B, 256) — mean-pooled
 
-        # 2. MIL aggregation.
-        bag_repr, attn_weights = self.mil_aggregator(
-            track_repr, mask=track_mask
-        )  # (B, 256), (B, N)
+        # Also get per-bin contextualized representations for attention
+        # Re-run transformer to get per-bin outputs for attention pooling
+        time_features = self.temporal_encoder.time_enc(bin_times)
+        h = bin_embeddings + self.temporal_encoder.time_proj(time_features)
+        src_key_padding_mask = ~bin_mask if bin_mask is not None else None
+        h_contextualized = self.temporal_encoder.transformer(
+            h, src_key_padding_mask=src_key_padding_mask
+        )  # (B, T, 256)
 
-        # 3. Population statistics.
-        pop_feat = self.pop_features(track_repr, mask=track_mask)  # (B, 64)
+        # 3. Attention pooling over time bins
+        experiment_repr, attn_weights = self.bin_attention(
+            h_contextualized, mask=bin_mask
+        )  # (B, 256), (B, T)
 
-        # 4. Concatenate bag repr, pop features, and time fraction.
+        # 4. Classify
         combined = torch.cat(
-            [bag_repr, pop_feat, time_fraction.unsqueeze(-1)],
+            [experiment_repr, time_fraction.unsqueeze(-1)],
             dim=-1,
-        )  # (B, 256 + 64 + 1) = (B, 321)
+        )  # (B, 257)
 
-        # 5. Classify.
         logits = self.classifier(combined)  # (B, 2)
 
         return {

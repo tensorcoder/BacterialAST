@@ -42,8 +42,8 @@ def plot_exit_time_distribution(
     save_path: Path,
     title: str = "Early-Exit Time Distribution",
 ) -> None:
-    """Histogram of exit times with correctness overlay."""
-    times = np.array([r.exit_time_sec for r in exit_results]) / 60  # minutes
+    """Histogram of exit times."""
+    times = np.array([r.exit_time_sec for r in exit_results]) / 60
 
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.hist(times, bins=30, edgecolor="black", alpha=0.7, color="steelblue")
@@ -60,24 +60,26 @@ def plot_exit_time_distribution(
 
 def plot_attention_heatmap(
     attention_weights: np.ndarray,
-    track_ids: np.ndarray | None = None,
+    bin_times_min: np.ndarray | None = None,
     save_path: Path | None = None,
-    title: str = "MIL Attention Weights",
+    title: str = "Time Bin Attention Weights",
 ) -> None:
-    """Visualizes which bacteria the model attends to."""
+    """Visualizes which time bins the model attends to most."""
     fig, ax = plt.subplots(figsize=(12, 3))
 
-    # Sort by attention weight
     order = np.argsort(attention_weights)[::-1]
     sorted_weights = attention_weights[order]
 
-    labels = [str(track_ids[i]) if track_ids is not None else str(i) for i in order]
+    if bin_times_min is not None:
+        labels = [f"{bin_times_min[i]:.0f}m" for i in order]
+    else:
+        labels = [str(i) for i in order]
     n_show = min(30, len(sorted_weights))
 
     ax.bar(range(n_show), sorted_weights[:n_show], color="steelblue")
     ax.set_xticks(range(n_show))
     ax.set_xticklabels(labels[:n_show], rotation=45, fontsize=8)
-    ax.set_xlabel("Track ID", fontsize=12)
+    ax.set_xlabel("Time Bin", fontsize=12)
     ax.set_ylabel("Attention Weight", fontsize=12)
     ax.set_title(title, fontsize=14)
     fig.tight_layout()
@@ -122,44 +124,6 @@ def plot_tsne_embeddings(
     ax.set_ylabel("t-SNE 2", fontsize=12)
     ax.set_title(title, fontsize=14)
     ax.legend(fontsize=12, markerscale=3)
-    fig.tight_layout()
-    fig.savefig(save_path, dpi=150, bbox_inches="tight")
-    plt.close(fig)
-
-
-def plot_morphological_trajectory(
-    track_features: np.ndarray,
-    save_path: Path,
-    title: str = "Single Bacterium Feature Trajectory",
-) -> None:
-    """PCA projection of feature trajectory over time for one bacterium."""
-    from sklearn.decomposition import PCA
-
-    pca = PCA(n_components=2)
-    projected = pca.fit_transform(track_features.astype(np.float32))
-
-    fig, ax = plt.subplots(figsize=(8, 8))
-    times = np.arange(len(projected))
-    scatter = ax.scatter(
-        projected[:, 0],
-        projected[:, 1],
-        c=times,
-        cmap="viridis",
-        s=15,
-        alpha=0.7,
-    )
-    # Connect consecutive points
-    ax.plot(projected[:, 0], projected[:, 1], "k-", alpha=0.2, linewidth=0.5)
-    # Mark start and end
-    ax.scatter(*projected[0], c="green", s=100, marker="^", zorder=5, label="Start")
-    ax.scatter(*projected[-1], c="red", s=100, marker="v", zorder=5, label="End")
-
-    cbar = plt.colorbar(scatter, ax=ax)
-    cbar.set_label("Frame Index", fontsize=10)
-    ax.set_xlabel(f"PC1 ({pca.explained_variance_ratio_[0]:.1%} var)", fontsize=12)
-    ax.set_ylabel(f"PC2 ({pca.explained_variance_ratio_[1]:.1%} var)", fontsize=12)
-    ax.set_title(title, fontsize=14)
-    ax.legend(fontsize=10)
     fig.tight_layout()
     fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.close(fig)

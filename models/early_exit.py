@@ -10,8 +10,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim import LBFGS
 
-from .classifier import TemporalMILClassifier
-
 
 # ---------------------------------------------------------------------------
 # Result container
@@ -31,8 +29,7 @@ class EarlyExitResult:
     """Wall-clock experiment time (in seconds) at which the prediction was made."""
 
     prediction_history: List[Dict[str, Any]] = field(default_factory=list)
-    """Per-evaluation-step records: each dict contains at least
-    ``time_sec``, ``prediction``, ``confidence``."""
+    """Per-evaluation-step records."""
 
 
 # ---------------------------------------------------------------------------
@@ -46,20 +43,17 @@ class EarlyExitPolicy:
     produces a prediction whose softmax confidence exceeds
     *confidence_threshold* for *patience* consecutive evaluations (and we are
     past *min_time*), the policy halts and returns that prediction.
-
-    If *max_time* is reached without a confident halt, the last prediction is
-    returned.
     """
 
     def __init__(
         self,
-        model: TemporalMILClassifier,
+        model: nn.Module,
         eval_interval: float = 30.0,
         patience: int = 3,
         confidence_threshold: float = 0.85,
         min_time: float = 60.0,
         max_time: float = 3600.0,
-        temperature_scaler: Optional["TemperatureScaler"] = None,
+        temperature_scaler: Optional[TemperatureScaler] = None,
     ) -> None:
         self.model = model
         self.eval_interval = eval_interval
@@ -72,76 +66,45 @@ class EarlyExitPolicy:
     @torch.no_grad()
     def predict_with_early_exit(
         self,
-        experiment_features_dict: Dict[str, Any],
+        experiment_data: Dict[str, Any],
     ) -> EarlyExitResult:
         """Run the early-exit evaluation loop over an experiment.
 
-        ``experiment_features_dict`` must contain:
+        ``experiment_data`` must contain all keys expected by the
+        PopulationTemporalClassifier's forward method, plus
+        ``max_experiment_time_sec`` indicating the total duration.
 
-        * ``track_features``:  (1, N, T_max, 384) – full experiment features.
-        * ``track_mask``:      (1, N) – valid-track mask.
-        * ``seq_mask``:        (1, N, T_max) – per-frame validity mask.
-        * ``timestamps_sec``:  1-D array/list of timestamps (in seconds)
-          corresponding to each frame index along the T dimension.
-
-        The method evaluates the classifier at every ``eval_interval`` seconds
-        from ``timestamps_sec[0]`` to ``max_time`` (or the last timestamp),
-        progressively revealing more frames.
-
-        Returns:
-            An :class:`EarlyExitResult` with the final prediction.
+        The method progressively increases the time window and evaluates
+        the classifier at each ``eval_interval``.
         """
         self.model.eval()
 
-        track_features: torch.Tensor = experiment_features_dict["track_features"]
-        track_mask: torch.Tensor = experiment_features_dict["track_mask"]
-        seq_mask_full: torch.Tensor = experiment_features_dict["seq_mask"]
-        timestamps_sec: list[float] = list(experiment_features_dict["timestamps_sec"])
-
-        total_experiment_time = min(timestamps_sec[-1], self.max_time)
-        device = track_features.device
+        max_experiment_time = min(
+            experiment_data.get("max_experiment_time_sec", self.max_time),
+            self.max_time,
+        )
 
         prediction_history: List[Dict[str, Any]] = []
         consecutive_confident = 0
         last_confident_pred: Optional[int] = None
 
-        # Evaluation times.
         eval_time = self.eval_interval
-        while eval_time <= total_experiment_time:
-            # Determine how many frames are available up to eval_time.
-            num_frames = 0
-            for ts in timestamps_sec:
-                if ts <= eval_time:
-                    num_frames += 1
-                else:
-                    break
-
-            if num_frames == 0:
+        while eval_time <= max_experiment_time:
+            # The caller is responsible for constructing the batch_dict
+            # for the current eval_time. This policy just manages the
+            # halting logic.
+            batch_dict = experiment_data.get("batch_dict_fn", lambda t: {})(eval_time)
+            if not batch_dict:
                 eval_time += self.eval_interval
                 continue
 
-            # Slice features and masks up to the current time.
-            feats_slice = track_features[:, :, :num_frames, :]  # (1, N, t, 384)
-            seq_mask_slice = seq_mask_full[:, :, :num_frames]   # (1, N, t)
-            time_frac = torch.tensor(
-                [eval_time / self.max_time], device=device, dtype=track_features.dtype
-            )
-
-            batch_dict = {
-                "track_features": feats_slice,
-                "track_mask": track_mask,
-                "seq_mask": seq_mask_slice,
-                "time_fraction": time_frac,
-            }
-
             output = self.model(batch_dict)
-            logits = output["logits"]  # (1, 2)
+            logits = output["logits"]
 
-            # Optionally calibrate.
             if self.temperature_scaler is not None:
                 logits = self.temperature_scaler(logits)
 
-            probs = F.softmax(logits, dim=-1)  # (1, 2)
+            probs = F.softmax(logits, dim=-1)
             confidence, pred = probs.max(dim=-1)
             confidence_val = confidence.item()
             pred_val = int(pred.item())
@@ -150,11 +113,9 @@ class EarlyExitPolicy:
                 "time_sec": eval_time,
                 "prediction": pred_val,
                 "confidence": confidence_val,
-                "num_frames": num_frames,
             }
             prediction_history.append(step_record)
 
-            # Check halting criterion.
             if confidence_val >= self.confidence_threshold:
                 if last_confident_pred == pred_val:
                     consecutive_confident += 1
@@ -178,7 +139,6 @@ class EarlyExitPolicy:
 
             eval_time += self.eval_interval
 
-        # Reached max_time without confident halt – return last prediction.
         if prediction_history:
             last = prediction_history[-1]
             return EarlyExitResult(
@@ -188,7 +148,6 @@ class EarlyExitPolicy:
                 prediction_history=prediction_history,
             )
 
-        # Edge case: no evaluations were performed (e.g. experiment too short).
         return EarlyExitResult(
             prediction=-1,
             confidence=0.0,
@@ -202,11 +161,7 @@ class EarlyExitPolicy:
 # ---------------------------------------------------------------------------
 
 class TemperatureScaler(nn.Module):
-    """Platt-style temperature scaling for post-hoc calibration.
-
-    A single learnable temperature parameter is optimised on a held-out
-    validation set to minimise negative log-likelihood.
-    """
+    """Platt-style temperature scaling for post-hoc calibration."""
 
     def __init__(self, init_temperature: float = 1.5) -> None:
         super().__init__()
@@ -215,14 +170,6 @@ class TemperatureScaler(nn.Module):
         )
 
     def forward(self, logits: torch.Tensor) -> torch.Tensor:
-        """Scale logits by the learned temperature.
-
-        Args:
-            logits: (*, C) raw logits from the classifier.
-
-        Returns:
-            (*, C) temperature-scaled logits.
-        """
         return logits / self.temperature
 
     def fit(
@@ -232,26 +179,11 @@ class TemperatureScaler(nn.Module):
         lr: float = 0.01,
         max_iter: int = 50,
     ) -> float:
-        """Optimise temperature to minimise NLL on validation data.
-
-        Args:
-            val_logits: (N, C) logits predicted by the classifier on the
-                validation set (detached, on the same device as this module).
-            val_labels: (N,) ground-truth class indices.
-            lr: Learning rate for L-BFGS.
-            max_iter: Maximum number of L-BFGS iterations.
-
-        Returns:
-            The final NLL loss value.
-        """
         val_logits = val_logits.detach()
         val_labels = val_labels.detach().long()
-
-        # Reset temperature before fitting.
         self.temperature.data.fill_(1.5)
 
         optimizer = LBFGS([self.temperature], lr=lr, max_iter=max_iter)
-
         final_loss = torch.tensor(0.0)
 
         def closure() -> torch.Tensor:
@@ -272,14 +204,7 @@ class TemperatureScaler(nn.Module):
 # ---------------------------------------------------------------------------
 
 class LearnedHaltingPolicy(nn.Module):
-    """LSTM-based learned halting policy.
-
-    At each evaluation timestep the network receives a feature vector
-
-        [logit_0, logit_1, confidence, time_frac, delta_conf]
-
-    and produces a halt probability via an LSTM followed by a sigmoid head.
-    """
+    """LSTM-based learned halting policy."""
 
     def __init__(
         self,
@@ -303,18 +228,8 @@ class LearnedHaltingPolicy(nn.Module):
         features_seq: torch.Tensor,
         hx: Optional[tuple[torch.Tensor, torch.Tensor]] = None,
     ) -> tuple[torch.Tensor, tuple[torch.Tensor, torch.Tensor]]:
-        """
-        Args:
-            features_seq: (B, T_eval, 5) sequence of per-timestep features:
-                ``[logit_0, logit_1, confidence, time_frac, delta_conf]``.
-            hx: optional initial LSTM hidden state ``(h_0, c_0)``.
-
-        Returns:
-            halt_probs: (B, T_eval) halt probability at each evaluation step.
-            hx:         final LSTM hidden state (for incremental inference).
-        """
-        lstm_out, hx = self.lstm(features_seq, hx)  # (B, T_eval, hidden_dim)
-        halt_probs = self.halt_head(lstm_out).squeeze(-1)  # (B, T_eval)
+        lstm_out, hx = self.lstm(features_seq, hx)
+        halt_probs = self.halt_head(lstm_out).squeeze(-1)
         return halt_probs, hx
 
     @staticmethod
@@ -322,23 +237,10 @@ class LearnedHaltingPolicy(nn.Module):
         logits_seq: torch.Tensor,
         time_fracs: torch.Tensor,
     ) -> torch.Tensor:
-        """Build the 5-D input features from raw classifier outputs.
-
-        Args:
-            logits_seq: (B, T_eval, 2) classifier logits at each eval step.
-            time_fracs: (B, T_eval) normalised time fraction at each step.
-
-        Returns:
-            (B, T_eval, 5) feature tensor.
-        """
-        probs = F.softmax(logits_seq, dim=-1)            # (B, T, 2)
-        confidence, _ = probs.max(dim=-1)                 # (B, T)
-
-        # Delta confidence: conf[t] - conf[t-1], zero-padded at t=0.
+        probs = F.softmax(logits_seq, dim=-1)
+        confidence, _ = probs.max(dim=-1)
         delta_conf = torch.zeros_like(confidence)
         delta_conf[:, 1:] = confidence[:, 1:] - confidence[:, :-1]
-
-        # Stack: [logit_0, logit_1, confidence, time_frac, delta_conf]
         features = torch.stack(
             [
                 logits_seq[:, :, 0],
@@ -348,5 +250,5 @@ class LearnedHaltingPolicy(nn.Module):
                 delta_conf,
             ],
             dim=-1,
-        )  # (B, T, 5)
+        )
         return features

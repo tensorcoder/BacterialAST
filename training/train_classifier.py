@@ -1,4 +1,4 @@
-"""Stage 4: Train the Temporal MIL classifier on pre-extracted features."""
+"""Stage 4: Train the Population Temporal classifier on pre-extracted features."""
 
 from __future__ import annotations
 
@@ -16,8 +16,8 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 from ..config import ClassifierConfig, FullConfig
-from ..data.dataset import TemporalMILDataset, build_experiment_list, create_splits
-from ..models.classifier import TemporalMILClassifier
+from ..data.dataset import PopulationTemporalDataset, build_experiment_list, create_splits
+from ..models.classifier import PopulationTemporalClassifier
 
 logger = logging.getLogger(__name__)
 
@@ -61,23 +61,6 @@ class TimeAwareLoss(nn.Module):
         return (ce * time_weight).mean()
 
 
-class TemporalConsistencyLoss(nn.Module):
-    """Encourages predictions to be consistent across adjacent time windows."""
-
-    def forward(
-        self,
-        logits: torch.Tensor,
-        labels: torch.Tensor,
-        prev_logits: torch.Tensor | None,
-    ) -> torch.Tensor:
-        if prev_logits is None:
-            return torch.tensor(0.0, device=logits.device)
-        # Penalize if current prediction is worse than previous
-        curr_ce = F.cross_entropy(logits, labels, reduction="none")
-        prev_ce = F.cross_entropy(prev_logits, labels, reduction="none")
-        return F.relu(curr_ce - prev_ce).mean()
-
-
 class AttentionEntropyRegularizer(nn.Module):
     """Encourages attention weights to be neither too uniform nor too peaked."""
 
@@ -88,23 +71,30 @@ class AttentionEntropyRegularizer(nn.Module):
     def forward(
         self,
         attention_weights: torch.Tensor,
-        track_mask: torch.Tensor,
+        bin_mask: torch.Tensor,
     ) -> torch.Tensor:
-        # Compute entropy of attention weights
         eps = 1e-8
         entropy = -(attention_weights * torch.log(attention_weights + eps)).sum(dim=-1)
-
-        # Max possible entropy (uniform over valid tracks)
-        n_valid = track_mask.float().sum(dim=-1)
+        n_valid = bin_mask.float().sum(dim=-1)
         max_entropy = torch.log(n_valid + eps)
-
-        # Penalize deviation from target ratio
         ratio = entropy / (max_entropy + eps)
         return ((ratio - self.target_ratio) ** 2).mean()
 
 
+def _batch_to_device(batch: dict, device: torch.device) -> dict:
+    """Move batch tensors to device."""
+    return {
+        "bin_features": batch["bin_features"].to(device, non_blocking=True),
+        "bin_mask": batch["bin_mask"].to(device, non_blocking=True),
+        "crop_mask": batch["crop_mask"].to(device, non_blocking=True),
+        "bin_times": batch["bin_times"].to(device, non_blocking=True),
+        "bin_counts": batch["bin_counts"].to(device, non_blocking=True),
+        "time_fraction": batch["time_fraction"].to(device, non_blocking=True),
+    }
+
+
 def train_classifier(config: FullConfig) -> Path:
-    """Train the Temporal MIL classifier and return path to best checkpoint."""
+    """Train the Population Temporal classifier and return path to best checkpoint."""
     cfg = config.classifier
     device = torch.device(config.device)
 
@@ -121,9 +111,8 @@ def train_classifier(config: FullConfig) -> Path:
     )
     train_exps, val_exps, test_exps = create_splits(
         experiments,
-        train_ratio=config.data_split.train_ratio,
+        data_root=config.paths.data_root,
         val_ratio=config.data_split.val_ratio,
-        test_ratio=config.data_split.test_ratio,
         seed=config.data_split.random_seed,
     )
 
@@ -132,24 +121,22 @@ def train_classifier(config: FullConfig) -> Path:
     )
 
     # Datasets
-    train_dataset = TemporalMILDataset(
+    train_dataset = PopulationTemporalDataset(
         feature_dir=config.paths.features_dir,
         experiments=train_exps,
+        time_bin_width_sec=cfg.time_bin_width_sec,
         time_windows_sec=cfg.time_windows,
         time_window_weights=cfg.time_window_weights,
-        max_tracks=cfg.max_tracks,
-        max_frames_per_track=cfg.max_frames_per_track,
-        frame_subsample_rate=cfg.frame_subsample_rate,
+        max_crops_per_bin=cfg.max_crops_per_bin,
         feature_dim=cfg.feature_dim,
         random_window=True,
     )
-    val_dataset = TemporalMILDataset(
+    val_dataset = PopulationTemporalDataset(
         feature_dir=config.paths.features_dir,
         experiments=val_exps,
+        time_bin_width_sec=cfg.time_bin_width_sec,
         time_windows_sec=cfg.time_windows,
-        max_tracks=cfg.max_tracks,
-        max_frames_per_track=cfg.max_frames_per_track,
-        frame_subsample_rate=cfg.frame_subsample_rate,
+        max_crops_per_bin=cfg.max_crops_per_bin,
         feature_dim=cfg.feature_dim,
         random_window=False,
     )
@@ -171,19 +158,16 @@ def train_classifier(config: FullConfig) -> Path:
     )
 
     # Model
-    model = TemporalMILClassifier(
+    model = PopulationTemporalClassifier(
         feature_dim=cfg.feature_dim,
         temporal_hidden_dim=cfg.temporal_hidden_dim,
         temporal_num_layers=cfg.temporal_num_layers,
         temporal_num_heads=cfg.temporal_num_heads,
         temporal_ffn_dim=cfg.temporal_ffn_dim,
-        mil_hidden_dim=cfg.mil_hidden_dim,
-        population_feat_dim=cfg.population_feat_dim,
         classifier_hidden_dim=cfg.classifier_hidden_dim,
         num_classes=cfg.num_classes,
         dropout=cfg.dropout,
-        delta_scales=cfg.delta_scales,
-        micro_batch_size=cfg.micro_batch_size,
+        max_count_normalizer=float(cfg.max_crops_per_bin),
     ).to(device)
 
     logger.info(
@@ -195,7 +179,6 @@ def train_classifier(config: FullConfig) -> Path:
         alpha=cfg.time_loss_alpha,
         label_smoothing=cfg.label_smoothing,
     ).to(device)
-    consistency_loss = TemporalConsistencyLoss()
     entropy_reg = AttentionEntropyRegularizer()
 
     # Optimizer
@@ -233,25 +216,17 @@ def train_classifier(config: FullConfig) -> Path:
         optimizer.zero_grad()
 
         for batch_idx, batch in enumerate(pbar):
-            # Move to device
-            batch_gpu = {
-                "track_features": batch["track_features"].to(device, non_blocking=True),
-                "track_mask": batch["track_mask"].to(device, non_blocking=True),
-                "seq_mask": batch["seq_mask"].to(device, non_blocking=True),
-                "time_fraction": batch["time_fraction"].to(device, non_blocking=True),
-            }
+            batch_gpu = _batch_to_device(batch, device)
             labels = batch["label"].to(device, non_blocking=True)
 
             with torch.amp.autocast("cuda"):
                 output = model(batch_gpu)
                 logits = output["logits"]
 
-                # Time-aware loss
                 loss_main = time_loss(logits, labels, batch_gpu["time_fraction"])
 
-                # Attention entropy regularizer
                 loss_entropy = entropy_reg(
-                    output["attention_weights"], batch_gpu["track_mask"]
+                    output["attention_weights"], batch_gpu["bin_mask"]
                 )
 
                 loss = (
@@ -331,7 +306,7 @@ def train_classifier(config: FullConfig) -> Path:
 
 
 def validate(
-    model: TemporalMILClassifier,
+    model: PopulationTemporalClassifier,
     val_loader: DataLoader,
     loss_fn: TimeAwareLoss,
     device: torch.device,
@@ -345,12 +320,7 @@ def validate(
 
     with torch.no_grad():
         for batch in val_loader:
-            batch_gpu = {
-                "track_features": batch["track_features"].to(device, non_blocking=True),
-                "track_mask": batch["track_mask"].to(device, non_blocking=True),
-                "seq_mask": batch["seq_mask"].to(device, non_blocking=True),
-                "time_fraction": batch["time_fraction"].to(device, non_blocking=True),
-            }
+            batch_gpu = _batch_to_device(batch, device)
             labels = batch["label"].to(device, non_blocking=True)
 
             with torch.amp.autocast("cuda"):

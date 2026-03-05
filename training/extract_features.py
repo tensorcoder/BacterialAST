@@ -32,7 +32,6 @@ class HDF5InferenceDataset(Dataset):
     def __getitem__(self, idx: int) -> torch.Tensor:
         with h5py.File(self.h5_path, "r") as f:
             crop = f["crops"][idx]  # (96, 96) uint8
-        # Normalize
         tensor = torch.from_numpy(crop.astype(np.float32) / 255.0)
         tensor = (tensor - self.mean) / self.std
         return tensor.unsqueeze(0)  # (1, 96, 96)
@@ -75,20 +74,12 @@ def extract_features_for_experiment(
 
     features = np.concatenate(all_features, axis=0)  # (N, 384) float16
 
-    # Save as npz
+    # Save with timestamps (not frame_idx or track_id)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(
         output_path,
         features=features,
-        frame_idx=metadata["frame_idx"],
-        track_id=metadata["track_id"] if "track_id" in metadata.dtype.names else np.zeros(len(metadata), dtype=np.int32),
-        detection_id=metadata["detection_id"],
-        cx=metadata["cx"],
-        cy=metadata["cy"],
-        w=metadata["w"],
-        h=metadata["h"],
-        angle=metadata["angle"],
-        confidence=metadata["confidence"],
+        timestamps=metadata["timestamp"],
     )
     logger.debug(f"Saved {len(features)} features to {output_path}")
 
@@ -109,7 +100,6 @@ def extract_all_features(
     """Extract features for all experiments using pretrained backbone."""
     device = torch.device(device_str)
 
-    # Load backbone
     backbone = ViTSmall(
         img_size=img_size,
         in_channels=1,
@@ -129,7 +119,6 @@ def extract_all_features(
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Find all HDF5 files
     h5_files = sorted(Path(preprocessed_dir).glob("**/*.h5"))
     logger.info(f"Found {len(h5_files)} experiment HDF5 files")
 

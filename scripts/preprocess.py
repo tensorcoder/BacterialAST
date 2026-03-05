@@ -1,13 +1,13 @@
 """CLI entry point for Stage 1: Preprocessing pipeline.
 
-Runs YOLO-OBB detection, crop extraction, and IoU tracking on all experiments.
+Runs YOLO-OBB detection on all experiments, filtering for in-focus bacteria
+and storing crops with timestamps in HDF5 format.
 
 Usage:
     python -m ast_classifier.scripts.preprocess \
         --data-root /path/to/MainFolder \
         --output-dir /path/to/preprocessed \
-        --yolo-weights /path/to/yolo11-obb.pt \
-        --num-workers 4
+        --yolo-weights /path/to/yolo11-obb.pt
 """
 
 from __future__ import annotations
@@ -16,14 +16,9 @@ import argparse
 import logging
 from pathlib import Path
 
-import pandas as pd
 from tqdm import tqdm
 
-import h5py
-import numpy as np
-
-from ..data.preprocessing import YOLOCropExtractor, HDF5CropWriter, extract_experiment, METADATA_DTYPE
-from ..data.tracking import BacteriaTracker
+from ..data.preprocessing import extract_experiment
 
 logging.basicConfig(
     level=logging.INFO,
@@ -33,13 +28,22 @@ logger = logging.getLogger(__name__)
 
 
 def find_experiments(data_root: Path) -> list[tuple[str, Path, int]]:
-    """Discover all experiment directories.
+    """Discover all experiment directories including Test/ folder.
 
     Returns list of (experiment_id, images_dir, label).
+    Labels for Test/ experiments are inferred from EC number matching
+    against the Resistant/Susceptible folders.
     """
+    import re
+
     experiments = []
-    for label_name, label_int in [("Susceptible", 0), ("Resistant", 1)]:
+    ec_label_map: dict[str, int] = {}
+
+    # Scan Resistant and Susceptible folders
+    for label_name, label_int in [("susceptible", 0), ("resistant", 1)]:
         label_dir = data_root / label_name
+        if not label_dir.exists():
+            label_dir = data_root / label_name.capitalize()
         if not label_dir.exists():
             logger.warning(f"Label directory not found: {label_dir}")
             continue
@@ -53,6 +57,32 @@ def find_experiments(data_root: Path) -> list[tuple[str, Path, int]]:
                 continue
             experiments.append((exp_dir.name, images_dir, label_int))
 
+            m = re.match(r"^(EC\d+)", exp_dir.name, re.IGNORECASE)
+            if m:
+                ec_label_map[m.group(1).upper()] = label_int
+
+    # Scan Test folder and infer labels from EC number
+    for name in ["Test", "test"]:
+        test_dir = data_root / name
+        if not test_dir.exists():
+            continue
+        for exp_dir in sorted(test_dir.iterdir()):
+            if not exp_dir.is_dir():
+                continue
+            images_dir = exp_dir / "images"
+            if not images_dir.exists():
+                logger.warning(f"No images dir in {exp_dir}")
+                continue
+            m = re.match(r"^(EC\d+)", exp_dir.name, re.IGNORECASE)
+            ec_num = m.group(1).upper() if m else None
+            if ec_num is None or ec_num not in ec_label_map:
+                logger.warning(
+                    f"Cannot determine label for Test experiment {exp_dir.name}, skipping."
+                )
+                continue
+            experiments.append((exp_dir.name, images_dir, ec_label_map[ec_num]))
+        break  # only process one test dir
+
     return experiments
 
 
@@ -63,41 +93,26 @@ def preprocess_all(
     crop_size: int = 96,
     yolo_confidence: float = 0.5,
     yolo_batch_size: int = 16,
-    iou_threshold: float = 0.3,
-    max_track_age: int = 15,
-    min_track_hits: int = 5,
-    min_track_length: int = 150,
+    focused_class_name: str = "Focused",
     device: str = "cuda:0",
 ) -> None:
-    """Run full preprocessing pipeline on all experiments."""
+    """Run preprocessing pipeline on all experiments."""
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Discover experiments
     experiments = find_experiments(data_root)
     logger.info(f"Found {len(experiments)} experiments")
 
-    # Initialize tracker
-    tracker = BacteriaTracker(
-        iou_threshold=iou_threshold,
-        max_age=max_track_age,
-        min_hits=min_track_hits,
-        min_track_length=min_track_length,
-    )
-
-    # Process each experiment
     for exp_id, images_dir, label in tqdm(experiments, desc="Processing experiments"):
         h5_path = output_dir / f"{exp_id}.h5"
-        csv_path = output_dir / f"{exp_id}.csv"
 
-        if h5_path.exists() and csv_path.exists():
+        if h5_path.exists():
             logger.info(f"Skipping {exp_id} (already processed)")
             continue
 
         logger.info(f"Processing {exp_id} ({images_dir})")
 
         try:
-            # Stage 1a: YOLO detection + crop extraction → HDF5
             extract_experiment(
                 image_dir=images_dir,
                 output_dir=output_dir,
@@ -105,60 +120,9 @@ def preprocess_all(
                 batch_size=yolo_batch_size,
                 crop_size=crop_size,
                 conf_threshold=yolo_confidence,
+                focused_class_name=focused_class_name,
                 device=device,
             )
-
-            # Read metadata from HDF5 to build DataFrame for tracking
-            with h5py.File(h5_path, "r") as f:
-                metadata = f["metadata"][:]
-
-            if len(metadata) == 0:
-                logger.warning(f"No detections in {exp_id}")
-                continue
-
-            metadata_df = pd.DataFrame({
-                "frame_idx": metadata["frame_idx"],
-                "detection_id": metadata["detection_id"],
-                "cx": metadata["cx"],
-                "cy": metadata["cy"],
-                "w": metadata["w"],
-                "h": metadata["h"],
-                "angle": metadata["angle"],
-                "confidence": metadata["confidence"],
-            })
-
-            # Stage 1b: IoU tracking
-            tracked_df, track_summaries = tracker.process_experiment(metadata_df)
-
-            # Add label and experiment_id
-            tracked_df["experiment_id"] = exp_id
-            tracked_df["label"] = label
-
-            # Save tracked metadata CSV
-            tracked_df.to_csv(csv_path, index=False)
-
-            # Update HDF5 metadata with track_id
-            # (Re-open and add track_id to the structured array)
-            with h5py.File(h5_path, "a") as f:
-                if "track_id" not in f:
-                    track_ids = tracked_df["track_id"].values.astype(np.int32)
-                    f.create_dataset("track_ids", data=track_ids)
-                # Also update the metadata structured array to include track_id
-                old_meta = f["metadata"][:]
-                new_dtype = np.dtype(list(METADATA_DTYPE.descr) + [("track_id", np.int32)])
-                new_meta = np.zeros(len(old_meta), dtype=new_dtype)
-                for name in METADATA_DTYPE.names:
-                    new_meta[name] = old_meta[name]
-                new_meta["track_id"] = tracked_df["track_id"].values.astype(np.int32)
-                del f["metadata"]
-                f.create_dataset("metadata", data=new_meta)
-
-            n_tracks = len(track_summaries)
-            logger.info(
-                f"  {exp_id}: {len(metadata_df)} detections, "
-                f"{n_tracks} valid tracks"
-            )
-
         except Exception as e:
             logger.error(f"Failed to process {exp_id}: {e}", exc_info=True)
             continue
@@ -174,13 +138,13 @@ def main() -> None:
         "--data-root",
         type=Path,
         required=True,
-        help="Path to MainFolder containing Resistant/ and Susceptible/ dirs",
+        help="Path to folder containing resistant/ and susceptible/ dirs",
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
         required=True,
-        help="Output directory for preprocessed HDF5 and CSV files",
+        help="Output directory for preprocessed HDF5 files",
     )
     parser.add_argument(
         "--yolo-weights",
@@ -191,10 +155,7 @@ def main() -> None:
     parser.add_argument("--crop-size", type=int, default=96)
     parser.add_argument("--yolo-confidence", type=float, default=0.5)
     parser.add_argument("--yolo-batch-size", type=int, default=16)
-    parser.add_argument("--iou-threshold", type=float, default=0.3)
-    parser.add_argument("--max-track-age", type=int, default=15)
-    parser.add_argument("--min-track-hits", type=int, default=5)
-    parser.add_argument("--min-track-length", type=int, default=150)
+    parser.add_argument("--focused-class-name", type=str, default="Focused")
     parser.add_argument("--device", type=str, default="cuda:0")
 
     args = parser.parse_args()
@@ -206,10 +167,7 @@ def main() -> None:
         crop_size=args.crop_size,
         yolo_confidence=args.yolo_confidence,
         yolo_batch_size=args.yolo_batch_size,
-        iou_threshold=args.iou_threshold,
-        max_track_age=args.max_track_age,
-        min_track_hits=args.min_track_hits,
-        min_track_length=args.min_track_length,
+        focused_class_name=args.focused_class_name,
         device=args.device,
     )
 

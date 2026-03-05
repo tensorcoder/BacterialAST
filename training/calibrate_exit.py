@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
@@ -12,10 +12,10 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from ..config import EarlyExitConfig, FullConfig
-from ..data.dataset import TemporalMILDataset, build_experiment_list, create_splits
-from ..models.classifier import TemporalMILClassifier
-from ..models.early_exit import EarlyExitResult, TemperatureScaler
+from ..config import FullConfig
+from ..data.dataset import PopulationTemporalDataset, build_experiment_list, create_splits
+from ..models.classifier import PopulationTemporalClassifier
+from ..models.early_exit import TemperatureScaler
 
 logger = logging.getLogger(__name__)
 
@@ -28,14 +28,25 @@ class CalibrationResult:
     per_window_predictions: dict[float, dict]  # {time: {labels, probs, preds}}
 
 
+def _batch_to_device(batch: dict, device: torch.device) -> dict:
+    """Move batch tensors to device."""
+    return {
+        "bin_features": batch["bin_features"].to(device, non_blocking=True),
+        "bin_mask": batch["bin_mask"].to(device, non_blocking=True),
+        "crop_mask": batch["crop_mask"].to(device, non_blocking=True),
+        "bin_times": batch["bin_times"].to(device, non_blocking=True),
+        "bin_counts": batch["bin_counts"].to(device, non_blocking=True),
+        "time_fraction": batch["time_fraction"].to(device, non_blocking=True),
+    }
+
+
 def evaluate_at_fixed_times(
-    model: TemporalMILClassifier,
+    model: PopulationTemporalClassifier,
     experiments: list,
     feature_dir: Path,
     time_windows: list[float],
-    max_tracks: int,
-    max_frames: int,
-    subsample_rate: int,
+    time_bin_width_sec: float,
+    max_crops_per_bin: int,
     feature_dim: int,
     device: torch.device,
     batch_size: int = 16,
@@ -46,13 +57,12 @@ def evaluate_at_fixed_times(
     results = {}
 
     for window_sec in tqdm(time_windows, desc="Evaluating time windows"):
-        dataset = TemporalMILDataset(
+        dataset = PopulationTemporalDataset(
             feature_dir=feature_dir,
             experiments=experiments,
+            time_bin_width_sec=time_bin_width_sec,
             time_windows_sec=[window_sec],
-            max_tracks=max_tracks,
-            max_frames_per_track=max_frames,
-            frame_subsample_rate=subsample_rate,
+            max_crops_per_bin=max_crops_per_bin,
             feature_dim=feature_dim,
             random_window=False,
         )
@@ -66,12 +76,7 @@ def evaluate_at_fixed_times(
 
         with torch.no_grad():
             for batch in loader:
-                batch_gpu = {
-                    "track_features": batch["track_features"].to(device),
-                    "track_mask": batch["track_mask"].to(device),
-                    "seq_mask": batch["seq_mask"].to(device),
-                    "time_fraction": batch["time_fraction"].to(device),
-                }
+                batch_gpu = _batch_to_device(batch, device)
                 with torch.amp.autocast("cuda"):
                     output = model(batch_gpu)
 
@@ -103,7 +108,6 @@ def find_pareto_optimal(
     configs = []
     for patience in patience_range:
         for threshold in threshold_range:
-            # Simulate early exit for each experiment
             exit_times = []
             correct = []
 
@@ -112,7 +116,7 @@ def find_pareto_optimal(
                 consecutive = 0
                 exited = False
 
-                for t_idx, t in enumerate(sorted(time_windows)):
+                for t in sorted(time_windows):
                     data = per_window[t]
                     prob = data["probs"][exp_idx]
                     label = data["labels"][exp_idx]
@@ -131,7 +135,6 @@ def find_pareto_optimal(
                         break
 
                 if not exited:
-                    # Force prediction at last window
                     last_t = max(time_windows)
                     last_data = per_window[last_t]
                     pred = int(last_data["probs"][exp_idx] > 0.5)
@@ -150,7 +153,7 @@ def find_pareto_optimal(
                 "median_exit_time": median_time,
             })
 
-    # Find Pareto front (maximize accuracy, minimize time)
+    # Find Pareto front
     pareto = []
     for c in configs:
         dominated = False
@@ -174,7 +177,6 @@ def find_pareto_optimal(
             best = min(valid, key=lambda x: x["mean_exit_time"])
             optimal[target_acc] = best
         else:
-            # Fall back to highest accuracy config
             best = max(configs, key=lambda x: x["accuracy"])
             optimal[target_acc] = best
 
@@ -189,19 +191,15 @@ def calibrate_early_exit(config: FullConfig) -> CalibrationResult:
 
     # Load trained classifier
     ckpt_path = Path(config.paths.checkpoints_dir) / "classifier" / "best_classifier.pt"
-    model = TemporalMILClassifier(
+    model = PopulationTemporalClassifier(
         feature_dim=clf_cfg.feature_dim,
         temporal_hidden_dim=clf_cfg.temporal_hidden_dim,
         temporal_num_layers=clf_cfg.temporal_num_layers,
         temporal_num_heads=clf_cfg.temporal_num_heads,
         temporal_ffn_dim=clf_cfg.temporal_ffn_dim,
-        mil_hidden_dim=clf_cfg.mil_hidden_dim,
-        population_feat_dim=clf_cfg.population_feat_dim,
         classifier_hidden_dim=clf_cfg.classifier_hidden_dim,
         num_classes=clf_cfg.num_classes,
         dropout=clf_cfg.dropout,
-        delta_scales=clf_cfg.delta_scales,
-        micro_batch_size=clf_cfg.micro_batch_size,
     ).to(device)
 
     checkpoint = torch.load(ckpt_path, map_location=device, weights_only=True)
@@ -214,6 +212,7 @@ def calibrate_early_exit(config: FullConfig) -> CalibrationResult:
     )
     _, val_exps, _ = create_splits(
         experiments,
+        data_root=config.paths.data_root,
         seed=config.data_split.random_seed,
     )
 
@@ -232,9 +231,8 @@ def calibrate_early_exit(config: FullConfig) -> CalibrationResult:
         experiments=val_exps,
         feature_dir=config.paths.features_dir,
         time_windows=eval_times,
-        max_tracks=clf_cfg.max_tracks,
-        max_frames=clf_cfg.max_frames_per_track,
-        subsample_rate=clf_cfg.frame_subsample_rate,
+        time_bin_width_sec=clf_cfg.time_bin_width_sec,
+        max_crops_per_bin=clf_cfg.max_crops_per_bin,
         feature_dim=clf_cfg.feature_dim,
         device=device,
     )
@@ -242,7 +240,6 @@ def calibrate_early_exit(config: FullConfig) -> CalibrationResult:
     # Temperature scaling
     logger.info("Fitting temperature scaling...")
     temp_scaler = TemperatureScaler().to(device)
-    # Use logits from the latest time window for calibration
     last_t = max(eval_times)
     temp_scaler.fit(
         per_window[last_t]["logits"].to(device),

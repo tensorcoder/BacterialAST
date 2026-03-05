@@ -9,7 +9,6 @@ from typing import Callable, Optional
 
 import h5py
 import numpy as np
-import pandas as pd
 import torch
 from PIL import Image
 from torch.utils.data import Dataset
@@ -43,7 +42,6 @@ class DINOCropDataset(Dataset):
                 n_crops = f["crops"].shape[0]
             if n_crops == 0:
                 continue
-            # Cap per experiment and sample uniformly
             indices = list(range(n_crops))
             if n_crops > self.max_crops:
                 indices = sorted(random.sample(indices, self.max_crops))
@@ -64,96 +62,9 @@ class DINOCropDataset(Dataset):
             global_crops, local_crops = self.transform(image)
             return global_crops, local_crops
 
-        # Fallback: return single tensor
         arr = np.array(image, dtype=np.float32) / 255.0
         tensor = torch.from_numpy(arr).unsqueeze(0)  # (1, 96, 96)
         return [tensor, tensor], []
-
-
-class TemporalPairDataset(Dataset):
-    """Yields pairs of the same tracked bacterium at different timepoints
-    for temporal contrastive learning (DynaCLR-style).
-    """
-
-    def __init__(
-        self,
-        hdf5_dir: Path,
-        track_csv_dir: Path,
-        tau_range: tuple[int, int] = (5, 150),
-        transform: Optional[Callable] = None,
-        max_pairs_per_experiment: int = 2000,
-    ):
-        self.hdf5_dir = Path(hdf5_dir)
-        self.tau_range = tau_range
-        self.transform = transform
-
-        # Build index of valid pairs
-        self.pairs: list[tuple[Path, int, int]] = []  # (h5_path, idx_t, idx_t_tau)
-        self._build_pairs(track_csv_dir, max_pairs_per_experiment)
-
-    def _build_pairs(
-        self, track_csv_dir: Path, max_pairs: int
-    ) -> None:
-        track_csvs = sorted(Path(track_csv_dir).glob("**/*.csv"))
-        for csv_path in track_csvs:
-            df = pd.read_csv(csv_path)
-            if "track_id" not in df.columns:
-                continue
-
-            h5_name = csv_path.stem + ".h5"
-            h5_path = self.hdf5_dir / h5_name
-            if not h5_path.exists():
-                # Try finding it in subdirectories
-                matches = list(self.hdf5_dir.glob(f"**/{h5_name}"))
-                if not matches:
-                    continue
-                h5_path = matches[0]
-
-            experiment_pairs = []
-            for track_id, group in df.groupby("track_id"):
-                group = group.sort_values("frame_idx").reset_index(drop=True)
-                if len(group) < self.tau_range[0] + 1:
-                    continue
-
-                # Sample pairs from this track
-                for _ in range(min(20, len(group))):
-                    t_idx = random.randint(0, len(group) - self.tau_range[0] - 1)
-                    tau = random.randint(
-                        self.tau_range[0],
-                        min(self.tau_range[1], len(group) - t_idx - 1),
-                    )
-                    # These are row indices in the dataframe, map to HDF5 indices
-                    # The detection_id column maps to HDF5 row index
-                    idx_t = group.iloc[t_idx].name  # original df index
-                    idx_t_tau = group.iloc[t_idx + tau].name
-                    experiment_pairs.append((h5_path, int(idx_t), int(idx_t_tau)))
-
-            if len(experiment_pairs) > max_pairs:
-                experiment_pairs = random.sample(experiment_pairs, max_pairs)
-            self.pairs.extend(experiment_pairs)
-
-    def __len__(self) -> int:
-        return len(self.pairs)
-
-    def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
-        h5_path, idx_t, idx_t_tau = self.pairs[idx]
-        with h5py.File(h5_path, "r") as f:
-            crop_t = f["crops"][idx_t]  # (96, 96) uint8
-            crop_t_tau = f["crops"][idx_t_tau]
-
-        img_t = Image.fromarray(crop_t, mode="L")
-        img_tau = Image.fromarray(crop_t_tau, mode="L")
-
-        if self.transform is not None:
-            # Use a simple single-crop transform for contrastive pairs
-            t_t = self.transform(img_t)
-            t_tau = self.transform(img_tau)
-            return t_t, t_tau
-
-        # Fallback
-        t_t = torch.from_numpy(crop_t.astype(np.float32) / 255.0).unsqueeze(0)
-        t_tau = torch.from_numpy(crop_t_tau.astype(np.float32) / 255.0).unsqueeze(0)
-        return t_t, t_tau
 
 
 @dataclass
@@ -161,37 +72,38 @@ class ExperimentMeta:
     experiment_id: str
     label: int  # 0=susceptible, 1=resistant
     features_path: Path
-    antibiotic_id: str = ""
-    dosage: str = ""
 
 
-class TemporalMILDataset(Dataset):
-    """Main dataset for Stage 4: Temporal MIL classifier training.
+class PopulationTemporalDataset(Dataset):
+    """Main dataset for classifier training using population-level temporal analysis.
 
-    Each sample is one (experiment, time_window) pair containing
-    pre-extracted feature sequences for all tracked bacteria.
+    Each sample is one (experiment, time_window) pair. For the selected time
+    window, crops are binned by timestamp into fixed-width time bins.  Each bin
+    contains the pre-extracted backbone features for all focused bacteria
+    detected in that time interval.
+
+    The model receives per-bin feature tensors and learns how the population
+    distribution shifts over the course of the experiment.
     """
 
     def __init__(
         self,
         feature_dir: Path,
         experiments: list[ExperimentMeta],
+        time_bin_width_sec: float = 120.0,
         time_windows_sec: list[float] | None = None,
         time_window_weights: list[float] | None = None,
-        max_tracks: int = 64,
-        max_frames_per_track: int = 512,
-        frame_subsample_rate: int = 5,
+        max_crops_per_bin: int = 256,
         feature_dim: int = 384,
-        fps: float = 5.0,
+        max_experiment_sec: float = 3600.0,
         random_window: bool = True,
     ):
         self.feature_dir = Path(feature_dir)
         self.experiments = experiments
-        self.max_tracks = max_tracks
-        self.max_frames = max_frames_per_track
-        self.subsample_rate = frame_subsample_rate
+        self.time_bin_width = time_bin_width_sec
+        self.max_crops_per_bin = max_crops_per_bin
         self.feature_dim = feature_dim
-        self.fps = fps
+        self.max_experiment_sec = max_experiment_sec
         self.random_window = random_window
 
         if time_windows_sec is None:
@@ -204,20 +116,16 @@ class TemporalMILDataset(Dataset):
         else:
             self.window_weights = time_window_weights
 
-        # Normalize weights
         total = sum(self.window_weights)
         self.window_weights = [w / total for w in self.window_weights]
 
         if random_window:
-            # During training: one sample per experiment, window sampled randomly
             self.samples = [(exp, None) for exp in self.experiments]
         else:
-            # During eval: all windows for each experiment
             self.samples = [
                 (exp, tw) for exp in self.experiments for tw in self.time_windows
             ]
 
-        # Cache loaded features
         self._cache: dict[str, dict] = {}
 
     def _load_features(self, exp: ExperimentMeta) -> dict:
@@ -226,14 +134,17 @@ class TemporalMILDataset(Dataset):
 
         npz_path = self.feature_dir / f"{exp.experiment_id}.npz"
         if not npz_path.exists():
-            # Try with path from experiment meta
             npz_path = exp.features_path
 
         data = np.load(npz_path)
+        # Timestamps are relative to experiment start (seconds from first frame)
+        timestamps = data["timestamps"].astype(np.float64)
+        t_start = timestamps.min()
+        relative_timestamps = timestamps - t_start
+
         result = {
             "features": data["features"],  # (N, 384) float16
-            "frame_idx": data["frame_idx"],  # (N,) int32
-            "track_id": data["track_id"],  # (N,) int32
+            "timestamps": relative_timestamps,  # (N,) float64, seconds from start
         }
         self._cache[exp.experiment_id] = result
         return result
@@ -253,62 +164,57 @@ class TemporalMILDataset(Dataset):
                 self.time_windows, weights=self.window_weights, k=1
             )[0]
 
-        max_frame = int(window_sec * self.fps)
+        # Filter to crops within the time window
+        timestamps = data["timestamps"]
+        mask = timestamps <= window_sec
+        features = data["features"][mask].astype(np.float32)
+        ts = timestamps[mask]
 
-        # Filter to frames within window
-        mask = data["frame_idx"] <= max_frame
-        features = data["features"][mask]
-        frame_idx = data["frame_idx"][mask]
-        track_ids = data["track_id"][mask]
+        # Compute time bins
+        n_bins = max(1, int(np.ceil(window_sec / self.time_bin_width)))
 
-        # Get unique tracks
-        unique_tracks = np.unique(track_ids)
+        # Build per-bin feature tensors
+        bin_features = torch.zeros(n_bins, self.max_crops_per_bin, self.feature_dim)
+        bin_mask = torch.zeros(n_bins, dtype=torch.bool)
+        crop_mask = torch.zeros(n_bins, self.max_crops_per_bin, dtype=torch.bool)
+        bin_times = torch.zeros(n_bins, dtype=torch.float32)
+        bin_counts = torch.zeros(n_bins, dtype=torch.float32)
 
-        # Limit number of tracks (sample if too many)
-        if len(unique_tracks) > self.max_tracks:
-            unique_tracks = np.sort(
-                np.random.choice(unique_tracks, self.max_tracks, replace=False)
-            )
+        for b in range(n_bins):
+            t_lo = b * self.time_bin_width
+            t_hi = (b + 1) * self.time_bin_width
+            bin_center = (t_lo + t_hi) / 2.0
+            bin_times[b] = bin_center
 
-        n_tracks = min(len(unique_tracks), self.max_tracks)
+            # Select crops in this bin
+            in_bin = (ts >= t_lo) & (ts < t_hi)
+            bin_feats = features[in_bin]
 
-        # Build per-track feature sequences
-        track_features = torch.zeros(
-            self.max_tracks, self.max_frames, self.feature_dim
-        )
-        track_mask = torch.zeros(self.max_tracks, dtype=torch.bool)
-        seq_mask = torch.zeros(self.max_tracks, self.max_frames, dtype=torch.bool)
+            if len(bin_feats) == 0:
+                continue
 
-        for i, tid in enumerate(unique_tracks):
-            track_mask[i] = True
-            t_mask = track_ids == tid
-            t_features = features[t_mask].astype(np.float32)
-            t_frames = frame_idx[t_mask]
+            bin_mask[b] = True
+            bin_counts[b] = len(bin_feats)
 
-            # Sort by frame
-            sort_idx = np.argsort(t_frames)
-            t_features = t_features[sort_idx]
-            t_frames = t_frames[sort_idx]
+            # Subsample if too many crops
+            if len(bin_feats) > self.max_crops_per_bin:
+                indices = np.random.choice(
+                    len(bin_feats), self.max_crops_per_bin, replace=False
+                )
+                bin_feats = bin_feats[indices]
 
-            # Subsample
-            if self.subsample_rate > 1:
-                sub_idx = np.arange(0, len(t_features), self.subsample_rate)
-                t_features = t_features[sub_idx]
-                t_frames = t_frames[sub_idx]
+            n_crops = len(bin_feats)
+            bin_features[b, :n_crops] = torch.from_numpy(bin_feats)
+            crop_mask[b, :n_crops] = True
 
-            # Truncate to max_frames
-            seq_len = min(len(t_features), self.max_frames)
-            track_features[i, :seq_len] = torch.from_numpy(t_features[:seq_len])
-            seq_mask[i, :seq_len] = True
-
-        # Time fraction for the classifier
-        max_possible_frame = int(3600 * self.fps)
-        time_fraction = min(max_frame / max_possible_frame, 1.0)
+        time_fraction = min(window_sec / self.max_experiment_sec, 1.0)
 
         return {
-            "track_features": track_features,  # (max_tracks, max_frames, 384)
-            "track_mask": track_mask,  # (max_tracks,)
-            "seq_mask": seq_mask,  # (max_tracks, max_frames)
+            "bin_features": bin_features,  # (n_bins, max_crops_per_bin, 384)
+            "bin_mask": bin_mask,  # (n_bins,) — which bins have data
+            "crop_mask": crop_mask,  # (n_bins, max_crops_per_bin)
+            "bin_times": bin_times,  # (n_bins,) — bin center times in seconds
+            "bin_counts": bin_counts,  # (n_bins,) — number of crops per bin
             "time_fraction": torch.tensor(time_fraction, dtype=torch.float32),
             "label": torch.tensor(exp.label, dtype=torch.long),
             "experiment_id": exp.experiment_id,
@@ -316,38 +222,112 @@ class TemporalMILDataset(Dataset):
         }
 
 
+def _extract_ec_number(experiment_id: str) -> str | None:
+    """Extract EC number prefix from experiment ID.
+
+    Examples::
+
+        EC35_Ampicillin_16mgL_preincubated_2_TEM40  →  EC35
+        EC126_Ampicillin_16mgL_preincubated          →  EC126
+
+    Returns None if no EC prefix is found.
+    """
+    import re
+    m = re.match(r"^(EC\d+)", experiment_id, re.IGNORECASE)
+    return m.group(1).upper() if m else None
+
+
+def _find_label_dir(data_root: Path, name: str) -> Path | None:
+    """Find a subdirectory case-insensitively."""
+    for d in data_root.iterdir():
+        if d.is_dir() and d.name.lower() == name.lower():
+            return d
+    return None
+
+
 def build_experiment_list(
     data_root: Path,
-    preprocessed_dir: Path,
+    features_dir: Path,
 ) -> list[ExperimentMeta]:
-    """Scan the data directory structure and build experiment metadata list."""
+    """Scan the data directory structure and build experiment metadata list.
+
+    Expected structure::
+
+        data_root/
+        ├── Resistant/
+        │   ├── EC35_Ampicillin_.../
+        │   │   └── images/
+        │   └── ...
+        ├── Susceptible/
+        │   ├── EC126_Ampicillin_.../
+        │   │   └── images/
+        │   └── ...
+        └── Test/
+            ├── EC35_Ampicillin_.../   ← label inferred from EC number
+            │   └── images/
+            └── ...
+
+    Labels for Test/ experiments are inferred from EC number: if EC35 appears
+    in Resistant/, then all EC35 experiments are resistant.
+    """
     experiments = []
     data_root = Path(data_root)
+    features_dir = Path(features_dir)
 
-    for label_name, label_int in [("Susceptible", 0), ("Resistant", 1)]:
-        label_dir = data_root / label_name
-        if not label_dir.exists():
+    # Step 1: Build EC-number → label mapping from Resistant/Susceptible folders
+    ec_label_map: dict[str, int] = {}
+
+    for label_name, label_int in [("susceptible", 0), ("resistant", 1)]:
+        label_dir = _find_label_dir(data_root, label_name)
+        if label_dir is None:
             continue
 
         for exp_dir in sorted(label_dir.iterdir()):
             if not exp_dir.is_dir():
                 continue
+            images_dir = exp_dir / "images"
+            if not images_dir.exists():
+                continue
 
             exp_id = exp_dir.name
-            # Parse experiment folder name: BacteriaID_AntibioticID_Dosage_ExpID
-            parts = exp_id.split("_")
-            antibiotic_id = parts[1] if len(parts) > 1 else ""
-            dosage = parts[2] if len(parts) > 2 else ""
-
-            features_path = Path(preprocessed_dir) / f"{exp_id}.npz"
+            ec_num = _extract_ec_number(exp_id)
+            if ec_num is not None:
+                ec_label_map[ec_num] = label_int
 
             experiments.append(
                 ExperimentMeta(
                     experiment_id=exp_id,
                     label=label_int,
-                    features_path=features_path,
-                    antibiotic_id=antibiotic_id,
-                    dosage=dosage,
+                    features_path=features_dir / f"{exp_id}.npz",
+                )
+            )
+
+    # Step 2: Add Test/ experiments with labels inferred from EC number
+    test_dir = _find_label_dir(data_root, "test")
+    if test_dir is not None:
+        for exp_dir in sorted(test_dir.iterdir()):
+            if not exp_dir.is_dir():
+                continue
+            images_dir = exp_dir / "images"
+            if not images_dir.exists():
+                continue
+
+            exp_id = exp_dir.name
+            ec_num = _extract_ec_number(exp_id)
+            if ec_num is None or ec_num not in ec_label_map:
+                import logging
+                logging.getLogger(__name__).warning(
+                    f"Cannot determine label for Test experiment {exp_id} "
+                    f"(EC number: {ec_num}), skipping."
+                )
+                continue
+
+            label_int = ec_label_map[ec_num]
+            experiments.append(
+                ExperimentMeta(
+                    experiment_id=exp_id,
+                    label=label_int,
+                    features_path=features_dir / f"{exp_id}.npz",
                 )
             )
 
@@ -356,32 +336,44 @@ def build_experiment_list(
 
 def create_splits(
     experiments: list[ExperimentMeta],
-    train_ratio: float = 0.7,
+    data_root: Path | None = None,
     val_ratio: float = 0.15,
-    test_ratio: float = 0.15,
     seed: int = 42,
 ) -> tuple[list[ExperimentMeta], list[ExperimentMeta], list[ExperimentMeta]]:
-    """Stratified split by experiment, ensuring all frames from one experiment
-    go to the same split. Stratified by (label, antibiotic_id).
+    """Split experiments into train/val/test.
+
+    If ``data_root`` is provided, experiments from the Test/ folder become
+    the test set and the Resistant/Susceptible experiments are split into
+    train/val.  Otherwise, a stratified random split is used.
     """
     rng = np.random.RandomState(seed)
 
-    # Group by (label, antibiotic_id) for stratification
-    groups: dict[tuple, list[ExperimentMeta]] = {}
-    for exp in experiments:
-        key = (exp.label, exp.antibiotic_id)
-        groups.setdefault(key, []).append(exp)
+    if data_root is not None:
+        # Determine which experiments came from Test/ folder
+        test_dir = _find_label_dir(Path(data_root), "test")
+        test_exp_ids: set[str] = set()
+        if test_dir is not None:
+            for d in test_dir.iterdir():
+                if d.is_dir():
+                    test_exp_ids.add(d.name)
 
-    train, val, test = [], [], []
+        test = [e for e in experiments if e.experiment_id in test_exp_ids]
+        train_val = [e for e in experiments if e.experiment_id not in test_exp_ids]
+    else:
+        train_val = experiments
+        test = []
 
-    for key, exps in groups.items():
+    # Stratified train/val split
+    groups: dict[int, list[ExperimentMeta]] = {}
+    for exp in train_val:
+        groups.setdefault(exp.label, []).append(exp)
+
+    train, val = [], []
+    for label, exps in groups.items():
         rng.shuffle(exps)
         n = len(exps)
-        n_train = max(1, int(n * train_ratio))
         n_val = max(1, int(n * val_ratio))
-
-        train.extend(exps[:n_train])
-        val.extend(exps[n_train : n_train + n_val])
-        test.extend(exps[n_train + n_val :])
+        val.extend(exps[:n_val])
+        train.extend(exps[n_val:])
 
     return train, val, test

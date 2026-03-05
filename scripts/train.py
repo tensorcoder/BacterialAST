@@ -2,7 +2,7 @@
 
 Usage:
     # Full pipeline
-    python -m ast_classifier.scripts.train --config config.yaml
+    python -m ast_classifier.scripts.train --stage all
 
     # Individual stages
     python -m ast_classifier.scripts.train --stage dino
@@ -75,11 +75,11 @@ def run_extract(config: FullConfig, backbone_path: Path | None = None) -> None:
 
 
 def run_classifier(config: FullConfig) -> Path:
-    """Stage 4: Temporal MIL classifier training."""
+    """Stage 4: Population Temporal classifier training."""
     from ..training.train_classifier import train_classifier
 
     logger.info("=" * 60)
-    logger.info("STAGE 4: Temporal MIL Classifier Training")
+    logger.info("STAGE 4: Population Temporal Classifier Training")
     logger.info("=" * 60)
 
     features_dir = Path(config.paths.features_dir)
@@ -109,7 +109,7 @@ def run_calibrate(config: FullConfig) -> None:
             "Run classifier training first (--stage classifier)."
         )
 
-    result = calibrate_early_exit(config)
+    calibrate_early_exit(config)
     logger.info("Calibration complete.")
 
 
@@ -124,46 +124,15 @@ def main() -> None:
         default="all",
         help="Which stage to run (default: all)",
     )
-    parser.add_argument(
-        "--data-root",
-        type=Path,
-        default=None,
-        help="Override data root path",
-    )
-    parser.add_argument(
-        "--preprocessed-dir",
-        type=Path,
-        default=None,
-        help="Override preprocessed data directory",
-    )
-    parser.add_argument(
-        "--features-dir",
-        type=Path,
-        default=None,
-        help="Override features directory",
-    )
-    parser.add_argument(
-        "--checkpoints-dir",
-        type=Path,
-        default=None,
-        help="Override checkpoints directory",
-    )
-    parser.add_argument(
-        "--device",
-        type=str,
-        default="cuda:0",
-        help="Device to use (default: cuda:0)",
-    )
-    parser.add_argument(
-        "--backbone-path",
-        type=Path,
-        default=None,
-        help="Path to pretrained backbone (for extract stage)",
-    )
+    parser.add_argument("--data-root", type=Path, default=None)
+    parser.add_argument("--preprocessed-dir", type=Path, default=None)
+    parser.add_argument("--features-dir", type=Path, default=None)
+    parser.add_argument("--checkpoints-dir", type=Path, default=None)
+    parser.add_argument("--device", type=str, default="cuda:0")
+    parser.add_argument("--backbone-path", type=Path, default=None)
 
     args = parser.parse_args()
 
-    # Build config
     config = FullConfig()
     config.device = args.device
 
@@ -176,7 +145,6 @@ def main() -> None:
     if args.checkpoints_dir:
         config.paths.checkpoints_dir = args.checkpoints_dir
 
-    # Ensure directories exist
     for d in [
         config.paths.preprocessed_dir,
         config.paths.features_dir,
