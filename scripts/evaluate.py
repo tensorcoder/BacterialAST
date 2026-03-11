@@ -62,9 +62,12 @@ def evaluate(config: FullConfig, output_dir: Path) -> None:
         classifier_hidden_dim=clf_cfg.classifier_hidden_dim,
         num_classes=clf_cfg.num_classes,
         dropout=clf_cfg.dropout,
+        use_delta_features=clf_cfg.use_delta_features,
+        bin_encoder_type=clf_cfg.bin_encoder_type,
+        bin_attn_heads=clf_cfg.bin_attn_heads,
     ).to(device)
 
-    checkpoint = torch.load(ckpt_path, map_location=device, weights_only=True)
+    checkpoint = torch.load(ckpt_path, map_location=device, weights_only=False)
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 

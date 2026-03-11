@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from ..config import FullConfig
-from ..data.dataset import PopulationTemporalDataset, build_experiment_list, create_splits
+from ..data.dataset import PopulationTemporalDataset, build_experiment_list, create_splits, population_temporal_collate
 from ..models.classifier import PopulationTemporalClassifier
 from ..models.early_exit import TemperatureScaler
 
@@ -67,7 +67,8 @@ def evaluate_at_fixed_times(
             random_window=False,
         )
         loader = DataLoader(
-            dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers
+            dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers,
+            collate_fn=population_temporal_collate,
         )
 
         all_probs = []
@@ -200,9 +201,12 @@ def calibrate_early_exit(config: FullConfig) -> CalibrationResult:
         classifier_hidden_dim=clf_cfg.classifier_hidden_dim,
         num_classes=clf_cfg.num_classes,
         dropout=clf_cfg.dropout,
+        use_delta_features=clf_cfg.use_delta_features,
+        bin_encoder_type=clf_cfg.bin_encoder_type,
+        bin_attn_heads=clf_cfg.bin_attn_heads,
     ).to(device)
 
-    checkpoint = torch.load(ckpt_path, map_location=device, weights_only=True)
+    checkpoint = torch.load(ckpt_path, map_location=device, weights_only=False)
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 

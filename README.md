@@ -22,6 +22,7 @@ A deep learning pipeline that distinguishes antibiotic-resistant from susceptibl
 - [Configuration Reference](#configuration-reference)
 - [Model Architecture Details](#model-architecture-details)
 - [Augmentation Strategy](#augmentation-strategy)
+- [DINO Training: Collapse and Recovery](#dino-training-collapse-and-recovery)
 - [Loss Functions](#loss-functions)
 - [Metrics and Evaluation](#metrics-and-evaluation)
 - [Visualization](#visualization)
@@ -362,12 +363,13 @@ PYTHONPATH=/path/to/parent python3 -m ast_classifier.scripts.train \
 
 **What happens:**
 
-1. Loads bacteria crops from all HDF5 files (capped at 5,000 per experiment for balance)
-2. Applies multi-crop augmentation: 2 global crops (128x128) + 6 local crops (64x64)
-3. Trains student-teacher ViT-Small pair with DINO loss for 100 epochs
-4. Saves best backbone checkpoint to `checkpoints/dino/best_backbone.pt`
+1. Loads bacteria crops from all HDF5 files (capped at 5,000 per experiment for balance; ~207K crops total)
+2. Applies CLAHE contrast enhancement, then multi-crop augmentation: 2 global crops (128x128) + 6 local crops (64x64)
+3. Normalizes with post-CLAHE statistics (mean=0.3387, std=0.1173)
+4. Trains student-teacher ViT-Small pair with DINO loss for 100 epochs
+5. Saves best backbone checkpoint to `checkpoints/dino/best_backbone.pt`
 
-**Expected runtime:** ~2-4 hours on RTX 3090
+**Expected runtime:** ~35 hours on RTX 3090 (~21 min/epoch)
 
 **VRAM usage:** ~10 GB
 
@@ -381,7 +383,7 @@ tensorboard --logdir ./logs/dino
 
 ### Stage 3: Feature Extraction
 
-Extracts 384-dimensional CLS token features for every crop using the pretrained backbone.
+Extracts 384-dimensional CLS token features for every crop using the pretrained backbone. Each crop is preprocessed with CLAHE and normalized with the same post-CLAHE statistics used during DINO training (mean=0.3387, std=0.1173) to ensure consistency.
 
 ```bash
 PYTHONPATH=/path/to/parent python3 -m ast_classifier.scripts.train \
@@ -545,11 +547,18 @@ All configuration is centralized in `config.py` using Python dataclasses.
 | `num_heads` | 6 | Attention heads (384/6 = 64 dim/head) |
 | `mlp_ratio` | 4.0 | FFN expansion ratio |
 | `drop_path_rate` | 0.1 | Stochastic depth rate |
+| `head_output_dim` | 4096 | DINO projection head output dimension (number of prototypes) |
 | `batch_size` | 64 | Training batch size |
 | `epochs` | 100 | Training epochs |
 | `base_lr` | 5e-4 | Base learning rate (scaled by batch_size/256) |
 | `warmup_epochs` | 10 | Linear LR warmup |
 | `max_crops_per_experiment` | 5000 | Cap per experiment for balanced sampling |
+| `dataset_mean` | 0.3387 | Post-CLAHE pixel mean (used for normalization) |
+| `dataset_std` | 0.1173 | Post-CLAHE pixel std (used for normalization) |
+| `aug_brightness` | 0.03 | Brightness jitter magnitude (calibrated to data range) |
+| `aug_contrast` | 0.3 | Contrast jitter magnitude |
+| `aug_noise_std_max` | 0.01 | Max Gaussian noise std |
+| `use_clahe` | True | Apply CLAHE before augmentations |
 
 ### ClassifierConfig
 
@@ -657,23 +666,90 @@ ClassifierHead:
 
 ## Augmentation Strategy
 
-Augmentations are designed for brightfield microscopy physics:
+Augmentations are designed for brightfield microscopy physics. All augmentation intensities are calibrated to the actual data dynamic range (see [DINO Training: Collapse and Recovery](#dino-training-collapse-and-recovery) for details on why this matters).
 
 | Augmentation | Parameters | Rationale |
 |-------------|-----------|-----------|
+| CLAHEEnhance | clipLimit=2.0, tileGrid=(8,8) | Expands the narrow dynamic range of brightfield crops; raw pixels span only ~[40, 85] uint8 |
 | RandomResizedCrop | Global: 128x128 scale (0.7, 1.0), Local: 64x64 scale (0.3, 0.6) | DINO multi-crop strategy; local crops capture sub-cellular detail |
 | RandomRotation | 180 degrees | Bacteria have no canonical orientation in brightfield |
 | RandomHorizontalFlip | p=0.5 | Symmetry augmentation |
 | RandomVerticalFlip | p=0.5 | Symmetry augmentation |
-| RandomIntensityJitter | brightness=0.3, contrast=0.3 | Simulates illumination variation between imaging sessions |
-| RandomGaussianNoise | std in (0.0, 0.05) | Simulates camera sensor noise |
+| RandomIntensityJitter | brightness=0.03, contrast=0.3 | Simulates illumination variation; brightness kept small relative to post-CLAHE dynamic range |
+| RandomGaussianNoise | std in (0.0, 0.01) | Simulates camera sensor noise; kept proportional to data std (~0.12) |
 | RandomDefocusBlur | radius in (0, 3) | Simulates slight defocus drift during acquisition |
-| Normalize | mean=0.5, std=0.25 | Empirical microscopy normalization |
+| Normalize | mean=0.3387, std=0.1173 | Computed from preprocessed crops after CLAHE enhancement |
 
 **Not included:**
 - Color jitter (images are grayscale)
 - Elastic deformation (would distort the morphological features we want to detect)
 - Cutout/erasing (risk removing the bacteria entirely from small crops)
+
+---
+
+## DINO Training: Collapse and Recovery
+
+The initial DINO training run (100 epochs) suffered from **mode collapse** -- the loss plateaued at `ln(4096) = 8.32` from epoch 2 onward, indicating that both student and teacher networks were producing uniform output distributions regardless of input. This section documents the root cause analysis, the fixes applied, and the validation results.
+
+### Symptoms
+
+- Loss converged to exactly `ln(output_dim)` by epoch 2 and never decreased
+- This is the theoretical loss when all outputs are uniform distributions (maximum entropy), meaning the network learned to ignore its input entirely
+
+### Root Causes
+
+Three compounding issues were identified:
+
+**1. Incorrect normalization statistics**
+
+The original augmentation pipeline normalized with `mean=0.5, std=0.25` (generic ImageNet-style defaults). The actual preprocessed crops have a very narrow dynamic range: raw pixel values of mean=57, std=10 (uint8), corresponding to `mean=0.225, std=0.049` in [0,1]. Normalizing with (0.5, 0.25) compressed all inputs into a tiny range of approximately `[-1.25, -0.67]` with a standard deviation of only `0.16`. The network effectively saw near-constant inputs.
+
+**2. Augmentation magnitudes too aggressive relative to data range**
+
+The data's effective dynamic range (in [0,1] space) was only ~0.145 (from ~0.157 to ~0.333). With a brightness jitter of +/-0.3, the augmentation noise was 4x the signal range. Gaussian noise with std up to 0.05 was also disproportionately large (equal to the data's own std). This drowned out meaningful morphological variation.
+
+**3. Excessive prototype count**
+
+The DINO projection head was configured with `head_output_dim=65536` prototypes for a dataset of ~207K crops (5000 per experiment x 42 experiments). With only ~3.2 crops per prototype, the Sinkhorn-like centering in DINO struggled to produce meaningful cluster assignments.
+
+### Fixes Applied
+
+| Change | Before | After | Rationale |
+|--------|--------|-------|-----------|
+| Add CLAHE preprocessing | None | clipLimit=2.0, tileGrid=(8,8) | Expands dynamic range from [40,85] to [50,156] uint8, giving the network meaningful contrast |
+| Normalization mean | 0.5 | 0.3387 | Computed from 2.38M crops after CLAHE enhancement |
+| Normalization std | 0.25 | 0.1173 | Computed from 2.38M crops after CLAHE enhancement |
+| Brightness jitter | 0.3 | 0.03 | Proportional to post-CLAHE dynamic range (~0.42 in [0,1]) |
+| Gaussian noise std max | 0.05 | 0.01 | Proportional to data std (~0.12 in [0,1]) |
+| head_output_dim | 65536 | 4096 | ~50 crops per prototype, enabling meaningful clustering |
+
+All changes were applied consistently to both the DINO training augmentation pipeline and the downstream feature extraction pipeline to ensure the backbone sees identical preprocessing at training and inference time.
+
+### Validation
+
+A 5-epoch trial run confirmed the fixes resolved the collapse:
+
+| Epoch | Loss (collapsed run) | Loss (fixed run) |
+|-------|---------------------|-------------------|
+| 1 | 11.27 | 8.43 |
+| 2 | 11.09 | 7.09 |
+| 3 | 11.09 | 5.35 |
+| 4 | 11.09 | 3.69 |
+| 5 | 11.09 | 2.45 |
+
+The fixed run shows a healthy, monotonically decreasing loss with no signs of collapse. The full 100-epoch training run continues to converge smoothly (loss reached ~0.85 by epoch 31).
+
+### Dataset Statistics
+
+| Metric | Raw | Post-CLAHE |
+|--------|-----|------------|
+| Mean (uint8) | 57 | 87 |
+| Std (uint8) | 10 | 28 |
+| Range (uint8) | ~[40, 85] | ~[50, 156] |
+| Mean ([0,1]) | 0.225 | 0.3387 |
+| Std ([0,1]) | 0.049 | 0.1173 |
+| Total crops | 2.38M | 2.38M |
+| Effective DINO dataset | ~207K (5000/experiment cap) | ~207K |
 
 ---
 
@@ -801,12 +877,12 @@ ast_classifier/
 | Stage | VRAM Usage | Time Estimate |
 |-------|-----------|---------------|
 | Preprocessing | ~2 GB | ~18 hours (42 experiments) |
-| DINO Pretraining | ~14 GB | ~3-5 hours |
+| DINO Pretraining | ~10 GB | ~35 hours (100 epochs, ~21 min/epoch) |
 | Feature Extraction | ~4 GB | ~30 minutes |
 | Classifier Training | ~8-12 GB | ~1-2 hours |
 | Calibration | ~4 GB | ~15 minutes |
 | Evaluation | ~4 GB | ~15 minutes |
-| **Total** | | **~22-25 hours** |
+| **Total** | | **~55 hours** |
 
 ### Disk Space
 

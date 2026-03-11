@@ -24,6 +24,44 @@ from torchvision.transforms import functional as TF
 # Custom augmentation callables
 # ---------------------------------------------------------------------------
 
+class CLAHEEnhance:
+    """Apply CLAHE (Contrast Limited Adaptive Histogram Equalization).
+
+    Expands the narrow dynamic range typical of brightfield microscopy
+    crops so that downstream augmentations and the network see meaningful
+    contrast.
+
+    Parameters
+    ----------
+    clip_limit : float
+        Contrast limiting threshold (default 2.0).
+    tile_grid_size : tuple[int, int]
+        Size of the grid for histogram equalization (default (8, 8)).
+    """
+
+    def __init__(
+        self, clip_limit: float = 2.0, tile_grid_size: tuple[int, int] = (8, 8)
+    ) -> None:
+        self.clip_limit = clip_limit
+        self.tile_grid_size = tile_grid_size
+
+    def __call__(self, img: Image.Image) -> Image.Image:
+        import cv2
+
+        arr = np.asarray(img, dtype=np.uint8)
+        clahe = cv2.createCLAHE(
+            clipLimit=self.clip_limit, tileGridSize=self.tile_grid_size
+        )
+        enhanced = clahe.apply(arr)
+        return Image.fromarray(enhanced, mode="L")
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(clip_limit={self.clip_limit}, "
+            f"tile_grid_size={self.tile_grid_size})"
+        )
+
+
 class RandomIntensityJitter:
     """Random brightness and contrast jitter for single-channel grayscale.
 
@@ -39,7 +77,7 @@ class RandomIntensityJitter:
         Maximum contrast factor deviation from 1.0.
     """
 
-    def __init__(self, brightness: float = 0.3, contrast: float = 0.3) -> None:
+    def __init__(self, brightness: float = 0.03, contrast: float = 0.3) -> None:
         self.brightness = brightness
         self.contrast = contrast
 
@@ -160,18 +198,7 @@ class RandomDefocusBlur:
         radius = random.uniform(*self.radius_range)
         if radius < 0.5:
             return img
-
-        if radius <= 2.0:
-            # Simple Gaussian blur.
-            return img.filter(ImageFilter.GaussianBlur(radius=radius))
-
-        # Disk blur approximation for larger radii.
-        int_radius = max(1, int(round(radius)))
-        disk = self._disk_kernel(int_radius)
-        blurred = img.filter(disk)
-        # Light Gaussian smoothing to remove ringing from the hard disk edge.
-        blurred = blurred.filter(ImageFilter.GaussianBlur(radius=0.5))
-        return blurred
+        return img.filter(ImageFilter.GaussianBlur(radius=radius))
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(radius_range={self.radius_range})"
@@ -200,17 +227,22 @@ def _ensure_pil_grayscale(img: Image.Image | NDArray[np.uint8]) -> Image.Image:
 
 
 def _build_augmentation_pipeline(
-    brightness: float = 0.3,
+    brightness: float = 0.03,
     contrast: float = 0.3,
-    noise_std_range: tuple[float, float] = (0.0, 0.05),
+    noise_std_range: tuple[float, float] = (0.0, 0.01),
     defocus_range: tuple[int, int] = (0, 3),
+    use_clahe: bool = True,
 ) -> list:
     """Build the list of microscopy augmentations (applied *before* crop)."""
-    return [
+    augs: list = []
+    if use_clahe:
+        augs.append(CLAHEEnhance())
+    augs.extend([
         RandomIntensityJitter(brightness=brightness, contrast=contrast),
         RandomGaussianNoise(std_range=noise_std_range),
         RandomDefocusBlur(radius_range=defocus_range),
-    ]
+    ])
+    return augs
 
 
 # ---------------------------------------------------------------------------
@@ -267,12 +299,13 @@ class DINOMicroscopyAugmentation:
         local_scale: tuple[float, float] = (0.3, 0.6),
         n_global_crops: int = 2,
         n_local_crops: int = 6,
-        brightness: float = 0.3,
+        brightness: float = 0.03,
         contrast: float = 0.3,
-        noise_std_range: tuple[float, float] = (0.0, 0.05),
+        noise_std_range: tuple[float, float] = (0.0, 0.01),
         defocus_range: tuple[int, int] = (0, 3),
-        mean: Sequence[float] = (0.5,),
-        std: Sequence[float] = (0.25,),
+        mean: Sequence[float] = (0.3387,),
+        std: Sequence[float] = (0.1173,),
+        use_clahe: bool = True,
     ) -> None:
         self.n_global_crops = n_global_crops
         self.n_local_crops = n_local_crops
@@ -282,6 +315,7 @@ class DINOMicroscopyAugmentation:
             contrast=contrast,
             noise_std_range=noise_std_range,
             defocus_range=defocus_range,
+            use_clahe=use_clahe,
         )
 
         # -- Global crop transform -------------------------------------------
@@ -309,6 +343,7 @@ class DINOMicroscopyAugmentation:
             contrast=contrast,
             noise_std_range=noise_std_range,
             defocus_range=defocus_range,
+            use_clahe=use_clahe,
         )
 
         self.local_transform = T.Compose(

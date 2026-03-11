@@ -80,10 +80,17 @@ def train_dino(config: FullConfig) -> Path:
     transform = DINOMicroscopyAugmentation(
         global_crop_size=cfg.img_size,
         local_crop_size=cfg.local_crop_size,
-        global_crop_scale=cfg.global_crop_scale,
-        local_crop_scale=cfg.local_crop_scale,
+        global_scale=cfg.global_crop_scale,
+        local_scale=cfg.local_crop_scale,
         n_global_crops=cfg.n_global_crops,
         n_local_crops=cfg.n_local_crops,
+        brightness=cfg.aug_brightness,
+        contrast=cfg.aug_contrast,
+        noise_std_range=(0.0, cfg.aug_noise_std_max),
+        defocus_range=(0, cfg.aug_defocus_max),
+        mean=(cfg.dataset_mean,),
+        std=(cfg.dataset_std,),
+        use_clahe=cfg.use_clahe,
     )
     dataset = DINOCropDataset(
         hdf5_dir=config.paths.preprocessed_dir,

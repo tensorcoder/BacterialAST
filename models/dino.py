@@ -40,11 +40,10 @@ class DINOHead(nn.Module):
             nn.GELU(),
             nn.Linear(hidden_dim, bottleneck_dim),
         )
-        self.last_layer = nn.utils.weight_norm(
-            nn.Linear(bottleneck_dim, out_dim, bias=False)
-        )
-        self.last_layer.weight_g.data.fill_(1.0)
-        self.last_layer.weight_g.requires_grad = False
+        self.last_layer = nn.Linear(bottleneck_dim, out_dim, bias=False)
+        nn.utils.parametrizations.weight_norm(self.last_layer)
+        self.last_layer.parametrizations.weight.original0.data.fill_(1.0)
+        self.last_layer.parametrizations.weight.original0.requires_grad = False
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.mlp(x)

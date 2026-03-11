@@ -25,9 +25,9 @@ logger = logging.getLogger(__name__)
 
 CROP_SIZE: int = 128
 
-# Regex to parse image filenames: image_{timestamp}[_{MIC}].bmp
+# Regex to parse image filenames: image_{timestamp}[_{MIC}].{bmp,tiff,tif}
 _FILENAME_RE = re.compile(
-    r"^image_(\d+(?:\.\d+)?)(?:_.+)?\.bmp$", re.IGNORECASE
+    r"^image_(\d+(?:\.\d+)?)(?:_.+)?\.(?:bmp|tiff?)$", re.IGNORECASE
 )
 
 
@@ -139,7 +139,7 @@ class YOLOCropExtractor:
             # Resolve focused class ID from model names
             names = self._model.names  # {int: str}
             for cls_id, cls_name in names.items():
-                if cls_name == self.focused_class_name:
+                if cls_name.lower() == self.focused_class_name.lower():
                     self._focused_class_id = cls_id
                     break
             if self._focused_class_id is None:
@@ -475,7 +475,7 @@ def extract_experiment(
     frame_timestamps: list[float] = []
 
     for p in sorted(image_dir.iterdir()):
-        if p.suffix.lower() != ".bmp":
+        if p.suffix.lower() not in (".bmp", ".tiff", ".tif"):
             continue
         ts = parse_timestamp_from_filename(p.name)
         if ts is None:
@@ -485,7 +485,7 @@ def extract_experiment(
         frame_timestamps.append(ts)
 
     if not frame_paths:
-        raise FileNotFoundError(f"No valid BMP frames found in {image_dir}")
+        raise FileNotFoundError(f"No valid image frames found in {image_dir}")
 
     # Sort by timestamp
     sort_idx = sorted(range(len(frame_timestamps)), key=lambda i: frame_timestamps[i])
@@ -493,7 +493,7 @@ def extract_experiment(
     frame_timestamps = [frame_timestamps[i] for i in sort_idx]
 
     logger.info(
-        "Found %d BMP frames in %s (%.1fs span)",
+        "Found %d image frames in %s (%.1fs span)",
         len(frame_paths),
         image_dir,
         frame_timestamps[-1] - frame_timestamps[0] if len(frame_timestamps) > 1 else 0,

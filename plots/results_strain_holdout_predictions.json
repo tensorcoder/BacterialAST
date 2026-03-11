@@ -1,0 +1,922 @@
+[
+  {
+    "fold": 0,
+    "holdout_r": [
+      "EC58",
+      "EC87"
+    ],
+    "holdout_s": [
+      "EC36",
+      "EC39"
+    ],
+    "experiments": {
+      "EC36_Ampicillin_16mgL_preincubated": {
+        "strain": "EC36",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.9613,
+          "120": 0.9759,
+          "180": 0.9758,
+          "300": 0.8312,
+          "600": 0.9716,
+          "900": 0.9662,
+          "1800": 0.0267,
+          "3600": 0.9758
+        }
+      },
+      "EC36_Ampicillin_16mgL_preincubated_2": {
+        "strain": "EC36",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.976,
+          "120": 0.976,
+          "180": 0.9761,
+          "300": 0.9758,
+          "600": 0.9758,
+          "900": 0.9759,
+          "1800": 0.9761,
+          "3600": 0.9756
+        }
+      },
+      "EC36_Ampicillin_16mgL_preincubated3": {
+        "strain": "EC36",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.9759,
+          "120": 0.0309,
+          "180": 0.021,
+          "300": 0.9646,
+          "600": 0.0261,
+          "900": 0.0259,
+          "1800": 0.023,
+          "3600": 0.9754
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.0207,
+          "120": 0.0201,
+          "180": 0.0205,
+          "300": 0.0216,
+          "600": 0.0203,
+          "900": 0.0202,
+          "1800": 0.02,
+          "3600": 0.02
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated_3": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.0266,
+          "120": 0.0266,
+          "180": 0.0294,
+          "300": 0.0211,
+          "600": 0.9728,
+          "900": 0.0343,
+          "1800": 0.0215,
+          "3600": 0.544
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated_2": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.97,
+          "120": 0.0218,
+          "180": 0.023,
+          "300": 0.0206,
+          "600": 0.0366,
+          "900": 0.0224,
+          "1800": 0.1567,
+          "3600": 0.9737
+        }
+      },
+      "EC58_Ampicillin_16mgL_preincubated": {
+        "strain": "EC58",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.0224,
+          "120": 0.0271,
+          "180": 0.0225,
+          "300": 0.021,
+          "600": 0.0236,
+          "900": 0.0218,
+          "1800": 0.9732,
+          "3600": 0.0216
+        }
+      },
+      "EC58_Ampicillin_16mgL_preincubated3": {
+        "strain": "EC58",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.9677,
+          "120": 0.9753,
+          "180": 0.9748,
+          "300": 0.9759,
+          "600": 0.9663,
+          "900": 0.027,
+          "1800": 0.0229,
+          "3600": 0.9714
+        }
+      },
+      "EC58_Ampicillin_16mgL_preincubated_2": {
+        "strain": "EC58",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.976,
+          "120": 0.976,
+          "180": 0.976,
+          "300": 0.9761,
+          "600": 0.9761,
+          "900": 0.9762,
+          "1800": 0.9761,
+          "3600": 0.976
+        }
+      },
+      "EC87_Ampicillin_16mgL_preincubated_2_OXA1_CTXM15": {
+        "strain": "EC87",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.0331,
+          "120": 0.0213,
+          "180": 0.9721,
+          "300": 0.9742,
+          "600": 0.0994,
+          "900": 0.046,
+          "1800": 0.0274,
+          "3600": 0.0204
+        }
+      },
+      "EC87_Ampicillin_16mgL_preincubated_OXA1_CTXM15": {
+        "strain": "EC87",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.976,
+          "120": 0.9759,
+          "180": 0.9761,
+          "300": 0.976,
+          "600": 0.9755,
+          "900": 0.9761,
+          "1800": 0.9761,
+          "3600": 0.9759
+        }
+      },
+      "EC87_Ampicillin_16mgL_preincubated3": {
+        "strain": "EC87",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.9758,
+          "120": 0.9755,
+          "180": 0.9758,
+          "300": 0.9753,
+          "600": 0.9757,
+          "900": 0.9761,
+          "1800": 0.9749,
+          "3600": 0.9746
+        }
+      }
+    }
+  },
+  {
+    "fold": 1,
+    "holdout_r": [
+      "EC58",
+      "EC60"
+    ],
+    "holdout_s": [
+      "EC33",
+      "EC39"
+    ],
+    "experiments": {
+      "EC33_Ampicillin_16mgL_preincubated": {
+        "strain": "EC33",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.3979,
+          "120": 0.1852,
+          "180": 0.1804,
+          "300": 0.179,
+          "600": 0.1784,
+          "900": 0.1765,
+          "1800": 0.1807,
+          "3600": 0.179
+        }
+      },
+      "EC33_Ampicillin_16mgL_routine_preincubated3": {
+        "strain": "EC33",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.1859,
+          "120": 0.187,
+          "180": 0.1805,
+          "300": 0.1971,
+          "600": 0.1851,
+          "900": 0.1787,
+          "1800": 0.2463,
+          "3600": 0.2294
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.1808,
+          "120": 0.1834,
+          "180": 0.2274,
+          "300": 0.1794,
+          "600": 0.1775,
+          "900": 0.196,
+          "1800": 0.1881,
+          "3600": 0.1766
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated_3": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.2327,
+          "120": 0.2763,
+          "180": 0.285,
+          "300": 0.1864,
+          "600": 0.2606,
+          "900": 0.863,
+          "1800": 0.1803,
+          "3600": 0.1763
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated_2": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.1821,
+          "120": 0.2125,
+          "180": 0.184,
+          "300": 0.2577,
+          "600": 0.242,
+          "900": 0.177,
+          "1800": 0.1971,
+          "3600": 0.1816
+        }
+      },
+      "EC58_Ampicillin_16mgL_preincubated": {
+        "strain": "EC58",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.1816,
+          "120": 0.7796,
+          "180": 0.7566,
+          "300": 0.3146,
+          "600": 0.3987,
+          "900": 0.3026,
+          "1800": 0.889,
+          "3600": 0.9343
+        }
+      },
+      "EC58_Ampicillin_16mgL_preincubated3": {
+        "strain": "EC58",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.1922,
+          "120": 0.1941,
+          "180": 0.1862,
+          "300": 0.1791,
+          "600": 0.1824,
+          "900": 0.1766,
+          "1800": 0.1832,
+          "3600": 0.8131
+        }
+      },
+      "EC58_Ampicillin_16mgL_preincubated_2": {
+        "strain": "EC58",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.9305,
+          "120": 0.9338,
+          "180": 0.9363,
+          "300": 0.9342,
+          "600": 0.9359,
+          "900": 0.9377,
+          "1800": 0.9363,
+          "3600": 0.9384
+        }
+      },
+      "EC60_Ampicillin_16mgL_preincubated": {
+        "strain": "EC60",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.9282,
+          "120": 0.58,
+          "180": 0.6983,
+          "300": 0.1921,
+          "600": 0.2393,
+          "900": 0.237,
+          "1800": 0.4449,
+          "3600": 0.3373
+        }
+      },
+      "EC60_Ampicillin_16mgL_preincubated2": {
+        "strain": "EC60",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.887,
+          "120": 0.8961,
+          "180": 0.7802,
+          "300": 0.2347,
+          "600": 0.2009,
+          "900": 0.1967,
+          "1800": 0.8613,
+          "3600": 0.8959
+        }
+      },
+      "EC60_Ampicillin_16mgL_preincubated3": {
+        "strain": "EC60",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.9305,
+          "120": 0.8664,
+          "180": 0.9194,
+          "300": 0.923,
+          "600": 0.9271,
+          "900": 0.8876,
+          "1800": 0.931,
+          "3600": 0.9329
+        }
+      }
+    }
+  },
+  {
+    "fold": 2,
+    "holdout_r": [
+      "EC35",
+      "EC87"
+    ],
+    "holdout_s": [
+      "EC33",
+      "EC39"
+    ],
+    "experiments": {
+      "EC33_Ampicillin_16mgL_preincubated": {
+        "strain": "EC33",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.4122,
+          "120": 0.412,
+          "180": 0.4132,
+          "300": 0.4134,
+          "600": 0.4133,
+          "900": 0.4132,
+          "1800": 0.4132,
+          "3600": 0.4133
+        }
+      },
+      "EC33_Ampicillin_16mgL_routine_preincubated3": {
+        "strain": "EC33",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.412,
+          "120": 0.412,
+          "180": 0.4133,
+          "300": 0.4133,
+          "600": 0.4131,
+          "900": 0.4131,
+          "1800": 0.4132,
+          "3600": 0.4134
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.4121,
+          "120": 0.412,
+          "180": 0.4133,
+          "300": 0.4134,
+          "600": 0.4132,
+          "900": 0.4131,
+          "1800": 0.4129,
+          "3600": 0.4132
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated_3": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.4117,
+          "120": 0.4121,
+          "180": 0.4134,
+          "300": 0.4136,
+          "600": 0.4132,
+          "900": 0.4132,
+          "1800": 0.4131,
+          "3600": 0.4131
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated_2": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.412,
+          "120": 0.412,
+          "180": 0.4133,
+          "300": 0.4133,
+          "600": 0.4132,
+          "900": 0.4131,
+          "1800": 0.4131,
+          "3600": 0.4132
+        }
+      },
+      "EC35_Ampicillin_16mgL_preincubated_2_TEM40": {
+        "strain": "EC35",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.4123,
+          "120": 0.412,
+          "180": 0.4134,
+          "300": 0.4137,
+          "600": 0.4134,
+          "900": 0.4133,
+          "1800": 0.4132,
+          "3600": 0.4134
+        }
+      },
+      "EC35_Ampicillin_16mgL_preincubated_3_TEM40": {
+        "strain": "EC35",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.4119,
+          "120": 0.412,
+          "180": 0.4132,
+          "300": 0.4135,
+          "600": 0.4132,
+          "900": 0.4132,
+          "1800": 0.4131,
+          "3600": 0.4132
+        }
+      },
+      "EC35_Ampicillin_16mgL_preincubated_exp2_TEM40": {
+        "strain": "EC35",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.4118,
+          "120": 0.4117,
+          "180": 0.4132,
+          "300": 0.4133,
+          "600": 0.4132,
+          "900": 0.4131,
+          "1800": 0.413,
+          "3600": 0.4134
+        }
+      },
+      "EC87_Ampicillin_16mgL_preincubated_2_OXA1_CTXM15": {
+        "strain": "EC87",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.4121,
+          "120": 0.4121,
+          "180": 0.4134,
+          "300": 0.4136,
+          "600": 0.4133,
+          "900": 0.4132,
+          "1800": 0.4131,
+          "3600": 0.4132
+        }
+      },
+      "EC87_Ampicillin_16mgL_preincubated_OXA1_CTXM15": {
+        "strain": "EC87",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.4116,
+          "120": 0.4116,
+          "180": 0.413,
+          "300": 0.4131,
+          "600": 0.413,
+          "900": 0.4129,
+          "1800": 0.4129,
+          "3600": 0.4131
+        }
+      },
+      "EC87_Ampicillin_16mgL_preincubated3": {
+        "strain": "EC87",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.4118,
+          "120": 0.4121,
+          "180": 0.4132,
+          "300": 0.4134,
+          "600": 0.4132,
+          "900": 0.413,
+          "1800": 0.4129,
+          "3600": 0.4132
+        }
+      }
+    }
+  },
+  {
+    "fold": 3,
+    "holdout_r": [
+      "EC35",
+      "EC87"
+    ],
+    "holdout_s": [
+      "EC36",
+      "EC39"
+    ],
+    "experiments": {
+      "EC36_Ampicillin_16mgL_preincubated": {
+        "strain": "EC36",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.9719,
+          "120": 0.9757,
+          "180": 0.9748,
+          "300": 0.9754,
+          "600": 0.9747,
+          "900": 0.9756,
+          "1800": 0.9753,
+          "3600": 0.9756
+        }
+      },
+      "EC36_Ampicillin_16mgL_preincubated_2": {
+        "strain": "EC36",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.97,
+          "120": 0.9702,
+          "180": 0.9701,
+          "300": 0.9741,
+          "600": 0.9754,
+          "900": 0.9607,
+          "1800": 0.975,
+          "3600": 0.9746
+        }
+      },
+      "EC36_Ampicillin_16mgL_preincubated3": {
+        "strain": "EC36",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.0344,
+          "120": 0.0379,
+          "180": 0.0501,
+          "300": 0.0337,
+          "600": 0.039,
+          "900": 0.0355,
+          "1800": 0.0441,
+          "3600": 0.038
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.0328,
+          "120": 0.0548,
+          "180": 0.0456,
+          "300": 0.0341,
+          "600": 0.036,
+          "900": 0.0337,
+          "1800": 0.045,
+          "3600": 0.0336
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated_3": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.0524,
+          "120": 0.0361,
+          "180": 0.0348,
+          "300": 0.0371,
+          "600": 0.0487,
+          "900": 0.0335,
+          "1800": 0.0352,
+          "3600": 0.0547
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated_2": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.0593,
+          "120": 0.0368,
+          "180": 0.0507,
+          "300": 0.0347,
+          "600": 0.1489,
+          "900": 0.0958,
+          "1800": 0.0585,
+          "3600": 0.0403
+        }
+      },
+      "EC35_Ampicillin_16mgL_preincubated_2_TEM40": {
+        "strain": "EC35",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.0629,
+          "120": 0.0489,
+          "180": 0.0389,
+          "300": 0.0509,
+          "600": 0.0382,
+          "900": 0.0895,
+          "1800": 0.9389,
+          "3600": 0.2314
+        }
+      },
+      "EC35_Ampicillin_16mgL_preincubated_3_TEM40": {
+        "strain": "EC35",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.9757,
+          "120": 0.9759,
+          "180": 0.9755,
+          "300": 0.9758,
+          "600": 0.9758,
+          "900": 0.9743,
+          "1800": 0.9747,
+          "3600": 0.9752
+        }
+      },
+      "EC35_Ampicillin_16mgL_preincubated_exp2_TEM40": {
+        "strain": "EC35",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.9755,
+          "120": 0.9752,
+          "180": 0.9743,
+          "300": 0.9745,
+          "600": 0.9759,
+          "900": 0.7545,
+          "1800": 0.9753,
+          "3600": 0.9752
+        }
+      },
+      "EC87_Ampicillin_16mgL_preincubated_2_OXA1_CTXM15": {
+        "strain": "EC87",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.0334,
+          "120": 0.0323,
+          "180": 0.0349,
+          "300": 0.0325,
+          "600": 0.0459,
+          "900": 0.0346,
+          "1800": 0.0361,
+          "3600": 0.0347
+        }
+      },
+      "EC87_Ampicillin_16mgL_preincubated_OXA1_CTXM15": {
+        "strain": "EC87",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.9748,
+          "120": 0.7625,
+          "180": 0.9687,
+          "300": 0.9745,
+          "600": 0.0521,
+          "900": 0.0474,
+          "1800": 0.9743,
+          "3600": 0.9061
+        }
+      },
+      "EC87_Ampicillin_16mgL_preincubated3": {
+        "strain": "EC87",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.0367,
+          "120": 0.0933,
+          "180": 0.9639,
+          "300": 0.9644,
+          "600": 0.0757,
+          "900": 0.9736,
+          "1800": 0.9641,
+          "3600": 0.9702
+        }
+      }
+    }
+  },
+  {
+    "fold": 4,
+    "holdout_r": [
+      "EC40",
+      "EC48"
+    ],
+    "holdout_s": [
+      "EC39",
+      "EC67"
+    ],
+    "experiments": {
+      "EC39_Ampicillin_16mgL_preincubated": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.0228,
+          "120": 0.0228,
+          "180": 0.0239,
+          "300": 0.0251,
+          "600": 0.025,
+          "900": 0.0259,
+          "1800": 0.0304,
+          "3600": 0.0389
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated_3": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.0238,
+          "120": 0.4596,
+          "180": 0.0269,
+          "300": 0.024,
+          "600": 0.044,
+          "900": 0.0246,
+          "1800": 0.1993,
+          "3600": 0.0472
+        }
+      },
+      "EC39_Ampicillin_16mgL_preincubated_2": {
+        "strain": "EC39",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.0318,
+          "120": 0.0241,
+          "180": 0.8209,
+          "300": 0.0293,
+          "600": 0.0242,
+          "900": 0.0264,
+          "1800": 0.0688,
+          "3600": 0.042
+        }
+      },
+      "EC67_Ampicillin_16mgL_preincubated": {
+        "strain": "EC67",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.0229,
+          "120": 0.0232,
+          "180": 0.0227,
+          "300": 0.0227,
+          "600": 0.0241,
+          "900": 0.0254,
+          "1800": 0.0287,
+          "3600": 0.0256
+        }
+      },
+      "EC67_Ampicillin_16mgL_preincubated2": {
+        "strain": "EC67",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.0225,
+          "120": 0.0233,
+          "180": 0.0227,
+          "300": 0.0229,
+          "600": 0.0234,
+          "900": 0.0235,
+          "1800": 0.0257,
+          "3600": 0.0299
+        }
+      },
+      "EC67_Ampicillin_16mgL_preincubated3": {
+        "strain": "EC67",
+        "label": 0,
+        "label_name": "Susceptible",
+        "predictions": {
+          "60": 0.0227,
+          "120": 0.0232,
+          "180": 0.0235,
+          "300": 0.0235,
+          "600": 0.0245,
+          "900": 0.0282,
+          "1800": 0.0252,
+          "3600": 0.027
+        }
+      },
+      "EC40_Ampicillin_16mgL_preincubated2_TEM1": {
+        "strain": "EC40",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.0713,
+          "120": 0.0252,
+          "180": 0.0304,
+          "300": 0.0234,
+          "600": 0.0308,
+          "900": 0.036,
+          "1800": 0.0788,
+          "3600": 0.0528
+        }
+      },
+      "EC40_Ampicillin_16mgL_preincubated3_routine": {
+        "strain": "EC40",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.0265,
+          "120": 0.0237,
+          "180": 0.9711,
+          "300": 0.0281,
+          "600": 0.0263,
+          "900": 0.04,
+          "1800": 0.03,
+          "3600": 0.5343
+        }
+      },
+      "EC40_Ampicillin_16mgL_preincubated_TEM1_sul1sul2": {
+        "strain": "EC40",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.9732,
+          "120": 0.9444,
+          "180": 0.967,
+          "300": 0.9725,
+          "600": 0.9685,
+          "900": 0.9524,
+          "1800": 0.9703,
+          "3600": 0.9706
+        }
+      },
+      "EC48_Ampicillin_16mgL_preincubated2": {
+        "strain": "EC48",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.0228,
+          "120": 0.0253,
+          "180": 0.0238,
+          "300": 0.0254,
+          "600": 0.0306,
+          "900": 0.0275,
+          "1800": 0.0304,
+          "3600": 0.7412
+        }
+      },
+      "EC48_Ampicillin_16mgL_preincubated_fromplate_TEM40": {
+        "strain": "EC48",
+        "label": 1,
+        "label_name": "Resistant",
+        "predictions": {
+          "60": 0.0242,
+          "120": 0.0227,
+          "180": 0.0232,
+          "300": 0.0236,
+          "600": 0.024,
+          "900": 0.0248,
+          "1800": 0.0284,
+          "3600": 0.0343
+        }
+      }
+    }
+  }
+]

@@ -263,13 +263,29 @@ class ViTSmall(nn.Module):
     # ------------------------------------------------------------------
     # Forward helpers
     # ------------------------------------------------------------------
+    def _interpolate_pos_embed(self, x: torch.Tensor, num_patches: int) -> torch.Tensor:
+        """Interpolate positional embeddings for inputs with different patch counts."""
+        if num_patches == self.num_patches:
+            return self.pos_embed
+        cls_pos = self.pos_embed[:, :1]  # (1, 1, D)
+        patch_pos = self.pos_embed[:, 1:]  # (1, N, D)
+        dim = patch_pos.shape[-1]
+        orig_size = int(self.num_patches ** 0.5)
+        new_size = int(num_patches ** 0.5)
+        patch_pos = patch_pos.reshape(1, orig_size, orig_size, dim).permute(0, 3, 1, 2)
+        patch_pos = F.interpolate(patch_pos, size=(new_size, new_size), mode="bicubic", align_corners=False)
+        patch_pos = patch_pos.permute(0, 2, 3, 1).reshape(1, -1, dim)
+        return torch.cat([cls_pos, patch_pos], dim=1)
+
     def _embed(self, x: torch.Tensor) -> torch.Tensor:
         """Patch-embed, prepend CLS, add positional embeddings."""
         B = x.shape[0]
-        x = self.patch_embed(x)  # (B, 36, 384)
-        cls_tokens = self.cls_token.expand(B, -1, -1)  # (B, 1, 384)
-        x = torch.cat([cls_tokens, x], dim=1)  # (B, 37, 384)
-        x = self.pos_drop(x + self.pos_embed)
+        x = self.patch_embed(x)  # (B, N, D)
+        num_patches = x.shape[1]
+        cls_tokens = self.cls_token.expand(B, -1, -1)  # (B, 1, D)
+        x = torch.cat([cls_tokens, x], dim=1)  # (B, N+1, D)
+        pos_embed = self._interpolate_pos_embed(x, num_patches)
+        x = self.pos_drop(x + pos_embed)
         return x
 
     def forward_features(self, x: torch.Tensor) -> torch.Tensor:

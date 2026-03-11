@@ -97,6 +97,7 @@ class PopulationTemporalDataset(Dataset):
         feature_dim: int = 384,
         max_experiment_sec: float = 3600.0,
         random_window: bool = True,
+        samples_per_experiment: int = 1,
     ):
         self.feature_dir = Path(feature_dir)
         self.experiments = experiments
@@ -120,7 +121,13 @@ class PopulationTemporalDataset(Dataset):
         self.window_weights = [w / total for w in self.window_weights]
 
         if random_window:
-            self.samples = [(exp, None) for exp in self.experiments]
+            # Repeat each experiment N times per epoch — each gets a different
+            # random window and random crop subsample, acting as augmentation.
+            self.samples = [
+                (exp, None)
+                for exp in self.experiments
+                for _ in range(samples_per_experiment)
+            ]
         else:
             self.samples = [
                 (exp, tw) for exp in self.experiments for tw in self.time_windows
@@ -220,6 +227,54 @@ class PopulationTemporalDataset(Dataset):
             "experiment_id": exp.experiment_id,
             "window_sec": window_sec,
         }
+
+
+def population_temporal_collate(batch: list[dict]) -> dict:
+    """Custom collate that pads variable-length time bin dimensions.
+
+    Different samples may have different numbers of time bins (due to
+    different time windows).  This function pads all bin-dimension tensors
+    to the maximum number of bins in the batch.  Padded bins have
+    bin_mask=False and are ignored by the model at every stage.
+    """
+    max_bins = max(item["bin_features"].shape[0] for item in batch)
+    max_crops = batch[0]["bin_features"].shape[1]
+    feat_dim = batch[0]["bin_features"].shape[2]
+
+    B = len(batch)
+    bin_features = torch.zeros(B, max_bins, max_crops, feat_dim)
+    bin_mask = torch.zeros(B, max_bins, dtype=torch.bool)
+    crop_mask = torch.zeros(B, max_bins, max_crops, dtype=torch.bool)
+    bin_times = torch.zeros(B, max_bins, dtype=torch.float32)
+    bin_counts = torch.zeros(B, max_bins, dtype=torch.float32)
+    time_fraction = torch.zeros(B, dtype=torch.float32)
+    labels = torch.zeros(B, dtype=torch.long)
+    experiment_ids = []
+    window_secs = []
+
+    for i, item in enumerate(batch):
+        n = item["bin_features"].shape[0]
+        bin_features[i, :n] = item["bin_features"]
+        bin_mask[i, :n] = item["bin_mask"]
+        crop_mask[i, :n] = item["crop_mask"]
+        bin_times[i, :n] = item["bin_times"]
+        bin_counts[i, :n] = item["bin_counts"]
+        time_fraction[i] = item["time_fraction"]
+        labels[i] = item["label"]
+        experiment_ids.append(item["experiment_id"])
+        window_secs.append(item["window_sec"])
+
+    return {
+        "bin_features": bin_features,
+        "bin_mask": bin_mask,
+        "crop_mask": crop_mask,
+        "bin_times": bin_times,
+        "bin_counts": bin_counts,
+        "time_fraction": time_fraction,
+        "label": labels,
+        "experiment_id": experiment_ids,
+        "window_sec": window_secs,
+    }
 
 
 def _extract_ec_number(experiment_id: str) -> str | None:

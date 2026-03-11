@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
+import cv2
 import h5py
 import numpy as np
 import torch
@@ -19,10 +20,19 @@ logger = logging.getLogger(__name__)
 class HDF5InferenceDataset(Dataset):
     """Loads all crops from a single HDF5 file for feature extraction."""
 
-    def __init__(self, h5_path: Path, mean: float = 0.5, std: float = 0.25):
+    _clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+
+    def __init__(
+        self,
+        h5_path: Path,
+        mean: float = 0.3387,
+        std: float = 0.1173,
+        use_clahe: bool = True,
+    ):
         self.h5_path = Path(h5_path)
         self.mean = mean
         self.std = std
+        self.use_clahe = use_clahe
         with h5py.File(self.h5_path, "r") as f:
             self.length = f["crops"].shape[0]
 
@@ -31,10 +41,12 @@ class HDF5InferenceDataset(Dataset):
 
     def __getitem__(self, idx: int) -> torch.Tensor:
         with h5py.File(self.h5_path, "r") as f:
-            crop = f["crops"][idx]  # (96, 96) uint8
+            crop = f["crops"][idx]  # (128, 128) uint8
+        if self.use_clahe:
+            crop = self._clahe.apply(crop)
         tensor = torch.from_numpy(crop.astype(np.float32) / 255.0)
         tensor = (tensor - self.mean) / self.std
-        return tensor.unsqueeze(0)  # (1, 96, 96)
+        return tensor.unsqueeze(0)  # (1, 128, 128)
 
 
 def extract_features_for_experiment(
@@ -44,9 +56,12 @@ def extract_features_for_experiment(
     batch_size: int = 512,
     num_workers: int = 4,
     device: torch.device = torch.device("cuda:0"),
+    mean: float = 0.3387,
+    std: float = 0.1173,
+    use_clahe: bool = True,
 ) -> None:
     """Extract features for all crops in one experiment HDF5 file."""
-    dataset = HDF5InferenceDataset(h5_path)
+    dataset = HDF5InferenceDataset(h5_path, mean=mean, std=std, use_clahe=use_clahe)
     if len(dataset) == 0:
         logger.warning(f"Empty HDF5: {h5_path}")
         return
@@ -92,10 +107,12 @@ def extract_all_features(
     num_workers: int = 4,
     device_str: str = "cuda:0",
     embed_dim: int = 384,
-    img_size: int = 96,
+    img_size: int = 128,
     patch_size: int = 16,
     depth: int = 12,
     num_heads: int = 6,
+    dataset_mean: float = 0.3387,
+    dataset_std: float = 0.1173,
 ) -> None:
     """Extract features for all experiments using pretrained backbone."""
     device = torch.device(device_str)
@@ -109,7 +126,7 @@ def extract_all_features(
         num_heads=num_heads,
     ).to(device)
 
-    checkpoint = torch.load(backbone_checkpoint, map_location=device, weights_only=True)
+    checkpoint = torch.load(backbone_checkpoint, map_location=device, weights_only=False)
     if "student_state_dict" in checkpoint:
         backbone.load_state_dict(checkpoint["student_state_dict"])
     else:
@@ -137,6 +154,8 @@ def extract_all_features(
             batch_size=batch_size,
             num_workers=num_workers,
             device=device,
+            mean=dataset_mean,
+            std=dataset_std,
         )
 
     logger.info(f"Feature extraction complete. Output: {output_dir}")

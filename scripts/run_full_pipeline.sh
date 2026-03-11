@@ -1,6 +1,6 @@
 #!/bin/bash
 # Full training pipeline — waits for preprocessing then runs stages 2-5
-set -e
+set -eo pipefail
 
 REPO_DIR="/home/mkedz/code/ast_classifier"
 VENV="$REPO_DIR/.venv/bin/python3"

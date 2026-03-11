@@ -36,7 +36,7 @@ class DINOConfig:
     # DINO head
     head_hidden_dim: int = 2048
     head_bottleneck_dim: int = 256
-    head_output_dim: int = 65536
+    head_output_dim: int = 4096
     head_nlayers: int = 3
     # Training
     batch_size: int = 64
@@ -64,26 +64,35 @@ class DINOConfig:
     local_crop_size: int = 64
     # Dataset
     max_crops_per_experiment: int = 5000
+    # Normalization (computed from preprocessed crops, post-CLAHE)
+    dataset_mean: float = 0.3387
+    dataset_std: float = 0.1173
+    # Augmentation (scaled to data dynamic range)
+    aug_brightness: float = 0.03
+    aug_contrast: float = 0.3
+    aug_noise_std_max: float = 0.01
+    aug_defocus_max: float = 3
+    use_clahe: bool = True
 
 
 @dataclass
 class ClassifierConfig:
-    # Architecture
+    # Architecture (reduced for small dataset — 27 experiments)
     feature_dim: int = 384
-    temporal_hidden_dim: int = 256
-    temporal_num_layers: int = 4
+    temporal_hidden_dim: int = 128
+    temporal_num_layers: int = 2
     temporal_num_heads: int = 4
-    temporal_ffn_dim: int = 512
+    temporal_ffn_dim: int = 256
     population_feat_dim: int = 64
-    classifier_hidden_dim: int = 128
+    classifier_hidden_dim: int = 64
     num_classes: int = 2
-    dropout: float = 0.1
+    dropout: float = 0.2
     # Population binning
     time_bin_width_sec: float = 120.0  # 2-minute bins (configurable)
     max_crops_per_bin: int = 256
     # Training
-    batch_size: int = 16
-    gradient_accumulation: int = 2
+    batch_size: int = 4
+    gradient_accumulation: int = 1
     epochs: int = 200
     lr: float = 1e-3
     weight_decay: float = 0.01
@@ -91,6 +100,13 @@ class ClassifierConfig:
     label_smoothing: float = 0.05
     grad_clip: float = 1.0
     early_stopping_patience: int = 30
+    # Bin encoder: "attention" (learned pooling) or "stats" (mean/std/skew/kurtosis)
+    bin_encoder_type: str = "stats"
+    bin_attn_heads: int = 4
+    # Auxiliary per-bin loss weight (time-conditioned R/S prediction per bin)
+    bin_aux_loss_weight: float = 0.5
+    # Delta features (subtract first-bin stats for strain invariance)
+    use_delta_features: bool = False
     # Time-aware loss
     time_loss_alpha: float = 2.0
     attention_entropy_weight: float = 0.01
@@ -123,7 +139,7 @@ class EarlyExitConfig:
 
 @dataclass
 class DataSplitConfig:
-    val_ratio: float = 0.15  # fraction of R/S experiments held out for validation
+    val_ratio: float = 0.20  # fraction of R/S experiments held out for validation
     random_seed: int = 42
     # Test set comes from the Test/ folder (pre-defined split)
 

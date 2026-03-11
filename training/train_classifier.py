@@ -16,7 +16,7 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 from ..config import ClassifierConfig, FullConfig
-from ..data.dataset import PopulationTemporalDataset, build_experiment_list, create_splits
+from ..data.dataset import PopulationTemporalDataset, build_experiment_list, create_splits, population_temporal_collate
 from ..models.classifier import PopulationTemporalClassifier
 
 logger = logging.getLogger(__name__)
@@ -130,6 +130,7 @@ def train_classifier(config: FullConfig) -> Path:
         max_crops_per_bin=cfg.max_crops_per_bin,
         feature_dim=cfg.feature_dim,
         random_window=True,
+        samples_per_experiment=8,
     )
     val_dataset = PopulationTemporalDataset(
         feature_dir=config.paths.features_dir,
@@ -147,7 +148,8 @@ def train_classifier(config: FullConfig) -> Path:
         shuffle=True,
         num_workers=config.num_workers,
         pin_memory=True,
-        drop_last=True,
+        drop_last=False,
+        collate_fn=population_temporal_collate,
     )
     val_loader = DataLoader(
         val_dataset,
@@ -155,6 +157,7 @@ def train_classifier(config: FullConfig) -> Path:
         shuffle=False,
         num_workers=config.num_workers,
         pin_memory=True,
+        collate_fn=population_temporal_collate,
     )
 
     # Model
@@ -168,6 +171,9 @@ def train_classifier(config: FullConfig) -> Path:
         num_classes=cfg.num_classes,
         dropout=cfg.dropout,
         max_count_normalizer=float(cfg.max_crops_per_bin),
+        use_delta_features=cfg.use_delta_features,
+        bin_encoder_type=cfg.bin_encoder_type,
+        bin_attn_heads=cfg.bin_attn_heads,
     ).to(device)
 
     logger.info(
@@ -233,6 +239,19 @@ def train_classifier(config: FullConfig) -> Path:
                     loss_main
                     + cfg.attention_entropy_weight * loss_entropy
                 )
+
+                # Auxiliary per-bin loss
+                if cfg.bin_aux_loss_weight > 0 and "bin_logits" in output:
+                    bin_mask = batch_gpu["bin_mask"]  # (B, T)
+                    bin_labels = labels.unsqueeze(1).expand_as(bin_mask)
+                    valid_logits = output["bin_logits"][bin_mask]
+                    valid_labels = bin_labels[bin_mask]
+                    if valid_logits.numel() > 0:
+                        aux_loss = F.cross_entropy(
+                            valid_logits, valid_labels,
+                            label_smoothing=cfg.label_smoothing,
+                        )
+                        loss = loss + cfg.bin_aux_loss_weight * aux_loss
 
             # Gradient accumulation
             scaled_loss = loss / cfg.gradient_accumulation

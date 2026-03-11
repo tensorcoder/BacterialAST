@@ -155,7 +155,7 @@ def main() -> None:
     parser.add_argument("--crop-size", type=int, default=96)
     parser.add_argument("--yolo-confidence", type=float, default=0.5)
     parser.add_argument("--yolo-batch-size", type=int, default=16)
-    parser.add_argument("--focused-class-name", type=str, default="Focused")
+    parser.add_argument("--focused-class-name", type=str, default="focused")
     parser.add_argument("--device", type=str, default="cuda:0")
 
     args = parser.parse_args()

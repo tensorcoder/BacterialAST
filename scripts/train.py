@@ -70,6 +70,8 @@ def run_extract(config: FullConfig, backbone_path: Path | None = None) -> None:
         patch_size=config.dino.patch_size,
         depth=config.dino.depth,
         num_heads=config.dino.num_heads,
+        dataset_mean=config.dino.dataset_mean,
+        dataset_std=config.dino.dataset_std,
     )
     logger.info("Feature extraction complete.")
 
@@ -130,11 +132,14 @@ def main() -> None:
     parser.add_argument("--checkpoints-dir", type=Path, default=None)
     parser.add_argument("--device", type=str, default="cuda:0")
     parser.add_argument("--backbone-path", type=Path, default=None)
+    parser.add_argument("--epochs", type=int, default=None, help="Override number of DINO epochs")
 
     args = parser.parse_args()
 
     config = FullConfig()
     config.device = args.device
+    if args.epochs is not None:
+        config.dino.epochs = args.epochs
 
     if args.data_root:
         config.paths.data_root = args.data_root
