@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import copy
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 import torch
 import torch.nn as nn
@@ -146,19 +146,27 @@ class DINOWrapper(nn.Module):
         for p in self.teacher_head.parameters():
             p.requires_grad = False
 
-    def forward_student(self, crops: List[torch.Tensor]) -> List[torch.Tensor]:
+    def forward_student(
+        self,
+        crops: List[torch.Tensor],
+        times: Optional[torch.Tensor] = None,
+    ) -> List[torch.Tensor]:
         outputs: List[torch.Tensor] = []
         for crop in crops:
-            feat = self.student_backbone(crop)
+            feat = self.student_backbone(crop, time=times)
             proj = self.student_head(feat)
             outputs.append(proj)
         return outputs
 
     @torch.no_grad()
-    def forward_teacher(self, crops: List[torch.Tensor]) -> List[torch.Tensor]:
+    def forward_teacher(
+        self,
+        crops: List[torch.Tensor],
+        times: Optional[torch.Tensor] = None,
+    ) -> List[torch.Tensor]:
         outputs: List[torch.Tensor] = []
         for crop in crops:
-            feat = self.teacher_backbone(crop)
+            feat = self.teacher_backbone(crop, time=times)
             proj = self.teacher_head(feat)
             outputs.append(proj)
         return outputs

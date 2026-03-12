@@ -23,7 +23,7 @@ from ultralytics import YOLO
 
 logger = logging.getLogger(__name__)
 
-CROP_SIZE: int = 128
+CROP_SIZE: int = 96
 
 # Regex to parse image filenames: image_{timestamp}[_{MIC}].{bmp,tiff,tif}
 _FILENAME_RE = re.compile(
@@ -170,10 +170,10 @@ class YOLOCropExtractor:
 
         The region defined by (cx, cy, w, h, angle) is rectified using an
         affine warp so that the OBB becomes axis-aligned, then **centered
-        on a fixed-size canvas** (``crop_size x crop_size``) using reflected
-        border fill.  The bacterium is placed at its native pixel size so
-        that both shape and absolute size are preserved.  Only the rare
-        detections larger than ``crop_size`` are downscaled to fit.
+        on a fixed-size canvas** (``crop_size x crop_size``) with zero
+        padding.  The bacterium is placed at its native pixel size so
+        that both shape and absolute size are preserved.  Detections
+        larger than ``crop_size`` are center-cropped (not downscaled).
         """
         rotation_matrix = cv2.getRotationMatrix2D(
             center=(cx, cy),
@@ -203,24 +203,25 @@ class YOLOCropExtractor:
 
         ch, cw = crop.shape[:2]
 
-        # Downscale only if the crop exceeds the canvas size.
-        if ch > crop_size or cw > crop_size:
-            scale = crop_size / max(ch, cw)
-            crop = cv2.resize(
-                crop,
-                (int(round(cw * scale)), int(round(ch * scale))),
-                interpolation=cv2.INTER_LINEAR,
-            )
-            ch, cw = crop.shape[:2]
+        # Center-crop if the detection exceeds the canvas size (no downscaling).
+        if ch > crop_size:
+            y_start = (ch - crop_size) // 2
+            crop = crop[y_start : y_start + crop_size, :]
+            ch = crop_size
+        if cw > crop_size:
+            x_start = (cw - crop_size) // 2
+            crop = crop[:, x_start : x_start + crop_size]
+            cw = crop_size
 
-        # Centre the crop on a fixed-size canvas with reflected border.
+        # Centre the crop on a fixed-size canvas with zero padding.
         pad_top = (crop_size - ch) // 2
         pad_bot = crop_size - ch - pad_top
         pad_left = (crop_size - cw) // 2
         pad_right = crop_size - cw - pad_left
         crop = cv2.copyMakeBorder(
             crop, pad_top, pad_bot, pad_left, pad_right,
-            borderType=cv2.BORDER_REFLECT_101,
+            borderType=cv2.BORDER_CONSTANT,
+            value=0,
         )
 
         return crop

@@ -17,7 +17,7 @@ class PathConfig:
 @dataclass
 class PreprocessingConfig:
     yolo_confidence: float = 0.5
-    crop_size: int = 128
+    crop_size: int = 96
     yolo_batch_size: int = 16
     focused_class_name: str = "focused"  # YOLO class name for in-focus bacteria
     fps: float = 5.0
@@ -26,13 +26,14 @@ class PreprocessingConfig:
 @dataclass
 class DINOConfig:
     # Architecture
-    img_size: int = 128
+    img_size: int = 96
     patch_size: int = 16
     embed_dim: int = 384
     depth: int = 12
     num_heads: int = 6
     mlp_ratio: float = 4.0
     drop_path_rate: float = 0.1
+    time_conditioned: bool = True
     # DINO head
     head_hidden_dim: int = 2048
     head_bottleneck_dim: int = 256
@@ -61,7 +62,7 @@ class DINOConfig:
     n_local_crops: int = 6
     global_crop_scale: tuple = (0.7, 1.0)
     local_crop_scale: tuple = (0.3, 0.6)
-    local_crop_size: int = 64
+    local_crop_size: int = 48
     # Dataset
     max_crops_per_experiment: int = 5000
     # Normalization (computed from preprocessed crops, post-CLAHE)

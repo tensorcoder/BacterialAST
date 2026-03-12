@@ -18,7 +18,8 @@ class DINOCropDataset(Dataset):
     """Loads bacteria crops from HDF5 files for DINO self-supervised pretraining.
 
     Samples uniformly across experiments to prevent dominant experiments
-    from biasing the learned representation.
+    from biasing the learned representation.  Also returns the relative
+    timestamp (seconds since experiment start) for time-conditioned training.
     """
 
     def __init__(
@@ -33,6 +34,8 @@ class DINOCropDataset(Dataset):
 
         # Build index: list of (hdf5_path, crop_index)
         self.index: list[tuple[Path, int]] = []
+        # Cache relative timestamps (seconds from experiment start) per experiment
+        self._rel_times: dict[Path, np.ndarray] = {}
         self._build_index()
 
     def _build_index(self) -> None:
@@ -40,8 +43,12 @@ class DINOCropDataset(Dataset):
         for h5_path in hdf5_files:
             with h5py.File(h5_path, "r") as f:
                 n_crops = f["crops"].shape[0]
-            if n_crops == 0:
-                continue
+                if n_crops == 0:
+                    continue
+                timestamps = f["metadata"]["timestamp"][:]
+                self._rel_times[h5_path] = (
+                    timestamps - timestamps.min()
+                ).astype(np.float32)
             indices = list(range(n_crops))
             if n_crops > self.max_crops:
                 indices = sorted(random.sample(indices, self.max_crops))
@@ -51,20 +58,24 @@ class DINOCropDataset(Dataset):
     def __len__(self) -> int:
         return len(self.index)
 
-    def __getitem__(self, idx: int) -> tuple[list[torch.Tensor], list[torch.Tensor]]:
+    def __getitem__(self, idx: int):
         h5_path, crop_idx = self.index[idx]
         with h5py.File(h5_path, "r") as f:
             crop = f["crops"][crop_idx]  # (96, 96) uint8
+
+        time_sec = torch.tensor(
+            float(self._rel_times[h5_path][crop_idx]), dtype=torch.float32,
+        )
 
         image = Image.fromarray(crop, mode="L")
 
         if self.transform is not None:
             global_crops, local_crops = self.transform(image)
-            return global_crops, local_crops
+            return global_crops, local_crops, time_sec
 
         arr = np.array(image, dtype=np.float32) / 255.0
         tensor = torch.from_numpy(arr).unsqueeze(0)  # (1, 96, 96)
-        return [tensor, tensor], []
+        return [tensor, tensor], [], time_sec
 
 
 @dataclass

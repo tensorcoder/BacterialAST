@@ -59,6 +59,7 @@ class FilteredDINOCropDataset(DINOCropDataset):
         """Override to filter out excluded strains."""
         import h5py
         import random
+        import numpy as np
 
         hdf5_files = sorted(self.hdf5_dir.glob("**/*.h5"))
         included = 0
@@ -75,8 +76,12 @@ class FilteredDINOCropDataset(DINOCropDataset):
 
             with h5py.File(h5_path, "r") as f:
                 n_crops = f["crops"].shape[0]
-            if n_crops == 0:
-                continue
+                if n_crops == 0:
+                    continue
+                timestamps = f["metadata"]["timestamp"][:]
+                self._rel_times[h5_path] = (
+                    timestamps - timestamps.min()
+                ).astype(np.float32)
 
             indices = list(range(n_crops))
             if n_crops > self.max_crops:
@@ -146,6 +151,7 @@ def main() -> None:
         num_heads=cfg.num_heads,
         mlp_ratio=cfg.mlp_ratio,
         drop_path_rate=cfg.drop_path_rate,
+        time_conditioned=cfg.time_conditioned,
     )
     head_kwargs = dict(
         in_dim=cfg.embed_dim,
@@ -292,19 +298,20 @@ def main() -> None:
         n_batches = 0
 
         pbar = tqdm(dataloader, desc=f"DINO Epoch {epoch+1}/{cfg.epochs}")
-        for batch_idx, (global_crops, local_crops) in enumerate(pbar):
+        for batch_idx, (global_crops, local_crops, times) in enumerate(pbar):
             all_crops = []
             for gc in global_crops:
                 all_crops.append(gc.to(device, non_blocking=True))
             for lc in local_crops:
                 all_crops.append(lc.to(device, non_blocking=True))
+            times = times.to(device, non_blocking=True)
 
             n_global = len(global_crops)
 
             with torch.amp.autocast("cuda"):
-                student_outputs = dino.forward_student(all_crops)
+                student_outputs = dino.forward_student(all_crops, times=times)
                 with torch.no_grad():
-                    teacher_outputs = dino.forward_teacher(all_crops[:n_global])
+                    teacher_outputs = dino.forward_teacher(all_crops[:n_global], times=times)
                 loss = dino_loss_fn(student_outputs, teacher_outputs)
 
             optimizer.zero_grad()

@@ -164,6 +164,36 @@ class TransformerBlock(nn.Module):
         return x
 
 
+class SinusoidalTimeEmbedding(nn.Module):
+    """Sinusoidal encoding for a scalar continuous time value.
+
+    Maps a scalar ``t`` (e.g. seconds since experiment start) to a
+    ``dim``-dimensional vector using log-spaced sinusoidal frequency bands,
+    similar to the positional encoding of Vaswani et al. (2017) but applied
+    to a single continuous value rather than integer positions.
+    """
+
+    def __init__(self, dim: int, max_period: float = 3600.0) -> None:
+        super().__init__()
+        half = dim // 2
+        freqs = torch.exp(
+            torch.arange(0, half, dtype=torch.float32)
+            * (-math.log(max_period) / half)
+        )
+        self.register_buffer("freqs", freqs)  # (half,)
+
+    def forward(self, t: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            t: (B,) scalar time values (seconds).
+
+        Returns:
+            (B, dim) sinusoidal embedding.
+        """
+        args = t.unsqueeze(-1) * self.freqs  # (B, half)
+        return torch.cat([torch.sin(args), torch.cos(args)], dim=-1)
+
+
 class ViTSmall(nn.Module):
     """Vision Transformer – Small variant for 96x96 single-channel microscopy.
 
@@ -173,6 +203,7 @@ class ViTSmall(nn.Module):
     * 1 prepended CLS token → sequence length 37
     * 12 Transformer blocks, embed_dim 384, 6 heads
     * Stochastic depth with linearly increasing drop rate (max 0.1)
+    * Optional time conditioning: sinusoidal time embedding added to all tokens
 
     Returns
     -------
@@ -193,10 +224,12 @@ class ViTSmall(nn.Module):
         dropout: float = 0.0,
         attn_drop: float = 0.0,
         drop_path_rate: float = 0.1,
+        time_conditioned: bool = False,
     ) -> None:
         super().__init__()
         self.embed_dim = embed_dim
         self.num_patches = (img_size // patch_size) ** 2  # 36
+        self.time_conditioned = time_conditioned
 
         # ---------- patch embedding ----------
         self.patch_embed = PatchEmbed(
@@ -212,6 +245,15 @@ class ViTSmall(nn.Module):
             torch.zeros(1, 1 + self.num_patches, embed_dim)  # (1, 37, 384)
         )
         self.pos_drop = nn.Dropout(p=dropout)
+
+        # ---------- optional time conditioning ----------
+        if time_conditioned:
+            self.time_sinusoidal = SinusoidalTimeEmbedding(embed_dim)
+            self.time_proj = nn.Sequential(
+                nn.Linear(embed_dim, embed_dim),
+                nn.GELU(),
+                nn.Linear(embed_dim, embed_dim),
+            )
 
         # ---------- transformer blocks ----------
         dpr = [
@@ -277,39 +319,54 @@ class ViTSmall(nn.Module):
         patch_pos = patch_pos.permute(0, 2, 3, 1).reshape(1, -1, dim)
         return torch.cat([cls_pos, patch_pos], dim=1)
 
-    def _embed(self, x: torch.Tensor) -> torch.Tensor:
-        """Patch-embed, prepend CLS, add positional embeddings."""
+    def _embed(
+        self, x: torch.Tensor, time: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
+        """Patch-embed, prepend CLS, add positional + time embeddings."""
         B = x.shape[0]
         x = self.patch_embed(x)  # (B, N, D)
         num_patches = x.shape[1]
         cls_tokens = self.cls_token.expand(B, -1, -1)  # (B, 1, D)
         x = torch.cat([cls_tokens, x], dim=1)  # (B, N+1, D)
         pos_embed = self._interpolate_pos_embed(x, num_patches)
-        x = self.pos_drop(x + pos_embed)
+        x = x + pos_embed
+
+        # Add time conditioning: broadcast to all tokens
+        if time is not None and self.time_conditioned:
+            time_emb = self.time_proj(self.time_sinusoidal(time))  # (B, D)
+            x = x + time_emb.unsqueeze(1)  # (B, 1, D) broadcast
+
+        x = self.pos_drop(x)
         return x
 
-    def forward_features(self, x: torch.Tensor) -> torch.Tensor:
+    def forward_features(
+        self, x: torch.Tensor, time: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
         """Return all token representations including CLS.
 
         Args:
             x: (B, 1, 96, 96) grayscale microscopy image.
+            time: (B,) optional time in seconds since experiment start.
 
         Returns:
             (B, 37, 384) – CLS at index 0 followed by 36 patch tokens.
         """
-        x = self._embed(x)
+        x = self._embed(x, time=time)
         for blk in self.blocks:
             x = blk(x)
         x = self.norm(x)
         return x
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self, x: torch.Tensor, time: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
         """Return the CLS token representation.
 
         Args:
             x: (B, 1, 96, 96) grayscale microscopy image.
+            time: (B,) optional time in seconds since experiment start.
 
         Returns:
             (B, 384) CLS feature vector.
         """
-        return self.forward_features(x)[:, 0]
+        return self.forward_features(x, time=time)[:, 0]

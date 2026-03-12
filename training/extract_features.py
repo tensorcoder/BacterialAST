@@ -18,7 +18,11 @@ logger = logging.getLogger(__name__)
 
 
 class HDF5InferenceDataset(Dataset):
-    """Loads all crops from a single HDF5 file for feature extraction."""
+    """Loads all crops from a single HDF5 file for feature extraction.
+
+    Also returns relative timestamps (seconds since experiment start)
+    for time-conditioned backbones.
+    """
 
     _clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
 
@@ -35,18 +39,22 @@ class HDF5InferenceDataset(Dataset):
         self.use_clahe = use_clahe
         with h5py.File(self.h5_path, "r") as f:
             self.length = f["crops"].shape[0]
+            timestamps = f["metadata"]["timestamp"][:]
+            t_start = float(timestamps.min())
+            self._rel_times = (timestamps - t_start).astype(np.float32)
 
     def __len__(self) -> int:
         return self.length
 
-    def __getitem__(self, idx: int) -> torch.Tensor:
+    def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
         with h5py.File(self.h5_path, "r") as f:
-            crop = f["crops"][idx]  # (128, 128) uint8
+            crop = f["crops"][idx]  # (96, 96) uint8
         if self.use_clahe:
             crop = self._clahe.apply(crop)
         tensor = torch.from_numpy(crop.astype(np.float32) / 255.0)
         tensor = (tensor - self.mean) / self.std
-        return tensor.unsqueeze(0)  # (1, 128, 128)
+        time_sec = torch.tensor(self._rel_times[idx], dtype=torch.float32)
+        return tensor.unsqueeze(0), time_sec  # (1, 96, 96), scalar
 
 
 def extract_features_for_experiment(
@@ -80,11 +88,16 @@ def extract_features_for_experiment(
 
     all_features = []
     backbone.eval()
+    time_conditioned = getattr(backbone, "time_conditioned", False)
 
     with torch.no_grad(), torch.amp.autocast("cuda"):
-        for batch in dataloader:
-            batch = batch.to(device, non_blocking=True)
-            features = backbone(batch)  # (B, 384)
+        for crops, times in dataloader:
+            crops = crops.to(device, non_blocking=True)
+            if time_conditioned:
+                times = times.to(device, non_blocking=True)
+                features = backbone(crops, time=times)  # (B, 384)
+            else:
+                features = backbone(crops)  # (B, 384)
             all_features.append(features.cpu().half().numpy())
 
     features = np.concatenate(all_features, axis=0)  # (N, 384) float16
@@ -107,12 +120,13 @@ def extract_all_features(
     num_workers: int = 4,
     device_str: str = "cuda:0",
     embed_dim: int = 384,
-    img_size: int = 128,
+    img_size: int = 96,
     patch_size: int = 16,
     depth: int = 12,
     num_heads: int = 6,
     dataset_mean: float = 0.3387,
     dataset_std: float = 0.1173,
+    time_conditioned: bool = True,
 ) -> None:
     """Extract features for all experiments using pretrained backbone."""
     device = torch.device(device_str)
@@ -124,6 +138,7 @@ def extract_all_features(
         embed_dim=embed_dim,
         depth=depth,
         num_heads=num_heads,
+        time_conditioned=time_conditioned,
     ).to(device)
 
     checkpoint = torch.load(backbone_checkpoint, map_location=device, weights_only=False)
