@@ -233,7 +233,9 @@ def train_fold(
         max_crops_per_bin=cfg.max_crops_per_bin,
         feature_dim=cfg.feature_dim,
         random_window=True,
-        samples_per_experiment=8,
+        samples_per_experiment=cfg.samples_per_experiment,
+        subsequence_sampling=cfg.subsequence_sampling,
+        min_subsequence_sec=cfg.min_subsequence_sec,
     )
     val_dataset = PopulationTemporalDataset(
         feature_dir=config.paths.features_dir,
@@ -477,6 +479,10 @@ def main() -> None:
     parser.add_argument("--n-folds", type=int, default=5)
     parser.add_argument("--device", type=str, default="cuda:0")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--subsequence", action="store_true",
+                        help="Enable sub-sequence sampling (random start + duration)")
+    parser.add_argument("--samples-per-experiment", type=int, default=None,
+                        help="Samples per experiment per epoch (default: 30 with --subsequence, 8 without)")
     args = parser.parse_args()
 
     config = FullConfig()
@@ -487,6 +493,11 @@ def main() -> None:
         config.paths.features_dir = args.features_dir
     if args.checkpoints_dir:
         config.paths.checkpoints_dir = args.checkpoints_dir
+    config.classifier.subsequence_sampling = args.subsequence
+    if args.samples_per_experiment is not None:
+        config.classifier.samples_per_experiment = args.samples_per_experiment
+    elif args.subsequence:
+        config.classifier.samples_per_experiment = 30
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)

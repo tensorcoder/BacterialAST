@@ -109,6 +109,8 @@ class PopulationTemporalDataset(Dataset):
         max_experiment_sec: float = 3600.0,
         random_window: bool = True,
         samples_per_experiment: int = 1,
+        subsequence_sampling: bool = False,
+        min_subsequence_sec: float = 120.0,
     ):
         self.feature_dir = Path(feature_dir)
         self.experiments = experiments
@@ -117,6 +119,8 @@ class PopulationTemporalDataset(Dataset):
         self.feature_dim = feature_dim
         self.max_experiment_sec = max_experiment_sec
         self.random_window = random_window
+        self.subsequence_sampling = subsequence_sampling
+        self.min_subsequence_sec = min_subsequence_sec
 
         if time_windows_sec is None:
             self.time_windows = [60, 120, 180, 300, 600, 900, 1800, 3600]
@@ -173,23 +177,34 @@ class PopulationTemporalDataset(Dataset):
     def __getitem__(self, idx: int) -> dict:
         exp, fixed_window = self.samples[idx]
         data = self._load_features(exp)
+        timestamps = data["timestamps"]
 
-        # Select time window
-        if fixed_window is not None:
-            window_sec = fixed_window
+        # Determine time window boundaries
+        if self.subsequence_sampling and fixed_window is None:
+            # Random sub-sequence: random start + random duration
+            max_time = float(timestamps.max()) if len(timestamps) > 0 else self.time_bin_width
+            min_dur = min(self.min_subsequence_sec, max_time)
+            duration = random.uniform(min_dur, max_time)
+            start_time = random.uniform(0, max(0, max_time - duration))
+            end_time = start_time + duration
+        elif fixed_window is not None:
+            start_time = 0.0
+            end_time = fixed_window
         else:
             window_sec = random.choices(
                 self.time_windows, weights=self.window_weights, k=1
             )[0]
+            start_time = 0.0
+            end_time = window_sec
 
         # Filter to crops within the time window
-        timestamps = data["timestamps"]
-        mask = timestamps <= window_sec
-        features = data["features"][mask].astype(np.float32)
-        ts = timestamps[mask]
+        sel = (timestamps >= start_time) & (timestamps <= end_time)
+        features = data["features"][sel].astype(np.float32)
+        ts = timestamps[sel]
 
         # Compute time bins
-        n_bins = max(1, int(np.ceil(window_sec / self.time_bin_width)))
+        duration = end_time - start_time
+        n_bins = max(1, int(np.ceil(duration / self.time_bin_width)))
 
         # Build per-bin feature tensors
         bin_features = torch.zeros(n_bins, self.max_crops_per_bin, self.feature_dim)
@@ -199,8 +214,8 @@ class PopulationTemporalDataset(Dataset):
         bin_counts = torch.zeros(n_bins, dtype=torch.float32)
 
         for b in range(n_bins):
-            t_lo = b * self.time_bin_width
-            t_hi = (b + 1) * self.time_bin_width
+            t_lo = start_time + b * self.time_bin_width
+            t_hi = start_time + (b + 1) * self.time_bin_width
             bin_center = (t_lo + t_hi) / 2.0
             bin_times[b] = bin_center
 
@@ -225,7 +240,7 @@ class PopulationTemporalDataset(Dataset):
             bin_features[b, :n_crops] = torch.from_numpy(bin_feats)
             crop_mask[b, :n_crops] = True
 
-        time_fraction = min(window_sec / self.max_experiment_sec, 1.0)
+        time_fraction = min(end_time / self.max_experiment_sec, 1.0)
 
         return {
             "bin_features": bin_features,  # (n_bins, max_crops_per_bin, 384)
@@ -236,7 +251,7 @@ class PopulationTemporalDataset(Dataset):
             "time_fraction": torch.tensor(time_fraction, dtype=torch.float32),
             "label": torch.tensor(exp.label, dtype=torch.long),
             "experiment_id": exp.experiment_id,
-            "window_sec": window_sec,
+            "window_sec": end_time,
         }
 
 

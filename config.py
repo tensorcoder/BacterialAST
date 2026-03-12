@@ -108,6 +108,10 @@ class ClassifierConfig:
     bin_aux_loss_weight: float = 0.5
     # Delta features (subtract first-bin stats for strain invariance)
     use_delta_features: bool = False
+    # Sub-sequence sampling (random start + duration per sample)
+    subsequence_sampling: bool = False
+    samples_per_experiment: int = 8
+    min_subsequence_sec: float = 120.0
     # Time-aware loss
     time_loss_alpha: float = 2.0
     attention_entropy_weight: float = 0.01

@@ -20,6 +20,7 @@ A deep learning pipeline that distinguishes antibiotic-resistant from susceptibl
   - [Evaluation](#evaluation)
   - [Full Pipeline](#full-pipeline)
   - [Per-Crop MLP Classifier](#per-crop-mlp-classifier)
+  - [Sub-Sequence Sampling](#sub-sequence-sampling)
 - [Configuration Reference](#configuration-reference)
 - [Model Architecture Details](#model-architecture-details)
 - [Augmentation Strategy](#augmentation-strategy)
@@ -924,6 +925,111 @@ results_crop_mlp/
 
 ---
 
+## Sub-Sequence Sampling
+
+A training data augmentation strategy that dramatically increases the effective number of training samples without requiring additional experiments. Instead of always feeding the model the full experiment from t=0, each training sample is a **random contiguous sub-sequence** with a random start time and random duration.
+
+### Motivation
+
+The population-temporal classifier trains on only ~23 experiments per fold (after strain holdout). With `samples_per_experiment=8` and 8 discrete time windows, the model sees ~184 training samples per epoch -- far too few for a transformer to learn robust temporal patterns. This explains why the stats encoder (no learned pooling parameters) outperforms learned approaches like attention.
+
+Sub-sequence sampling addresses this by:
+
+1. **Multiplying training data ~4x**: 30 random sub-sequences per experiment per epoch = ~690 samples (vs ~184).
+2. **Teaching time-awareness**: The model sees population snapshots from all parts of the experiment (middle, late, short windows, long windows), not just cumulative prefixes from t=0.
+3. **Directly training early-exit**: The model learns to classify from partial observations at any time horizon, removing the train/test mismatch where it was trained on full experiments but asked to classify partial ones.
+
+### Design
+
+**Training:** Each sample draws a random duration from `[min_subsequence_sec, max_experiment_time]` and a random start time from `[0, max_time - duration]`. Crops are filtered to the selected interval and binned using absolute timestamps (so the model knows WHERE in the experiment the sub-sequence comes from via `ContinuousTimeEncoding`). `time_fraction = end_time / 3600` tells the classifier head how far into the experiment the latest observation is.
+
+**Evaluation:** Always uses prefix mode (from t=0 to each evaluation time point) -- unchanged from previous experiments, ensuring fair comparison.
+
+**Configuration:**
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `subsequence_sampling` | `False` | Enable sub-sequence sampling (off by default for backward compatibility) |
+| `samples_per_experiment` | `8` (30 with `--subsequence`) | Training sub-sequences drawn per experiment per epoch |
+| `min_subsequence_sec` | `120.0` | Minimum sub-sequence duration (1 bin width) |
+
+### Results
+
+**Aggregate (5-fold strain-holdout):** AUROC 0.74 +/- 0.26, Accuracy 0.68 +/- 0.15
+
+| Fold | Holdout R | Holdout S | Val AUC | Test AUROC | Test Acc@60min |
+|------|-----------|-----------|---------|------------|----------------|
+| 0 | EC58, EC87 | EC36, EC39 | 0.922 | 0.889 | 0.667 |
+| 1 | EC58, EC60 | EC33, EC39 | 0.948 | 0.900 | 0.727 |
+| 2 | EC35, EC87 | EC33, EC39 | 0.759 | 0.217 | 0.455 |
+| 3 | EC35, EC87 | EC36, EC39 | 1.000 | 0.792 | 0.667 |
+| 4 | EC40, EC48 | EC39, EC67 | 1.000 | 0.900 | 0.909 |
+
+**Accuracy vs cumulative time (mean +/- std across folds):**
+
+| Time | Accuracy |
+|------|----------|
+| 1 min | 0.564 +/- 0.168 |
+| 2 min | 0.524 +/- 0.139 |
+| 5 min | 0.559 +/- 0.157 |
+| 10 min | 0.577 +/- 0.110 |
+| 15 min | 0.524 +/- 0.100 |
+| 30 min | 0.630 +/- 0.178 |
+| 60 min | 0.685 +/- 0.146 |
+
+**Comparison across all classifier variants (AUROC @ 60 min):**
+
+| Variant | AUROC | Accuracy |
+|---------|-------|----------|
+| Stats baseline | 0.80 +/- 0.09 | 0.65 +/- 0.16 |
+| Crop MLP | 0.76 +/- 0.14 | 0.60 +/- 0.10 |
+| Delta features | 0.74 +/- 0.08 | 0.72 +/- 0.04 |
+| **Sub-seq sampling** | **0.74 +/- 0.26** | **0.68 +/- 0.15** |
+| LSTM | 0.66 +/- 0.20 | 0.58 +/- 0.07 |
+| Stats + aux | 0.60 +/- 0.27 | 0.54 +/- 0.08 |
+| Ctx aux | 0.56 +/- 0.15 | 0.60 +/- 0.04 |
+| Attention bin | 0.50 +/- 0.00 | 0.54 +/- 0.11 |
+| Attention + aux | 0.50 +/- 0.00 | 0.59 +/- 0.10 |
+
+**Key findings:**
+
+1. **Temporal signal emerges.** Unlike the baseline (flat accuracy over time) and the crop MLP (completely flat), sub-sequence sampling shows a positive accuracy trend: 52% at 2 min rising to 68% at 60 min. This suggests the model is learning to exploit temporal dynamics, not just strain morphology.
+
+2. **Individual fold improvement on good folds.** Folds 0, 1, and 4 all achieved AUROC >= 0.89 (vs baseline's 0.83, 0.73, 0.88 for the same holdout strains). The model benefits from seeing more diverse temporal windows during training.
+
+3. **High variance from one catastrophic fold.** Fold 2 (holdout EC35+EC87 + EC33+EC39) collapsed to 0.22 AUROC, dragging the mean down. The same strain combination was also the weakest in the baseline (0.72). This suggests EC35 and EC87 have morphologies that the current DINO embeddings confuse with susceptible strains.
+
+4. **Accuracy improves; AUROC has higher variance.** Mean accuracy at 60 min improved (0.68 vs 0.65) but mean AUROC dropped due to the fold 2 outlier. Excluding fold 2, mean AUROC = 0.87 -- substantially above the baseline's 0.82 (same folds excluded).
+
+### Usage
+
+```bash
+PYTHONPATH=/path/to/parent python3 -m ast_classifier.scripts.strain_holdout_eval \
+    --output-dir ./results_strain_holdout_subseq \
+    --device cuda:0 \
+    --subsequence
+```
+
+**Additional arguments:**
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `--subsequence` | off | Enable sub-sequence sampling |
+| `--samples-per-experiment` | 30 (when `--subsequence`) | Sub-sequences per experiment per epoch |
+
+**Output:**
+```
+results_strain_holdout_subseq/
+├── checkpoints/
+│   ├── fold0_best.pt ... fold4_best.pt
+├── plots/
+│   ├── auroc_comparison_all_variants.png
+│   ├── accuracy_vs_time_comparison.png
+│   ├── per_fold_auroc_subseq.png
+│   └── per_fold_accuracy_vs_time_subseq.png
+└── strain_holdout_results.json
+```
+
+---
+
 ## Project Structure
 
 ```
@@ -970,6 +1076,7 @@ ast_classifier/
     ├── strain_holdout_lstm.py          # Strain-holdout CV (BiLSTM variant)
     ├── strain_holdout_ctx_aux.py       # Strain-holdout CV (contextualized aux)
     ├── strain_holdout_crop_classifier.py  # Per-crop MLP classifier
+    ├── plot_subseq_results.py          # Plot sub-sequence sampling results
     └── train_dino_holdout.py           # DINO training with strain exclusion
 ```
 

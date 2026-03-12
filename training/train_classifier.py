@@ -130,7 +130,9 @@ def train_classifier(config: FullConfig) -> Path:
         max_crops_per_bin=cfg.max_crops_per_bin,
         feature_dim=cfg.feature_dim,
         random_window=True,
-        samples_per_experiment=8,
+        samples_per_experiment=cfg.samples_per_experiment,
+        subsequence_sampling=cfg.subsequence_sampling,
+        min_subsequence_sec=cfg.min_subsequence_sec,
     )
     val_dataset = PopulationTemporalDataset(
         feature_dir=config.paths.features_dir,
