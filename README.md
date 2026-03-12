@@ -19,6 +19,7 @@ A deep learning pipeline that distinguishes antibiotic-resistant from susceptibl
   - [Stage 5: Early-Exit Calibration](#stage-5-early-exit-calibration)
   - [Evaluation](#evaluation)
   - [Full Pipeline](#full-pipeline)
+  - [Per-Crop MLP Classifier](#per-crop-mlp-classifier)
 - [Configuration Reference](#configuration-reference)
 - [Model Architecture Details](#model-architecture-details)
 - [Augmentation Strategy](#augmentation-strategy)
@@ -824,6 +825,105 @@ The `utils/visualization.py` module generates publication-quality figures:
 
 ---
 
+## Per-Crop MLP Classifier
+
+An alternative approach that bypasses the population-level temporal pipeline entirely. Instead of binning crops into time windows and modelling population statistics, this classifier operates on **individual bacterium DINO embeddings** directly.
+
+### Motivation
+
+The population-temporal models (transformer, BiLSTM, attention variants) achieved AUROC 0.56-0.80 across strain-holdout folds. A key question is whether the DINO embeddings themselves carry per-crop R/S signal, or whether the temporal aggregation is losing information. This per-crop classifier serves as both:
+
+1. **A diagnostic tool** -- time-series plots of per-crop predictions reveal when the morphological R/S signal emerges during the experiment
+2. **A strong baseline** -- if individual crop classification + majority vote outperforms population-temporal models, the bottleneck is in the aggregation, not the embeddings
+
+### Design
+
+**Training:** Only uses crops from **t > 40 minutes** (2400 seconds into the experiment), where morphological differences between resistant and susceptible bacteria are expected to be most pronounced (validated by prior YOLO-OBB experiments showing correct classification after 40-50 minutes).
+
+**Model:** A small 2-hidden-layer MLP (384 -> 128 -> 64 -> 2) with LayerNorm, GELU, and Dropout(0.3). ~58K parameters. Each DINO embedding is independently classified as R or S.
+
+**Validation:** Strain-holdout cross-validation (5 folds, each holding out 2 resistant + 2 susceptible strains). Class-weighted loss handles imbalance. Early stopping on validation AUROC.
+
+**Evaluation:** At test time, the model runs on **all crops from all time points** (not just t > 40min). Results are binned into 5-minute intervals to show how classification evolves over time. Experiment-level predictions use majority vote (mean P(R) > 0.5) computed cumulatively at each time point.
+
+### Output
+
+The script produces:
+- **Per-fold time-series plots**: Each test experiment shown as a line of mean P(Resistant) across 5-minute bins. Solid lines = true resistant, dashed = true susceptible. Ideally, R lines trend upward over time and S lines trend downward.
+- **Per-fold crop fraction plots**: Fraction of crops classified as resistant, separated by true label.
+- **Aggregate accuracy plot**: Experiment-level accuracy (cumulative majority vote) vs time, mean +/- std across folds.
+- **Aggregate time-series by label**: Mean P(R) over time for true-R vs true-S experiments, showing when the signal separates.
+- **JSON results**: Summary metrics and detailed per-experiment time-series data.
+
+### Results
+
+**Aggregate (5-fold strain-holdout):** AUROC 0.76 +/- 0.14, Accuracy 0.60 +/- 0.10
+
+| Fold | Holdout R | Holdout S | Val AUC | Test AUROC | Test Accuracy |
+|------|-----------|-----------|---------|------------|---------------|
+| 0 | EC58, EC87 | EC36, EC39 | 0.877 | 0.889 | 0.667 |
+| 1 | EC58, EC60 | EC33, EC39 | 0.667 | 0.867 | 0.636 |
+| 2 | EC35, EC87 | EC33, EC39 | 0.797 | 0.533 | 0.455 |
+| 3 | EC35, EC87 | EC36, EC39 | 0.919 | 0.667 | 0.500 |
+| 4 | EC40, EC48 | EC39, EC67 | 0.717 | 0.867 | 0.727 |
+
+**Accuracy vs cumulative time (mean +/- std across folds):**
+
+| Time | Accuracy |
+|------|----------|
+| 5 min | 0.564 +/- 0.084 |
+| 10 min | 0.545 +/- 0.095 |
+| 15 min | 0.529 +/- 0.108 |
+| 20 min | 0.545 +/- 0.095 |
+| 25 min | 0.544 +/- 0.118 |
+| 30 min | 0.579 +/- 0.131 |
+| 40 min | 0.579 +/- 0.131 |
+| 50 min | 0.579 +/- 0.131 |
+| 60 min | 0.579 +/- 0.131 |
+
+**Key findings:**
+
+1. **No temporal signal in predictions.** Accuracy is flat from 5 minutes through 60 minutes -- the majority-vote experiment-level prediction does not change over time for most folds. This means the model is not detecting a time-dependent morphological shift (e.g., susceptible bacteria elongating or lysing over time).
+
+2. **High fold variance driven by strain identity.** AUROC ranges from 0.53 (fold 2, holdout EC35+EC87) to 0.89 (fold 0, holdout EC58+EC87). The model generalises well to some unseen strains but fails on others, suggesting the DINO embeddings encode more strain-level morphological fingerprint than antibiotic-response signal.
+
+3. **Class imbalance is significant.** After 40 minutes, resistant experiments contribute 4.12x more crops than susceptible experiments (651K vs 158K), reflecting that susceptible bacteria are killed by the antibiotic. Class-weighted loss compensates but cannot create signal that isn't there.
+
+4. **Comparable to population-temporal models.** The per-crop MLP (AUROC 0.76) performs similarly to the population-level transformer (0.80), BiLSTM (0.62), and attention variants (0.56-0.71). This suggests the bottleneck is not in the temporal aggregation strategy but in the DINO embedding quality itself -- the backbone may not be learning features that distinguish antibiotic response from strain morphology.
+
+### Usage
+
+```bash
+PYTHONPATH=/path/to/parent python3 -m ast_classifier.scripts.strain_holdout_crop_classifier \
+    --output-dir ./results_crop_mlp \
+    --device cuda:0
+```
+
+**Key arguments:**
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `--min-time-sec` | 2400 | Training time threshold (seconds). Only train on crops after this time |
+| `--max-crops-per-exp` | 10000 | Max training crops per experiment (prevents dominant experiments) |
+| `--bin-width-sec` | 300 | Evaluation time bin width (seconds). Default: 5 minutes |
+| `--n-folds` | 5 | Number of strain-holdout folds |
+
+**Output directory structure:**
+```
+results_crop_mlp/
+├── checkpoints/
+│   ├── fold0_best.pt ... fold4_best.pt
+├── plots/
+│   ├── fold0_timeseries.png         # Per-experiment P(R) over time
+│   ├── fold0_crop_fractions.png     # R vs S fraction by true label
+│   ├── ...
+│   ├── aggregate_accuracy_vs_time.png
+│   └── aggregate_timeseries_by_label.png
+├── strain_holdout_results.json      # Summary metrics
+└── per_experiment_details.json      # Full per-experiment time-series data
+```
+
+---
+
 ## Project Structure
 
 ```
@@ -865,7 +965,12 @@ ast_classifier/
     ├── preprocess.py                   # Stage 1: YOLO detection + crop extraction
     ├── train.py                        # Stages 2-5: Training pipeline
     ├── evaluate.py                     # Full evaluation with early-exit simulation
-    └── run_full_pipeline.sh            # Automated end-to-end pipeline
+    ├── run_full_pipeline.sh            # Automated end-to-end pipeline
+    ├── strain_holdout_eval.py          # Strain-holdout CV (baseline transformer)
+    ├── strain_holdout_lstm.py          # Strain-holdout CV (BiLSTM variant)
+    ├── strain_holdout_ctx_aux.py       # Strain-holdout CV (contextualized aux)
+    ├── strain_holdout_crop_classifier.py  # Per-crop MLP classifier
+    └── train_dino_holdout.py           # DINO training with strain exclusion
 ```
 
 ---
