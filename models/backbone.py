@@ -225,11 +225,13 @@ class ViTSmall(nn.Module):
         attn_drop: float = 0.0,
         drop_path_rate: float = 0.1,
         time_conditioned: bool = False,
+        time_quantize_sec: float = 0.0,
     ) -> None:
         super().__init__()
         self.embed_dim = embed_dim
         self.num_patches = (img_size // patch_size) ** 2  # 36
         self.time_conditioned = time_conditioned
+        self.time_quantize_sec = time_quantize_sec
 
         # ---------- patch embedding ----------
         self.patch_embed = PatchEmbed(
@@ -333,6 +335,8 @@ class ViTSmall(nn.Module):
 
         # Add time conditioning: broadcast to all tokens
         if time is not None and self.time_conditioned:
+            if self.time_quantize_sec > 0:
+                time = (time // self.time_quantize_sec) * self.time_quantize_sec
             time_emb = self.time_proj(self.time_sinusoidal(time))  # (B, D)
             x = x + time_emb.unsqueeze(1)  # (B, 1, D) broadcast
 

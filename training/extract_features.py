@@ -32,11 +32,13 @@ class HDF5InferenceDataset(Dataset):
         mean: float = 0.3387,
         std: float = 0.1173,
         use_clahe: bool = True,
+        img_size: int = 96,
     ):
         self.h5_path = Path(h5_path)
         self.mean = mean
         self.std = std
         self.use_clahe = use_clahe
+        self.img_size = img_size
         with h5py.File(self.h5_path, "r") as f:
             self.length = f["crops"].shape[0]
             timestamps = f["metadata"]["timestamp"][:]
@@ -48,9 +50,12 @@ class HDF5InferenceDataset(Dataset):
 
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
         with h5py.File(self.h5_path, "r") as f:
-            crop = f["crops"][idx]  # (96, 96) uint8
+            crop = f["crops"][idx]  # uint8
         if self.use_clahe:
             crop = self._clahe.apply(crop)
+        # Resize if HDF5 crop size doesn't match expected img_size
+        if crop.shape[0] != self.img_size or crop.shape[1] != self.img_size:
+            crop = cv2.resize(crop, (self.img_size, self.img_size), interpolation=cv2.INTER_LINEAR)
         tensor = torch.from_numpy(crop.astype(np.float32) / 255.0)
         tensor = (tensor - self.mean) / self.std
         time_sec = torch.tensor(self._rel_times[idx], dtype=torch.float32)
@@ -67,9 +72,10 @@ def extract_features_for_experiment(
     mean: float = 0.3387,
     std: float = 0.1173,
     use_clahe: bool = True,
+    img_size: int = 96,
 ) -> None:
     """Extract features for all crops in one experiment HDF5 file."""
-    dataset = HDF5InferenceDataset(h5_path, mean=mean, std=std, use_clahe=use_clahe)
+    dataset = HDF5InferenceDataset(h5_path, mean=mean, std=std, use_clahe=use_clahe, img_size=img_size)
     if len(dataset) == 0:
         logger.warning(f"Empty HDF5: {h5_path}")
         return
@@ -127,6 +133,7 @@ def extract_all_features(
     dataset_mean: float = 0.3387,
     dataset_std: float = 0.1173,
     time_conditioned: bool = True,
+    time_quantize_sec: float = 0.0,
 ) -> None:
     """Extract features for all experiments using pretrained backbone."""
     device = torch.device(device_str)
@@ -139,6 +146,7 @@ def extract_all_features(
         depth=depth,
         num_heads=num_heads,
         time_conditioned=time_conditioned,
+        time_quantize_sec=time_quantize_sec,
     ).to(device)
 
     checkpoint = torch.load(backbone_checkpoint, map_location=device, weights_only=False)
@@ -171,6 +179,7 @@ def extract_all_features(
             device=device,
             mean=dataset_mean,
             std=dataset_std,
+            img_size=img_size,
         )
 
     logger.info(f"Feature extraction complete. Output: {output_dir}")

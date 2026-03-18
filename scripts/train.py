@@ -72,6 +72,8 @@ def run_extract(config: FullConfig, backbone_path: Path | None = None) -> None:
         num_heads=config.dino.num_heads,
         dataset_mean=config.dino.dataset_mean,
         dataset_std=config.dino.dataset_std,
+        time_conditioned=config.dino.time_conditioned,
+        time_quantize_sec=config.dino.time_quantize_sec,
     )
     logger.info("Feature extraction complete.")
 

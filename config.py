@@ -34,6 +34,7 @@ class DINOConfig:
     mlp_ratio: float = 4.0
     drop_path_rate: float = 0.1
     time_conditioned: bool = True
+    time_quantize_sec: float = 300.0  # Quantize time to 5-min bins (0 = no quantization)
     # DINO head
     head_hidden_dim: int = 2048
     head_bottleneck_dim: int = 256

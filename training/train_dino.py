@@ -56,6 +56,7 @@ def train_dino(config: FullConfig) -> Path:
         mlp_ratio=cfg.mlp_ratio,
         drop_path_rate=cfg.drop_path_rate,
         time_conditioned=cfg.time_conditioned,
+        time_quantize_sec=cfg.time_quantize_sec,
     )
     head_kwargs = dict(
         in_dim=cfg.embed_dim,
