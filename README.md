@@ -30,6 +30,14 @@ A deep learning pipeline that distinguishes antibiotic-resistant from susceptibl
 - [Visualization](#visualization)
 - [Project Structure](#project-structure)
 - [Hardware Requirements](#hardware-requirements)
+- [Methods and Results](#methods-and-results)
+  - [Dataset](#dataset)
+  - [Preprocessing](#preprocessing)
+  - [Self-Supervised Feature Learning (DINO)](#self-supervised-feature-learning-dino)
+  - [Downstream Classification](#downstream-classification)
+  - [Evaluation Protocol](#evaluation-protocol)
+  - [Results](#results)
+  - [Key Findings](#key-findings)
 - [Literature and References](#literature-and-references)
 
 ---
@@ -1111,6 +1119,114 @@ ast_classifier/
 - **Multi-GPU:** Increase batch sizes proportionally. DINO supports `DistributedDataParallel` out of the box
 - **More VRAM:** Increase `batch_size`, increase `max_crops_per_bin`
 - **Less VRAM (16GB):** Reduce `batch_size` to 32 for DINO, increase `gradient_accumulation` for classifier
+
+---
+
+## Methods and Results
+
+### Dataset
+
+Data were collected from 42 *E. coli* experiments (11 resistant, 16 susceptible, 15 test) exposed to 16 mg/L ampicillin under the second protocol. Each experiment consists of ~14,500 brightfield microscopy frames captured at 100x magnification, 5 FPS, over 1 hour. Test experiment labels were inferred from strain identity (e.g., EC35 appears in both the Resistant and Test folders). In total, the dataset spans 15 unique strains: 7 resistant (EC35, EC40, EC48, EC58, EC60, EC65, EC87) and 8 susceptible (EC126, EC33, EC36, EC39, EC42, EC67, EC79, EC89).
+
+### Preprocessing
+
+A finetuned YOLOv11-OBB model (1024x1024, DOTAv1-pretrained) detects bacteria in each frame and classifies them as focused, unfocused, or vertical. Only focused detections are retained. Detected bacteria are cropped from the original frame and stored in per-experiment HDF5 files with metadata (timestamp, bounding box coordinates, confidence).
+
+Two preprocessing variants were evaluated:
+
+| Version | Crop size | Padding | Total crops |
+|---------|-----------|---------|-------------|
+| **v1** | 128x128 | Reflection | 2,378,824 |
+| **v2** | 96x96 | Zero | 2,099,023 |
+
+### Self-Supervised Feature Learning (DINO)
+
+A ViT-Small backbone (12 layers, 384-dim, 6 heads) is pretrained using DINO self-supervised learning on up to 5,000 crops per experiment (~207K total). The backbone is time-conditioned: a sinusoidal encoding of each crop's timestamp (seconds since experiment start) is projected through a 2-layer MLP and added to all token embeddings, allowing the model to learn time-dependent representations.
+
+Augmentations are calibrated to the data's narrow dynamic range (post-CLAHE mean=0.34, std=0.12): brightness jitter 0.03, contrast jitter 0.3, Gaussian noise std max 0.01. CLAHE contrast enhancement (clipLimit=2.0) is applied before normalization. Multi-crop training uses 2 global crops (70-100% scale) and 6 local crops (30-60% scale at 48x48).
+
+Three DINO variants were trained:
+
+| Version | Crops | Time conditioning | Loss (best) | Epochs |
+|---------|-------|-------------------|-------------|--------|
+| **v1** | 128x128 reflection-padded | Continuous (0.2s resolution) | 0.815 | 100 (best @ 44) |
+| **v2** | 96x96 zero-padded | Continuous (0.2s resolution) | 0.033 | 100 |
+| **v3** | 96x96 zero-padded | Quantized to 5-min bins | 0.003 | 100 (best @ 26) |
+
+The dramatically lower loss for v2 and v3 was initially interpreted as better learning but turned out to indicate shortcut learning (see Analysis below).
+
+### Downstream Classification
+
+#### Per-Crop MLP Classifier
+
+A 2-layer MLP (384 -> 128 -> 2) is trained on individual crop DINO embeddings to predict resistant vs susceptible. Training uses only crops from t > 40 minutes (where susceptible bacteria show clear morphological changes). At evaluation time, the classifier produces P(resistant) for every crop in each 5-minute time bin, and the bin-level mean P(resistant) is tracked over the full 1-hour experiment.
+
+#### Population Temporal Classifier
+
+A transformer-based architecture aggregates per-bin population statistics (mean, std, skew, kurtosis of DINO embeddings + crop count) across time bins using a temporal transformer encoder, followed by gated attention pooling over contextualized bins. Multiple variants were evaluated (stats-based, attention-based, LSTM, contextual auxiliary loss).
+
+### Evaluation Protocol
+
+**Strain-holdout cross-validation:** Each of 5 folds holds out 2 resistant and 2 susceptible strains (all experiments for those strains), ensuring the classifier is evaluated on bacteria it has never seen at the strain level. This tests whether the model learns antibiotic response biology rather than strain-specific morphological fingerprints.
+
+**Trajectory-based evaluation:** Rather than computing accuracy at isolated time points, we evaluate the *trajectory* of P(resistant) over the full experiment. The expected biological signal is:
+- **Susceptible experiments:** P(resistant) starts high (bacteria look healthy/resistant initially) and decreases over time as the antibiotic takes effect (morphological changes: elongation, blebbing, lysis).
+- **Resistant experiments:** P(resistant) remains stable throughout (bacteria continue growing normally).
+
+This trajectory view is critical because penalizing the classifier for calling susceptible bacteria "resistant" at t=2 minutes is biologically incorrect -- the antibiotic has not had time to act yet.
+
+### Results
+
+#### Per-Crop MLP -- Trajectory Analysis
+
+The per-crop MLP on **v1 features** (128x128, reflection padding) shows clear biological signal in the trajectory analysis:
+
+- Susceptible experiments: Mean P(resistant) drops from **0.65 at t=2min to 0.17 at t=60min**
+- Resistant experiments: Mean P(resistant) remains **flat at ~0.70** throughout
+- The curves cross the 0.5 decision boundary at approximately **25-30 minutes**
+- Aggregate AUROC@60min: **0.764 +/- 0.141** (5-fold strain-holdout CV)
+
+Per-fold AUROC breakdown:
+
+| Fold | Holdout R | Holdout S | AUROC |
+|------|-----------|-----------|-------|
+| 0 | EC58, EC87 | EC36, EC39 | 0.889 |
+| 1 | EC58, EC60 | EC33, EC39 | 0.867 |
+| 2 | EC35, EC87 | EC33, EC39 | 0.533 |
+| 3 | EC35, EC87 | EC36, EC39 | 0.667 |
+| 4 | EC40, EC48 | EC39, EC67 | 0.867 |
+
+Folds containing EC35 (resistant) perform worst -- this strain may have atypical morphology or slower growth under the experimental conditions.
+
+#### Zero-Padding Shortcut (v2/v3 Failure)
+
+The v2 (96x96, zero-padded) and v3 (96x96, zero-padded + 5-min time quantization) features produce **no biological signal**:
+
+| DINO features | Crop MLP AUROC | Trajectory separation |
+|---------------|----------------|----------------------|
+| **v1** (128x128, reflection pad) | 0.764 +/- 0.141 | Clear divergence |
+| **v2** (96x96, zero pad) | 0.562 +/- 0.277 | None (both at ~0.50) |
+| **v3** (96x96, zero pad + time quant) | 0.661 +/- 0.232 | None (both at ~0.50) |
+
+**Root cause:** With 96x96 crops and zero-padding, **85-90% of pixels are zero** on average (bacteria occupy a small region within the crop). The zero-padding boundary creates a unique silhouette per crop that DINO can trivially use to match augmented views -- it never needs to learn actual morphological features. This explains the paradoxically low DINO loss (0.003-0.033) compared to v1 (0.815): lower loss indicated an easier task (shortcut learning), not better features.
+
+Time quantization (v3) was introduced to prevent DINO from using timestamp similarity as a shortcut for view-matching, but this was irrelevant because the zero-padding shortcut dominated.
+
+#### Population Temporal Classifier
+
+The transformer-based temporal classifiers trained on v1 features did not outperform the simpler per-crop MLP. All variants (baseline stats, delta features, attention bin encoder, LSTM, contextual auxiliary) produced aggregate AUROCs in the 0.5-0.8 range with high variance across folds. The per-crop MLP's trajectory analysis provides a more interpretable and biologically grounded evaluation framework.
+
+### Key Findings
+
+1. **The v1 DINO backbone (128x128, reflection padding) successfully learns morphological features** that distinguish resistant from susceptible bacteria, despite concerns about time-based shortcuts.
+
+2. **Zero-padding destroys feature quality.** When bacteria occupy <15% of the crop area and the rest is zero, DINO learns the padding boundary pattern rather than cell morphology. Reflection padding avoids this by filling the entire image with plausible content.
+
+3. **Trajectory evaluation is essential.** Standard accuracy metrics penalize the classifier for biologically correct predictions (calling susceptible bacteria "resistant" at early time points). The trajectory of P(resistant) over time reveals the true signal: susceptible populations diverge from resistant populations starting at ~25-30 minutes.
+
+4. **Strain EC35 is a challenging case.** Folds holding out EC35 consistently underperform, suggesting this resistant strain has atypical morphology that the classifier struggles to generalize to.
+
+5. **Simpler classifiers can outperform complex architectures** when evaluated with the right metric. The per-crop MLP with trajectory analysis outperforms the multi-stage population temporal transformer in interpretability and reveals signal that aggregate accuracy obscures.
 
 ---
 
