@@ -271,6 +271,7 @@ def train_fold(
         use_delta_features=cfg.use_delta_features,
         bin_encoder_type=cfg.bin_encoder_type,
         bin_attn_heads=cfg.bin_attn_heads,
+        include_count=cfg.include_count,
     ).to(device)
 
     loss_fn = TimeAwareLoss(alpha=cfg.time_loss_alpha, label_smoothing=cfg.label_smoothing).to(device)
@@ -401,6 +402,7 @@ def evaluate_fold(
         use_delta_features=cfg.use_delta_features,
         bin_encoder_type=cfg.bin_encoder_type,
         bin_attn_heads=cfg.bin_attn_heads,
+        include_count=cfg.include_count,
     ).to(device)
 
     ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
@@ -483,6 +485,8 @@ def main() -> None:
                         help="Enable sub-sequence sampling (random start + duration)")
     parser.add_argument("--samples-per-experiment", type=int, default=None,
                         help="Samples per experiment per epoch (default: 30 with --subsequence, 8 without)")
+    parser.add_argument("--no-count", action="store_true",
+                        help="Exclude crop count from bin encoding (morphology-only)")
     args = parser.parse_args()
 
     config = FullConfig()
@@ -494,6 +498,8 @@ def main() -> None:
     if args.checkpoints_dir:
         config.paths.checkpoints_dir = args.checkpoints_dir
     config.classifier.subsequence_sampling = args.subsequence
+    if args.no_count:
+        config.classifier.include_count = False
     if args.samples_per_experiment is not None:
         config.classifier.samples_per_experiment = args.samples_per_experiment
     elif args.subsequence:

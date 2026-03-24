@@ -105,6 +105,9 @@ class ClassifierConfig:
     # Bin encoder: "attention" (learned pooling) or "stats" (mean/std/skew/kurtosis)
     bin_encoder_type: str = "stats"
     bin_attn_heads: int = 4
+    # Whether to include normalised crop count as a feature in the bin encoder.
+    # Set to False to force the model to rely purely on morphological features.
+    include_count: bool = True
     # Auxiliary per-bin loss weight (time-conditioned R/S prediction per bin)
     bin_aux_loss_weight: float = 0.5
     # Delta features (subtract first-bin stats for strain invariance)

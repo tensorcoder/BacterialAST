@@ -91,6 +91,7 @@ class PopulationTemporalClassifier(nn.Module):
         use_delta_features: bool = False,
         bin_encoder_type: str = "stats",
         bin_attn_heads: int = 4,
+        include_count: bool = True,
     ) -> None:
         super().__init__()
         self.use_delta_features = use_delta_features
@@ -109,6 +110,7 @@ class PopulationTemporalClassifier(nn.Module):
                 feat_dim=feature_dim,
                 hidden_dim=temporal_hidden_dim,
                 max_count_normalizer=max_count_normalizer,
+                include_count=include_count,
             )
 
         # Temporal evolution across bins

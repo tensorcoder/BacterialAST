@@ -187,12 +187,15 @@ class PopulationBinEncoder(nn.Module):
         feat_dim: int = 384,
         hidden_dim: int = 256,
         max_count_normalizer: float = 256.0,
+        include_count: bool = True,
     ) -> None:
         super().__init__()
         self.feat_dim = feat_dim
         self.max_count_normalizer = max_count_normalizer
+        self.include_count = include_count
+        input_dim = feat_dim * 4 + (1 if include_count else 0)
         self.proj = nn.Sequential(
-            nn.Linear(feat_dim * 4 + 1, hidden_dim),
+            nn.Linear(input_dim, hidden_dim),
             nn.GELU(),
             nn.Linear(hidden_dim, hidden_dim),
         )
@@ -251,6 +254,9 @@ class PopulationBinEncoder(nn.Module):
         """
         mean, std, skewness, kurtosis = self._masked_stats(crop_features, crop_mask)
         stats = torch.cat([mean, std, skewness, kurtosis], dim=-1)  # (B, 4*D)
+
+        if not self.include_count:
+            return stats  # (B, 4*D)
 
         if crop_counts is not None:
             norm_count = (crop_counts / self.max_count_normalizer).unsqueeze(-1)

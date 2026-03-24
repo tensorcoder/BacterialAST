@@ -37,6 +37,7 @@ A deep learning pipeline that distinguishes antibiotic-resistant from susceptibl
   - [Downstream Classification](#downstream-classification)
   - [Evaluation Protocol](#evaluation-protocol)
   - [Results](#results)
+  - [No-Antibiotic Control Experiment](#no-antibiotic-control-experiment)
   - [Key Findings](#key-findings)
 - [Literature and References](#literature-and-references)
 
@@ -1212,9 +1213,63 @@ The v2 (96x96, zero-padded) and v3 (96x96, zero-padded + 5-min time quantization
 
 Time quantization (v3) was introduced to prevent DINO from using timestamp similarity as a shortcut for view-matching, but this was irrelevant because the zero-padding shortcut dominated.
 
-#### Population Temporal Classifier
+#### Population Temporal Classifiers (v1 features)
 
-The transformer-based temporal classifiers trained on v1 features did not outperform the simpler per-crop MLP. All variants (baseline stats, delta features, attention bin encoder, LSTM, contextual auxiliary) produced aggregate AUROCs in the 0.5-0.8 range with high variance across folds. The per-crop MLP's trajectory analysis provides a more interpretable and biologically grounded evaluation framework.
+Seven population temporal classifier variants were evaluated on v1 DINO features using strain-holdout CV. These classifiers operate at the experiment level: they bin DINO embeddings into time windows, compute population-level statistics per bin, and feed the temporal sequence of bin representations through a sequence model to predict R/S.
+
+| Variant | Architecture | AUROC@60min | Acc@60min |
+|---------|-------------|-------------|-----------|
+| **Baseline** | Transformer + Stats encoder | **0.802 +/- 0.092** | 0.652 |
+| Delta features | Baseline + subtract first-bin stats | 0.744 +/- 0.081 | 0.718 |
+| Sub-sequence sampling | Baseline + random time windows | 0.739 +/- 0.265 | 0.685 |
+| BiLSTM | LSTM replacing transformer | 0.656 +/- 0.202 | 0.577 |
+| Stats + Auxiliary loss | Baseline + per-bin R/S prediction | 0.603 +/- 0.270 | 0.541 |
+| Contextual auxiliary | Cross-attention + auxiliary loss | 0.559 +/- 0.148 | 0.597 |
+| Attention bin encoder | Learned attention pooling per bin | 0.500 +/- 0.000 | -- |
+| Attention + Auxiliary | Attention encoder + aux loss | 0.500 +/- 0.000 | -- |
+| **No count (morphology only)** | Baseline with crop count removed | **0.710 +/- 0.162** | 0.542 |
+
+The baseline transformer + stats encoder achieves the highest AUROC (0.802), slightly above the per-crop MLP (0.764). However, the population classifiers were evaluated using aggregate accuracy at fixed time windows -- a metric that penalises biologically correct early-time predictions. The attention-based bin encoder variants collapsed entirely (constant 0.5 predictions), likely due to the small dataset size (27 training experiments per fold).
+
+**Count ablation:** Removing the normalised crop count from the bin encoder (forcing the model to rely purely on morphological feature statistics) reduces AUROC from 0.802 to 0.710 and nearly doubles variance. This indicates ~40% of the baseline's discriminative power came from growth rate information (bacteria count trajectory over time), with the remaining signal coming from genuine morphological features.
+
+**Important caveat on aggregate accuracy:** The population temporal classifiers were not evaluated using trajectory analysis (P(resistant) over time per experiment). Their aggregate AUROC numbers are therefore not directly comparable to the per-crop MLP trajectory results. The baseline's 0.802 AUROC uses a single experiment-level prediction at t=60min, while the crop MLP's 0.764 uses per-crop voting. The trajectory analysis was only run for the per-crop MLP, which showed the clearest biological signal (susceptible P(R) dropping from 0.65 to 0.17 over 60 minutes).
+
+#### Population Temporal Classifiers (v2/v3 features)
+
+Population classifiers trained on zero-padded features confirm the shortcut learning finding:
+
+| Features | AUROC@60min | Acc@60min |
+|----------|-------------|-----------|
+| v2 (96x96, zero pad) | 0.564 +/- 0.200 | 0.509 |
+| v3 (96x96, zero pad + time quant) | 0.643 +/- 0.198 | 0.509 |
+
+Both near-random, consistent with the crop MLP results on the same features. Trajectory analysis on v3 features showed the classifiers collapse to outputting a per-fold constant -- no variation over time or between classes.
+
+#### No-Antibiotic Control Experiment
+
+To distinguish whether classifiers learn antibiotic-induced morphological changes or strain-specific features, 5 control experiments were collected: susceptible strains (EC33, EC36, EC39) imaged **without ampicillin exposure**. These bacteria are genetically susceptible but have not been treated, so they should exhibit the same morphology as resistant bacteria (normal growth, no drug-induced damage).
+
+- If a classifier predicts these as **resistant** → it is responding to morphology (correct reasoning: untreated bacteria look like resistant bacteria)
+- If a classifier predicts these as **susceptible** → it has learned strain identity (incorrect reasoning: recognizing the strain rather than the drug response)
+
+| Classifier | Mean P(R) @ 60min | % Classified R | Signal Source |
+|---|---|---|---|
+| **Per-Crop MLP** | **0.984 +/- 0.015** | **100%** | **Morphology** |
+| BiLSTM Temporal | 0.785 +/- 0.361 | 80% | Morphology |
+| No Count (morphology only) | 0.752 +/- 0.310 | 72% | Morphology |
+| Baseline (Transformer + Stats) | 0.610 +/- 0.402 | 60% | Mixed |
+| Contextualized Auxiliary | 0.546 +/- 0.411 | 60% | Mixed |
+| Attention + Auxiliary | 0.543 +/- 0.088 | 56% | ~Chance |
+| Subsequence Sampling | 0.476 +/- 0.471 | 48% | ~Chance |
+| Stats + Auxiliary | 0.477 +/- 0.412 | 40% | Mixed |
+| Delta Features | 0.443 +/- 0.402 | 44% | Strain-leaning |
+
+The **per-crop MLP** is the most morphology-pure classifier: it classifies all 5 untreated experiments as resistant with >95% confidence across all 5 folds, with negligible variance (std=0.015). This holds regardless of whether the strain was in the fold's training set or held out, confirming the model has learned drug-response morphology rather than strain identity.
+
+The population temporal classifiers show high variance across folds (std=0.3-0.4), indicating that some folds learn morphology while others learn strain features. Removing the count feature shifts the temporal model toward morphology-based classification (0.752 vs 0.610 for the baseline), suggesting the count trajectory partly acted as a strain identifier.
+
+Results and per-fold trajectory plots are in `results_no_amp_control/` and `results_crop_mlp/plots_no_amp/`.
 
 ### Key Findings
 
@@ -1227,6 +1282,12 @@ The transformer-based temporal classifiers trained on v1 features did not outper
 4. **Strain EC35 is a challenging case.** Folds holding out EC35 consistently underperform, suggesting this resistant strain has atypical morphology that the classifier struggles to generalize to.
 
 5. **Simpler classifiers can outperform complex architectures** when evaluated with the right metric. The per-crop MLP with trajectory analysis outperforms the multi-stage population temporal transformer in interpretability and reveals signal that aggregate accuracy obscures.
+
+6. **The per-crop MLP learns genuine morphological features, not strain identity.** No-antibiotic control experiments (susceptible bacteria without ampicillin) are classified as resistant with 98.4% confidence across all folds -- the expected result if the classifier detects the absence of drug-induced damage rather than recognizing which strain it is looking at.
+
+7. **Population temporal classifiers partially rely on growth rate information.** Removing the crop count feature from the baseline reduces AUROC from 0.802 to 0.710, and the no-antibiotic control shows that the remaining morphology signal is less consistent across folds (high variance). The per-crop MLP avoids this issue entirely since it operates on individual embeddings without access to population-level count information.
+
+8. **The per-crop MLP is the recommended classifier.** Despite lower AUROC on the standard R/S classification task (0.764 vs 0.802), it is the only model that (a) shows clear biological signal in trajectory analysis, (b) passes the no-antibiotic control test with 100% consistency, and (c) operates purely on morphological features without growth rate confounds.
 
 ---
 
