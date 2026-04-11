@@ -117,6 +117,7 @@ class YOLOCropExtractor:
         conf_threshold: float = 0.25,
         focused_class_name: str = "Focused",
         device: str | None = None,
+        border_mode: int = cv2.BORDER_CONSTANT,
     ) -> None:
         self.model_path = Path(model_path)
         self.crop_size = crop_size
@@ -124,6 +125,7 @@ class YOLOCropExtractor:
         self.conf_threshold = conf_threshold
         self.focused_class_name = focused_class_name
         self.device = device
+        self.border_mode = border_mode
 
         self._model: YOLO | None = None
         self._focused_class_id: int | None = None
@@ -165,15 +167,22 @@ class YOLOCropExtractor:
         h: float,
         angle: float,
         crop_size: int,
+        border_mode: int = cv2.BORDER_CONSTANT,
     ) -> NDArray[np.uint8]:
         """Extract a size-preserving crop from an oriented bounding box.
 
         The region defined by (cx, cy, w, h, angle) is rectified using an
         affine warp so that the OBB becomes axis-aligned, then **centered
-        on a fixed-size canvas** (``crop_size x crop_size``) with zero
-        padding.  The bacterium is placed at its native pixel size so
-        that both shape and absolute size are preserved.  Detections
-        larger than ``crop_size`` are center-cropped (not downscaled).
+        on a fixed-size canvas** (``crop_size x crop_size``).  The bacterium
+        is placed at its native pixel size so that both shape and absolute
+        size are preserved.  Detections larger than ``crop_size`` are
+        center-cropped (not downscaled).
+
+        Parameters
+        ----------
+        border_mode : int
+            OpenCV border mode for canvas padding. Use ``cv2.BORDER_CONSTANT``
+            for zero padding or ``cv2.BORDER_REFLECT_101`` for reflection.
         """
         rotation_matrix = cv2.getRotationMatrix2D(
             center=(cx, cy),
@@ -213,16 +222,22 @@ class YOLOCropExtractor:
             crop = crop[:, x_start : x_start + crop_size]
             cw = crop_size
 
-        # Centre the crop on a fixed-size canvas with zero padding.
+        # Centre the crop on a fixed-size canvas.
         pad_top = (crop_size - ch) // 2
         pad_bot = crop_size - ch - pad_top
         pad_left = (crop_size - cw) // 2
         pad_right = crop_size - cw - pad_left
-        crop = cv2.copyMakeBorder(
-            crop, pad_top, pad_bot, pad_left, pad_right,
-            borderType=cv2.BORDER_CONSTANT,
-            value=0,
-        )
+        if border_mode == cv2.BORDER_CONSTANT:
+            crop = cv2.copyMakeBorder(
+                crop, pad_top, pad_bot, pad_left, pad_right,
+                borderType=cv2.BORDER_CONSTANT,
+                value=0,
+            )
+        else:
+            crop = cv2.copyMakeBorder(
+                crop, pad_top, pad_bot, pad_left, pad_right,
+                borderType=border_mode,
+            )
 
         return crop
 
@@ -330,7 +345,8 @@ class YOLOCropExtractor:
 
             for det in detections:
                 crop = self._rectify_obb_crop(
-                    image, det.cx, det.cy, det.w, det.h, det.angle, self.crop_size
+                    image, det.cx, det.cy, det.w, det.h, det.angle,
+                    self.crop_size, self.border_mode,
                 )
                 crops.append(crop)
                 row = np.array(
@@ -436,6 +452,7 @@ def extract_experiment(
     focused_class_name: str = "Focused",
     device: str | None = None,
     compression: str | None = "gzip",
+    border_mode: int = cv2.BORDER_CONSTANT,
 ) -> Path:
     """Process all BMP frames in an experiment folder.
 
@@ -507,6 +524,7 @@ def extract_experiment(
         conf_threshold=conf_threshold,
         focused_class_name=focused_class_name,
         device=device,
+        border_mode=border_mode,
     )
     writer = HDF5CropWriter(
         crop_size=crop_size, compression=compression
@@ -528,9 +546,16 @@ def extract_experiment(
             batch_timestamps = frame_timestamps[batch_start : batch_start + batch_size]
             frame_indices = list(range(batch_start, batch_start + len(batch_paths)))
 
-            crops, metadata_rows = extractor.detect_and_crop(
-                batch_paths, frame_indices, batch_timestamps
-            )
+            try:
+                crops, metadata_rows = extractor.detect_and_crop(
+                    batch_paths, frame_indices, batch_timestamps
+                )
+            except Exception as e:
+                logger.warning(
+                    "Skipping batch at frame %d due to error: %s",
+                    batch_start, e,
+                )
+                continue
             writer.append(h5file, crops, metadata_rows)
             total_crops += len(crops)
 

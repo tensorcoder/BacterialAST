@@ -96,6 +96,52 @@ Trajectory plots are in:
 - `plots_v3_trajectories/` — v3 population temporal classifier trajectories (no signal)
 - `plots_v3_quantized_time/` — aggregate v3 results and v2 vs v3 comparison
 
+## DINO Training: What Worked and What Didn't
+
+### dino_old: Mode Collapse (checkpoints/dino_old/)
+
+The first 100-epoch DINO run collapsed — loss stuck at ln(65536) = 11.09 from epoch 2 onward. The model output a uniform distribution over all prototypes, meaning it could not commit any crop to any visual concept. Three problems contributed:
+
+1. **Wrong normalisation.** Used ImageNet defaults (mean=0.5, std=0.25) instead of the actual data statistics. Raw microscopy crops have mean=57, std=10 in uint8 — after dividing by 255 and applying the wrong normalisation, all inputs were compressed to the narrow band [-1.25, -0.67] with std=0.16. Every crop looked nearly identical to the network.
+
+2. **Too many prototypes.** `head_output_dim=65536` for ~207K training crops gives ~3 crops per prototype. Each prototype in DINO is a learnable visual cluster centre — the projection head outputs a temperature-sharpened softmax distribution over all prototypes. With so few examples per prototype, the centering and sharpening mechanisms cannot produce peaked distributions, and the loss settles at the entropy of a uniform distribution: ln(65536) = 11.09.
+
+3. **Overly aggressive augmentation.** Brightness jitter of ±0.3 was ~4x the data's actual 0.145 dynamic range, and noise std of 0.05 was large relative to the signal. Augmentation dominated the real variation between crops.
+
+### dino v1: Successful Training (checkpoints/dino/)
+
+Fixed all three issues:
+
+| Parameter | dino_old | dino v1 |
+|-----------|----------|---------|
+| CLAHE preprocessing | None | clipLimit=2.0, tileGrid=8x8 |
+| Normalisation | mean=0.5, std=0.25 | mean=0.3387, std=0.1173 (post-CLAHE) |
+| head_output_dim | 65536 | 4096 (~50 crops/prototype) |
+| Brightness jitter | ±0.3 | ±0.03 |
+| Noise std | 0.05 | 0.01 |
+
+Adding CLAHE expanded the dynamic range from [40, 85] to [50, 156] before normalisation, giving the network more contrast to work with. Reducing prototypes to 4096 allowed each to represent a meaningful morphological pattern. Best loss reached 0.815 at epoch 44, well below ln(4096) = 8.32, confirming non-trivial structure was learned.
+
+**On brightness jitter and noise:** even the reduced values (0.03 jitter, 0.01 noise) are questionable. The microscopy setup has controlled, fixed illumination — there is no real brightness variation between experiments to be invariant to. These augmentations force the model to discard subtle intensity features that may carry genuine morphological information (membrane texture, internal structure). The multi-crop strategy (global + local crops at different scales) plus geometric augmentations (flips, rotations) already provide sufficient view diversity for DINO's self-supervised objective. Setting jitter and noise to zero may improve feature quality.
+
+### Potential Improvements
+
+1. **Increase `max_crops_per_experiment`.** Currently set to 5000, which subsamples each experiment's ~57K crops down to 5000, giving only ~207K total training crops out of the 2.4M available. Raising this to 20K+ or removing the cap entirely would give DINO far more morphological diversity to learn from.
+
+2. **Reduce prototypes.** 4096 prototypes is likely more than the number of meaningful morphological states bacteria exhibit (normal rod, elongated, blebbing, dividing, lysing — perhaps dozens of real categories). Reducing to 1024-2048 would concentrate the clusters and could produce sharper features. With more training crops (point 1), even 2048 prototypes would have hundreds of examples each.
+
+3. **Remove brightness jitter and noise.** As discussed above, the controlled microscopy illumination means there is no real brightness variation to be invariant to. Setting both to zero may allow the model to retain subtle intensity features that carry morphological information.
+
+4. **Train DINO only on late-time crops (t > 30 min).** After 30 minutes, susceptible bacteria show visible drug-induced morphological changes (elongation, blebbing, lysis) while resistant bacteria still look normal. Training on this subset exposes DINO to the full spectrum of morphologies that matter for classification. No data is lost because the `max_crops_per_experiment` cap (currently 5000) is well below the ~28.5K crops available per experiment after 30 minutes. The model still sees "normal" morphology in the resistant late-time crops, so early-time inference is not impaired.
+
+5. **Use labels during DINO training on late-time crops.** If DINO is restricted to t > 30 min crops (point 4), experiment-level labels become meaningful at the crop level — susceptible crops genuinely look different from resistant crops at this point. Options include supervised contrastive learning (positive pairs from same class, negatives from different class) or adding a classification head alongside the DINO loss. This would directly guide the backbone toward features that distinguish drug-induced morphological change.
+
+6. **Supervised fine-tuning after DINO pretraining.** As a less invasive alternative to point 5: keep DINO unsupervised, then fine-tune the frozen or unfrozen backbone with a classification head on late-time labeled crops as a second stage.
+
+### dino v2/v3: Zero-Padding Shortcut
+
+Trained on 96x96 zero-padded crops. Achieved paradoxically lower loss (0.033 and 0.003) than v1 (0.815) because the task was easier — DINO learned to match augmented views by the unique zero-padding silhouette boundary rather than bacterium morphology. See "Zero-Padding Failure Analysis" below for details.
+
 ## Zero-Padding Failure Analysis
 
 96x96 crops with zero-padding: bacteria occupy ~10-15% of pixels, rest is zero. DINO learns to match augmented views by the unique zero-padding silhouette boundary. Evidence:

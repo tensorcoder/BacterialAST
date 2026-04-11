@@ -1,0 +1,138 @@
+{
+  "brightness": {
+    "EC33_None_0mgL": {
+      "raw_mean": 55.544967346191406,
+      "raw_std": 12.157624853297566,
+      "clahe_mean": 87.03018511962891,
+      "clahe_std": 31.187040382911768
+    },
+    "EC33_None_0mgL_exp2": {
+      "raw_mean": 84.8477241821289,
+      "raw_std": 16.00393682882723,
+      "clahe_mean": 121.13924926757812,
+      "clahe_std": 38.347627577124285
+    },
+    "EC33_None_exp3": {
+      "raw_mean": 92.27348803710937,
+      "raw_std": 20.009934402725328,
+      "clahe_mean": 131.75268395996093,
+      "clahe_std": 41.7410832989712
+    },
+    "EC36_NoAntibiotic_0mgL_Susceptible": {
+      "raw_mean": 58.00429846191406,
+      "raw_std": 11.759631055575863,
+      "clahe_mean": 88.05127349853515,
+      "clahe_std": 28.364143103737597
+    },
+    "EC36_None_0mgL_exp2": {
+      "raw_mean": 93.49852020263671,
+      "raw_std": 16.23658140783119,
+      "clahe_mean": 130.83399060058593,
+      "clahe_std": 38.320649475587814
+    },
+    "EC36_None_exp3": {
+      "raw_mean": 89.78131298828124,
+      "raw_std": 14.188468763032125,
+      "clahe_mean": 124.08548553466797,
+      "clahe_std": 34.13033098919286
+    },
+    "EC39_None_0mgL_": {
+      "raw_mean": 84.95680194091797,
+      "raw_std": 15.632100900672462,
+      "clahe_mean": 120.31096911621094,
+      "clahe_std": 36.99811759313337
+    },
+    "B1_Ampicillin_16mgL_exp1": {
+      "raw_mean": 90.35714532470703,
+      "raw_std": 13.21490764053979,
+      "clahe_mean": 122.28752532958984,
+      "clahe_std": 31.136377658522218
+    },
+    "B1_Ampicillin_16mgL_exp1_part2": {
+      "raw_mean": 91.7583999633789,
+      "raw_std": 13.621180154262085,
+      "clahe_mean": 124.98369714355469,
+      "clahe_std": 32.71750618775188
+    },
+    "B2_Ampicillin_16mgL_exp1": {
+      "raw_mean": 92.82641552734376,
+      "raw_std": 16.2330412980252,
+      "clahe_mean": 129.2420934448242,
+      "clahe_std": 38.00987988281294
+    },
+    "B3_Ampicillin_16mgL": {
+      "raw_mean": 91.22719580078125,
+      "raw_std": 14.948297209567661,
+      "clahe_mean": 125.17580114746093,
+      "clahe_std": 34.50879853535925
+    }
+  },
+  "experiments": {
+    "B1_Ampicillin_16mgL_exp1": {
+      "ensemble_prob_r": 0.09644086435437202,
+      "ensemble_pred": "Susceptible",
+      "std": 0.07003458039808377,
+      "raw_brightness": 90.35714532470703
+    },
+    "B1_Ampicillin_16mgL_exp1_part2": {
+      "ensemble_prob_r": 0.09582633152604103,
+      "ensemble_pred": "Susceptible",
+      "std": 0.07087783935231096,
+      "raw_brightness": 91.7583999633789
+    },
+    "B2_Ampicillin_16mgL_exp1": {
+      "ensemble_prob_r": 0.07678492367267609,
+      "ensemble_pred": "Susceptible",
+      "std": 0.04010167280210581,
+      "raw_brightness": 92.82641552734376
+    },
+    "B3_Ampicillin_16mgL": {
+      "ensemble_prob_r": 0.08876569718122482,
+      "ensemble_pred": "Susceptible",
+      "std": 0.05400335630905677,
+      "raw_brightness": 91.22719580078125
+    },
+    "EC33_None_0mgL": {
+      "ensemble_prob_r": 0.09522350803017617,
+      "ensemble_pred": "Susceptible",
+      "std": 0.04020650025001797,
+      "raw_brightness": 55.544967346191406
+    },
+    "EC33_None_0mgL_exp2": {
+      "ensemble_prob_r": 0.1877005696296692,
+      "ensemble_pred": "Susceptible",
+      "std": 0.06908607260666969,
+      "raw_brightness": 84.8477241821289
+    },
+    "EC33_None_exp3": {
+      "ensemble_prob_r": 0.16527292728424073,
+      "ensemble_pred": "Susceptible",
+      "std": 0.08459312664322989,
+      "raw_brightness": 92.27348803710937
+    },
+    "EC36_NoAntibiotic_0mgL_Susceptible": {
+      "ensemble_prob_r": 0.6504693627357483,
+      "ensemble_pred": "Resistant",
+      "std": 0.022460926256333346,
+      "raw_brightness": 58.00429846191406
+    },
+    "EC36_None_0mgL_exp2": {
+      "ensemble_prob_r": 0.10617531016469002,
+      "ensemble_pred": "Susceptible",
+      "std": 0.05854406449998159,
+      "raw_brightness": 93.49852020263671
+    },
+    "EC36_None_exp3": {
+      "ensemble_prob_r": 0.13205681666731833,
+      "ensemble_pred": "Susceptible",
+      "std": 0.07507340873403232,
+      "raw_brightness": 89.78131298828124
+    },
+    "EC39_None_0mgL_": {
+      "ensemble_prob_r": 0.16922526955604553,
+      "ensemble_pred": "Susceptible",
+      "std": 0.061202523900973145,
+      "raw_brightness": 84.95680194091797
+    }
+  }
+}
