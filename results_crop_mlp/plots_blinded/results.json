@@ -1,0 +1,71 @@
+{
+  "pipeline": {
+    "crop_size": 128,
+    "border_mode": "BORDER_REFLECT_101",
+    "conf_threshold": 0.25,
+    "dino_img_size": 128,
+    "dino_mean": 0.3387,
+    "dino_std": 0.1173
+  },
+  "brightness": {
+    "B1_Ampicillin_16mgL_exp1": 90.82524652099609,
+    "B1_Ampicillin_16mgL_exp1_part2": 92.26087701416016,
+    "B2_Ampicillin_16mgL_exp1": 93.47820324707031,
+    "B3_Ampicillin_16mgL": 91.59102545166016
+  },
+  "n_folds": 5,
+  "experiments": {
+    "B1_Ampicillin_16mgL_exp1": {
+      "ensemble_prob_r": 0.09807425439357757,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.23481851816177368,
+        0.07205646485090256,
+        0.0631207749247551,
+        0.04209427535533905,
+        0.07828123867511749
+      ],
+      "std": 0.06945960883495263,
+      "brightness": 90.82524652099609
+    },
+    "B1_Ampicillin_16mgL_exp1_part2": {
+      "ensemble_prob_r": 0.0976749874651432,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.23619313538074493,
+        0.07111689448356628,
+        0.06104106083512306,
+        0.04179324209690094,
+        0.0782306045293808
+      ],
+      "std": 0.07033563489195778,
+      "brightness": 92.26087701416016
+    },
+    "B2_Ampicillin_16mgL_exp1": {
+      "ensemble_prob_r": 0.08199474513530731,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.1599595993757248,
+        0.07794679701328278,
+        0.08488374948501587,
+        0.035765763372182846,
+        0.051417816430330276
+      ],
+      "std": 0.042837642443872476,
+      "brightness": 93.47820324707031
+    },
+    "B3_Ampicillin_16mgL": {
+      "ensemble_prob_r": 0.09107592850923538,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.1965220421552658,
+        0.07398716360330582,
+        0.07366722077131271,
+        0.041044026613235474,
+        0.0701591894030571
+      ],
+      "std": 0.054138106831201606,
+      "brightness": 91.59102545166016
+    }
+  }
+}
