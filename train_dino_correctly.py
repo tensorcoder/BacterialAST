@@ -56,8 +56,12 @@ def apply_checkpoint_settings(config: FullConfig) -> None:
     cfg.num_heads = 6
     cfg.mlp_ratio = 4.0
     cfg.drop_path_rate = 0.1
-    cfg.time_conditioned = True
-    cfg.time_quantize_sec = 300.0  # 5-minute time bins
+    # The production best_backbone.pt student_state_dict contains no
+    # time_proj weights, so the backbone that produced it was trained
+    # without time conditioning. The `True` value previously pickled into
+    # the checkpoint's config field was incorrect.
+    cfg.time_conditioned = False
+    cfg.time_quantize_sec = 0.0
 
     # Projection head
     cfg.head_hidden_dim = 2048
