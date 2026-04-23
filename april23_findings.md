@@ -43,14 +43,35 @@ land before the next training cycle.
 
 ## 2. Dataset — training strains (EC-series)
 
-**Folders under `/mnt/f/Data_second_protocol/`:**
+Experiments are grouped for training by **strain (EC number) + true
+label**, *not* by folder. The `Resistant/`, `Susceptible/`, `Test/`
+subdirectories under `/mnt/f/Data_second_protocol/` are filesystem
+organization only: `scripts/strain_holdout_eval.py:build_strain_grouped_experiments`
+collects every experiment across all three folders, parses the EC
+number from each experiment name, and assigns its label from whichever
+EC strain it belongs to (EC35 → R regardless of which folder the
+recording lives in). All 42 experiments go into the training /
+CV pool; folder membership has no role downstream.
 
-| Folder | Role | # experiments | Strains |
-|---|---|---|---|
-| `Resistant/` | labeled Resistant | 11 | EC35, EC40, EC48, EC58, EC60, EC65, EC87 |
-| `Susceptible/` | labeled Susceptible | 16 | EC33, EC36, EC39, EC42, EC67, EC79, EC89, EC126 |
-| `Test/` | labeled via EC-number lookup | 15 | same 15 strains, additional repeats |
-| **Total training** | **42** | **15 strains** |
+**15 unique strains, 42 experiments total:**
+
+| Label | Strain | # experiments |
+|---|---|---|
+| **Resistant (7 strains, 19 experiments)** | EC35 | 3 |
+| | EC40 | 3 |
+| | EC48 | 2 |
+| | EC58 | 3 |
+| | EC60 | 3 |
+| | EC65 | 2 |
+| | EC87 | 3 |
+| **Susceptible (8 strains, 23 experiments)** | EC33 | 2 |
+| | EC36 | 3 |
+| | EC39 | 3 |
+| | EC42 | 3 |
+| | EC67 | 3 |
+| | EC79 | 3 |
+| | EC89 | 3 |
+| | EC126 | 3 |
 
 **Experiment naming:** `EC{num}_{Antibiotic}_{dose}_{details}` (e.g.
 `EC35_Ampicillin_16mgL_preincubated_2_TEM40`).
