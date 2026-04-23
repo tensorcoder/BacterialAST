@@ -1,0 +1,4572 @@
+{
+  "fold0": {
+    "B1_Ampicillin_16mgL_exp1_old_bright": {
+      "exp_prob_r": 0.21542607247829437,
+      "n_total_crops": 6114,
+      "max_time_min": 3.8144317626953126,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6114,
+          "frac_resistant": 0.08488714425907752,
+          "mean_prob_r": 0.21542607247829437
+        }
+      ]
+    },
+    "B1_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.5791215896606445,
+      "n_total_crops": 57797,
+      "max_time_min": 62.11734212239583,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 2316,
+          "frac_resistant": 0.6040587219343696,
+          "mean_prob_r": 0.5777759552001953
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 3208,
+          "frac_resistant": 0.6876558603491272,
+          "mean_prob_r": 0.6272833347320557
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1425,
+          "frac_resistant": 0.7494736842105263,
+          "mean_prob_r": 0.6755273342132568
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 3227,
+          "frac_resistant": 0.6064456151224047,
+          "mean_prob_r": 0.5643057227134705
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 2410,
+          "frac_resistant": 0.6066390041493775,
+          "mean_prob_r": 0.5654905438423157
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 4616,
+          "frac_resistant": 0.7084055459272097,
+          "mean_prob_r": 0.6351237893104553
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 3644,
+          "frac_resistant": 0.6896267837541163,
+          "mean_prob_r": 0.6283300518989563
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 4421,
+          "frac_resistant": 0.5910427505089346,
+          "mean_prob_r": 0.550739049911499
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 6915,
+          "frac_resistant": 0.6804049168474331,
+          "mean_prob_r": 0.6166642904281616
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 7158,
+          "frac_resistant": 0.5680357641799385,
+          "mean_prob_r": 0.5390165448188782
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 9007,
+          "frac_resistant": 0.5900965915399135,
+          "mean_prob_r": 0.553606390953064
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 5720,
+          "frac_resistant": 0.5926573426573427,
+          "mean_prob_r": 0.5595551133155823
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 3730,
+          "frac_resistant": 0.5648793565683646,
+          "mean_prob_r": 0.5385730862617493
+        }
+      ]
+    },
+    "B1_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.512553334236145,
+      "n_total_crops": 102340,
+      "max_time_min": 61.267582194010416,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5386,
+          "frac_resistant": 0.4910880059413294,
+          "mean_prob_r": 0.4952539801597595
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 6662,
+          "frac_resistant": 0.5168117682377664,
+          "mean_prob_r": 0.5081300735473633
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2976,
+          "frac_resistant": 0.5497311827956989,
+          "mean_prob_r": 0.5326380133628845
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 6979,
+          "frac_resistant": 0.5019343745522281,
+          "mean_prob_r": 0.49978765845298767
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 4703,
+          "frac_resistant": 0.45439081437380396,
+          "mean_prob_r": 0.4712579548358917
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 8737,
+          "frac_resistant": 0.5305024607989012,
+          "mean_prob_r": 0.5158937573432922
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 5632,
+          "frac_resistant": 0.5337357954545454,
+          "mean_prob_r": 0.5238853096961975
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 8726,
+          "frac_resistant": 0.5229200091680036,
+          "mean_prob_r": 0.5094572305679321
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 8641,
+          "frac_resistant": 0.5188056937854415,
+          "mean_prob_r": 0.5062151551246643
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 9648,
+          "frac_resistant": 0.5178275290215588,
+          "mean_prob_r": 0.5112149715423584
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 18942,
+          "frac_resistant": 0.5481469749762433,
+          "mean_prob_r": 0.5217711329460144
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 10008,
+          "frac_resistant": 0.5083932853717026,
+          "mean_prob_r": 0.4986894130706787
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 5300,
+          "frac_resistant": 0.6264150943396226,
+          "mean_prob_r": 0.5714244842529297
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_exp1_old_bright": {
+      "exp_prob_r": 0.1599595993757248,
+      "n_total_crops": 25151,
+      "max_time_min": 59.50413818359375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 4007,
+          "frac_resistant": 0.06338906912902421,
+          "mean_prob_r": 0.1466311812400818
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4073,
+          "frac_resistant": 0.05794254849005647,
+          "mean_prob_r": 0.15298862755298615
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1537,
+          "frac_resistant": 0.03057905009759271,
+          "mean_prob_r": 0.11932067573070526
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 1983,
+          "frac_resistant": 0.10388300554715078,
+          "mean_prob_r": 0.17335818707942963
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1644,
+          "frac_resistant": 0.04257907542579075,
+          "mean_prob_r": 0.1300050914287567
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1891,
+          "frac_resistant": 0.10312004230565838,
+          "mean_prob_r": 0.17473988234996796
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1163,
+          "frac_resistant": 0.09200343938091143,
+          "mean_prob_r": 0.18387459218502045
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 2245,
+          "frac_resistant": 0.058351893095768374,
+          "mean_prob_r": 0.16928082704544067
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1865,
+          "frac_resistant": 0.04075067024128686,
+          "mean_prob_r": 0.15958495438098907
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1397,
+          "frac_resistant": 0.09591982820329277,
+          "mean_prob_r": 0.19121244549751282
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2263,
+          "frac_resistant": 0.03800265134776845,
+          "mean_prob_r": 0.17123809456825256
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 1083,
+          "frac_resistant": 0.06371191135734072,
+          "mean_prob_r": 0.18005560338497162
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.46556928753852844,
+      "n_total_crops": 10920,
+      "max_time_min": 48.06361083984375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 710,
+          "frac_resistant": 0.7394366197183099,
+          "mean_prob_r": 0.645581841468811
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 1376,
+          "frac_resistant": 0.7063953488372093,
+          "mean_prob_r": 0.6310859322547913
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1178,
+          "frac_resistant": 0.5772495755517827,
+          "mean_prob_r": 0.5384493470191956
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 1381,
+          "frac_resistant": 0.44315713251267197,
+          "mean_prob_r": 0.4571387469768524
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1034,
+          "frac_resistant": 0.3916827852998066,
+          "mean_prob_r": 0.4255804419517517
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1363,
+          "frac_resistant": 0.44974321349963314,
+          "mean_prob_r": 0.4606177806854248
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1189,
+          "frac_resistant": 0.3162321278385198,
+          "mean_prob_r": 0.3583829998970032
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 715,
+          "frac_resistant": 0.26153846153846155,
+          "mean_prob_r": 0.3263084888458252
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1464,
+          "frac_resistant": 0.38524590163934425,
+          "mean_prob_r": 0.4125569760799408
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 510,
+          "frac_resistant": 0.22549019607843138,
+          "mean_prob_r": 0.3144979774951935
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.3539646565914154,
+      "n_total_crops": 20201,
+      "max_time_min": 66.2773193359375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 2574,
+          "frac_resistant": 0.5497280497280498,
+          "mean_prob_r": 0.5232232809066772
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 2642,
+          "frac_resistant": 0.4814534443603331,
+          "mean_prob_r": 0.4808836579322815
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1591,
+          "frac_resistant": 0.35575109993714643,
+          "mean_prob_r": 0.40973570942878723
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 2094,
+          "frac_resistant": 0.336676217765043,
+          "mean_prob_r": 0.4019549489021301
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1458,
+          "frac_resistant": 0.35253772290809327,
+          "mean_prob_r": 0.3833184540271759
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1493,
+          "frac_resistant": 0.19156061620897522,
+          "mean_prob_r": 0.29137417674064636
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 855,
+          "frac_resistant": 0.1567251461988304,
+          "mean_prob_r": 0.2575758993625641
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 1381,
+          "frac_resistant": 0.19695872556118754,
+          "mean_prob_r": 0.2719646394252777
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1388,
+          "frac_resistant": 0.17939481268011528,
+          "mean_prob_r": 0.2718876898288727
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1182,
+          "frac_resistant": 0.25888324873096447,
+          "mean_prob_r": 0.3070446252822876
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 1503,
+          "frac_resistant": 0.09314703925482369,
+          "mean_prob_r": 0.1934279203414917
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 750,
+          "frac_resistant": 0.10933333333333334,
+          "mean_prob_r": 0.19115586578845978
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 1133,
+          "frac_resistant": 0.11915269196822595,
+          "mean_prob_r": 0.21009235084056854
+        },
+        {
+          "bin_center_min": 67.5,
+          "n_crops": 157,
+          "frac_resistant": 0.19745222929936307,
+          "mean_prob_r": 0.2385009527206421
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_old_bright": {
+      "exp_prob_r": 0.1965220421552658,
+      "n_total_crops": 114102,
+      "max_time_min": 65.11913248697917,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5845,
+          "frac_resistant": 0.09461077844311377,
+          "mean_prob_r": 0.20488661527633667
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 5158,
+          "frac_resistant": 0.0876308646762311,
+          "mean_prob_r": 0.200863316655159
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2874,
+          "frac_resistant": 0.0744606819763396,
+          "mean_prob_r": 0.18030740320682526
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 6052,
+          "frac_resistant": 0.07204230006609386,
+          "mean_prob_r": 0.18559163808822632
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 3610,
+          "frac_resistant": 0.0745152354570637,
+          "mean_prob_r": 0.1765567511320114
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 7485,
+          "frac_resistant": 0.08042752171008684,
+          "mean_prob_r": 0.189181387424469
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 5766,
+          "frac_resistant": 0.06555671175858481,
+          "mean_prob_r": 0.17404988408088684
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 11999,
+          "frac_resistant": 0.07767313942828569,
+          "mean_prob_r": 0.1912134438753128
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 7776,
+          "frac_resistant": 0.06430041152263374,
+          "mean_prob_r": 0.16971540451049805
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 9981,
+          "frac_resistant": 0.09207494239054204,
+          "mean_prob_r": 0.2049533575773239
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 17924,
+          "frac_resistant": 0.0923343003793796,
+          "mean_prob_r": 0.20634745061397552
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9215,
+          "frac_resistant": 0.08486163863266413,
+          "mean_prob_r": 0.19914747774600983
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 19976,
+          "frac_resistant": 0.09576491790148178,
+          "mean_prob_r": 0.21137787401676178
+        },
+        {
+          "bin_center_min": 67.5,
+          "n_crops": 441,
+          "frac_resistant": 0.047619047619047616,
+          "mean_prob_r": 0.17156265676021576
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.4785253703594208,
+      "n_total_crops": 104308,
+      "max_time_min": 59.969380696614586,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6225,
+          "frac_resistant": 0.5590361445783133,
+          "mean_prob_r": 0.5254199504852295
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 6959,
+          "frac_resistant": 0.6476505245006466,
+          "mean_prob_r": 0.5885891914367676
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 5250,
+          "frac_resistant": 0.5274285714285715,
+          "mean_prob_r": 0.5118892192840576
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 9470,
+          "frac_resistant": 0.5717001055966209,
+          "mean_prob_r": 0.54170161485672
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 5214,
+          "frac_resistant": 0.475258918296893,
+          "mean_prob_r": 0.48088327050209045
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 10151,
+          "frac_resistant": 0.5294059698551867,
+          "mean_prob_r": 0.5137668251991272
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 8560,
+          "frac_resistant": 0.6107476635514019,
+          "mean_prob_r": 0.5643801093101501
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 9086,
+          "frac_resistant": 0.4246092890160687,
+          "mean_prob_r": 0.45447516441345215
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 9171,
+          "frac_resistant": 0.4573110893032385,
+          "mean_prob_r": 0.476104199886322
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 10122,
+          "frac_resistant": 0.32622011460185735,
+          "mean_prob_r": 0.4052346646785736
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 14610,
+          "frac_resistant": 0.33689253935660507,
+          "mean_prob_r": 0.41203516721725464
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9490,
+          "frac_resistant": 0.27829293993677556,
+          "mean_prob_r": 0.37502267956733704
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.4347619116306305,
+      "n_total_crops": 96278,
+      "max_time_min": 60.76708984375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5687,
+          "frac_resistant": 0.4102338667135572,
+          "mean_prob_r": 0.4377613663673401
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 5905,
+          "frac_resistant": 0.46655376799322607,
+          "mean_prob_r": 0.47475549578666687
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 4033,
+          "frac_resistant": 0.38507314654103647,
+          "mean_prob_r": 0.42961710691452026
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 8997,
+          "frac_resistant": 0.4185839724352562,
+          "mean_prob_r": 0.4514542520046234
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 5851,
+          "frac_resistant": 0.39719706033156726,
+          "mean_prob_r": 0.4291117489337921
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 8554,
+          "frac_resistant": 0.3982931961655366,
+          "mean_prob_r": 0.4370778799057007
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 6866,
+          "frac_resistant": 0.4156714244101369,
+          "mean_prob_r": 0.4379778206348419
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 10832,
+          "frac_resistant": 0.3467503692762186,
+          "mean_prob_r": 0.4051493704319
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 8737,
+          "frac_resistant": 0.4342451642440197,
+          "mean_prob_r": 0.4580036997795105
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 8650,
+          "frac_resistant": 0.3796531791907514,
+          "mean_prob_r": 0.42874887585639954
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 10453,
+          "frac_resistant": 0.37204630249689086,
+          "mean_prob_r": 0.4184603989124298
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9278,
+          "frac_resistant": 0.39588273334770424,
+          "mean_prob_r": 0.4366603195667267
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 2435,
+          "frac_resistant": 0.32813141683778235,
+          "mean_prob_r": 0.4064323902130127
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.5162094831466675,
+      "n_total_crops": 35568,
+      "max_time_min": 55.776814778645836,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6016,
+          "frac_resistant": 0.7599734042553191,
+          "mean_prob_r": 0.6852424144744873
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 7559,
+          "frac_resistant": 0.6773382722582352,
+          "mean_prob_r": 0.607967734336853
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2626,
+          "frac_resistant": 0.5856816450875857,
+          "mean_prob_r": 0.5448054671287537
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 3501,
+          "frac_resistant": 0.5766923736075407,
+          "mean_prob_r": 0.5455721616744995
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 2002,
+          "frac_resistant": 0.5849150849150849,
+          "mean_prob_r": 0.5360942482948303
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 2720,
+          "frac_resistant": 0.46286764705882355,
+          "mean_prob_r": 0.4596885144710541
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 2173,
+          "frac_resistant": 0.4035895075931891,
+          "mean_prob_r": 0.42619189620018005
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 3044,
+          "frac_resistant": 0.4480946123521682,
+          "mean_prob_r": 0.44631409645080566
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1554,
+          "frac_resistant": 0.2438867438867439,
+          "mean_prob_r": 0.2930697202682495
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1980,
+          "frac_resistant": 0.23484848484848486,
+          "mean_prob_r": 0.28897273540496826
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2181,
+          "frac_resistant": 0.2260430994956442,
+          "mean_prob_r": 0.2775992751121521
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 212,
+          "frac_resistant": 0.18867924528301888,
+          "mean_prob_r": 0.2850882112979889
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.3174898624420166,
+      "n_total_crops": 34567,
+      "max_time_min": 52.85223388671875,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 3492,
+          "frac_resistant": 0.38831615120274915,
+          "mean_prob_r": 0.42483124136924744
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4421,
+          "frac_resistant": 0.37683781949785117,
+          "mean_prob_r": 0.41875818371772766
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2983,
+          "frac_resistant": 0.22024807241032518,
+          "mean_prob_r": 0.3138527572154999
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 4715,
+          "frac_resistant": 0.23987274655355248,
+          "mean_prob_r": 0.32306188344955444
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 3145,
+          "frac_resistant": 0.26931637519872814,
+          "mean_prob_r": 0.34392985701560974
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 3306,
+          "frac_resistant": 0.15366001209921354,
+          "mean_prob_r": 0.2724091410636902
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 2636,
+          "frac_resistant": 0.23520485584218512,
+          "mean_prob_r": 0.321855753660202
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 3479,
+          "frac_resistant": 0.13797068123023856,
+          "mean_prob_r": 0.23943783342838287
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 2610,
+          "frac_resistant": 0.10881226053639846,
+          "mean_prob_r": 0.22889116406440735
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1998,
+          "frac_resistant": 0.12062062062062062,
+          "mean_prob_r": 0.22912085056304932
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 1782,
+          "frac_resistant": 0.13468013468013468,
+          "mean_prob_r": 0.2589910328388214
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated_new": {
+      "exp_prob_r": 0.3382459580898285,
+      "n_total_crops": 29858,
+      "max_time_min": 64.64459635416667,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 4016,
+          "frac_resistant": 0.4407370517928287,
+          "mean_prob_r": 0.4561077654361725
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4117,
+          "frac_resistant": 0.4576147680349769,
+          "mean_prob_r": 0.4645797908306122
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2155,
+          "frac_resistant": 0.3568445475638051,
+          "mean_prob_r": 0.400214284658432
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 2839,
+          "frac_resistant": 0.3930961606199366,
+          "mean_prob_r": 0.41996434330940247
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1641,
+          "frac_resistant": 0.26020719073735527,
+          "mean_prob_r": 0.34176912903785706
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 2943,
+          "frac_resistant": 0.17703024125042474,
+          "mean_prob_r": 0.2818862199783325
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1360,
+          "frac_resistant": 0.18970588235294117,
+          "mean_prob_r": 0.2993248999118805
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 1191,
+          "frac_resistant": 0.08228379513014274,
+          "mean_prob_r": 0.2223108410835266
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1361,
+          "frac_resistant": 0.0867009551800147,
+          "mean_prob_r": 0.2217302769422531
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1911,
+          "frac_resistant": 0.10465724751439037,
+          "mean_prob_r": 0.2240554839372635
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2719,
+          "frac_resistant": 0.14380286870172856,
+          "mean_prob_r": 0.25875434279441833
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 1396,
+          "frac_resistant": 0.08237822349570201,
+          "mean_prob_r": 0.2152540385723114
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 2209,
+          "frac_resistant": 0.11181530104119511,
+          "mean_prob_r": 0.22812239825725555
+        }
+      ]
+    }
+  },
+  "fold1": {
+    "B1_Ampicillin_16mgL_exp1_old_bright": {
+      "exp_prob_r": 0.06896435469388962,
+      "n_total_crops": 6114,
+      "max_time_min": 3.8144317626953126,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6114,
+          "frac_resistant": 0.004416094210009814,
+          "mean_prob_r": 0.06896435469388962
+        }
+      ]
+    },
+    "B1_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.5527990460395813,
+      "n_total_crops": 57797,
+      "max_time_min": 62.11734212239583,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 2316,
+          "frac_resistant": 0.6256476683937824,
+          "mean_prob_r": 0.5932530164718628
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 3208,
+          "frac_resistant": 0.6817331670822943,
+          "mean_prob_r": 0.633222758769989
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1425,
+          "frac_resistant": 0.7270175438596491,
+          "mean_prob_r": 0.6733368039131165
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 3227,
+          "frac_resistant": 0.564920979237682,
+          "mean_prob_r": 0.5455664396286011
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 2410,
+          "frac_resistant": 0.5564315352697096,
+          "mean_prob_r": 0.537811815738678
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 4616,
+          "frac_resistant": 0.6388648180242634,
+          "mean_prob_r": 0.6020255088806152
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 3644,
+          "frac_resistant": 0.6350164654226125,
+          "mean_prob_r": 0.6054378151893616
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 4421,
+          "frac_resistant": 0.5100655960190003,
+          "mean_prob_r": 0.511001467704773
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 6915,
+          "frac_resistant": 0.6065075921908893,
+          "mean_prob_r": 0.5814337134361267
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 7158,
+          "frac_resistant": 0.513271863649064,
+          "mean_prob_r": 0.5094094276428223
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 9007,
+          "frac_resistant": 0.5180415232596869,
+          "mean_prob_r": 0.5161365270614624
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 5720,
+          "frac_resistant": 0.5416083916083916,
+          "mean_prob_r": 0.5382232666015625
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 3730,
+          "frac_resistant": 0.503485254691689,
+          "mean_prob_r": 0.5066633820533752
+        }
+      ]
+    },
+    "B1_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.4754541516304016,
+      "n_total_crops": 102340,
+      "max_time_min": 61.267582194010416,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5386,
+          "frac_resistant": 0.5753806164129224,
+          "mean_prob_r": 0.5613197088241577
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 6662,
+          "frac_resistant": 0.5577904533173221,
+          "mean_prob_r": 0.5464694499969482
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2976,
+          "frac_resistant": 0.5013440860215054,
+          "mean_prob_r": 0.5139172673225403
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 6979,
+          "frac_resistant": 0.47929502794096573,
+          "mean_prob_r": 0.49726933240890503
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 4703,
+          "frac_resistant": 0.4139910695300872,
+          "mean_prob_r": 0.44769686460494995
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 8737,
+          "frac_resistant": 0.4936477051619549,
+          "mean_prob_r": 0.4994271695613861
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 5632,
+          "frac_resistant": 0.4630681818181818,
+          "mean_prob_r": 0.48833802342414856
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 8726,
+          "frac_resistant": 0.4461379784551914,
+          "mean_prob_r": 0.4694367051124573
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 8641,
+          "frac_resistant": 0.3807429695637079,
+          "mean_prob_r": 0.4237270951271057
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 9648,
+          "frac_resistant": 0.4078565505804312,
+          "mean_prob_r": 0.44536423683166504
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 18942,
+          "frac_resistant": 0.4399746594868546,
+          "mean_prob_r": 0.4646216630935669
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 10008,
+          "frac_resistant": 0.3767985611510791,
+          "mean_prob_r": 0.42084789276123047
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 5300,
+          "frac_resistant": 0.5064150943396226,
+          "mean_prob_r": 0.5108715295791626
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_exp1_old_bright": {
+      "exp_prob_r": 0.07794679701328278,
+      "n_total_crops": 25151,
+      "max_time_min": 59.50413818359375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 4007,
+          "frac_resistant": 0.007736461192912403,
+          "mean_prob_r": 0.07944752275943756
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4073,
+          "frac_resistant": 0.0056469432850478765,
+          "mean_prob_r": 0.08257593959569931
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1537,
+          "frac_resistant": 0.00520494469746259,
+          "mean_prob_r": 0.06735938787460327
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 1983,
+          "frac_resistant": 0.02168431669188099,
+          "mean_prob_r": 0.09297581017017365
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1644,
+          "frac_resistant": 0.0072992700729927005,
+          "mean_prob_r": 0.0748555064201355
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1891,
+          "frac_resistant": 0.006874669487043892,
+          "mean_prob_r": 0.08416520804166794
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1163,
+          "frac_resistant": 0.046431642304385214,
+          "mean_prob_r": 0.11179664731025696
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 2245,
+          "frac_resistant": 0.0031180400890868597,
+          "mean_prob_r": 0.06882482767105103
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1865,
+          "frac_resistant": 0.0037533512064343165,
+          "mean_prob_r": 0.0637967586517334
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1397,
+          "frac_resistant": 0.004294917680744453,
+          "mean_prob_r": 0.08043937385082245
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2263,
+          "frac_resistant": 0.0013256738842244808,
+          "mean_prob_r": 0.06137796863913536
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 1083,
+          "frac_resistant": 0.010156971375807941,
+          "mean_prob_r": 0.07465960830450058
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.4709410071372986,
+      "n_total_crops": 10920,
+      "max_time_min": 48.06361083984375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 710,
+          "frac_resistant": 0.7943661971830986,
+          "mean_prob_r": 0.7114958167076111
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 1376,
+          "frac_resistant": 0.7492732558139535,
+          "mean_prob_r": 0.6866734027862549
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1178,
+          "frac_resistant": 0.5959252971137521,
+          "mean_prob_r": 0.5731456279754639
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 1381,
+          "frac_resistant": 0.4670528602461984,
+          "mean_prob_r": 0.4615495204925537
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1034,
+          "frac_resistant": 0.3955512572533849,
+          "mean_prob_r": 0.42285826802253723
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1363,
+          "frac_resistant": 0.4578136463683052,
+          "mean_prob_r": 0.45286470651626587
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1189,
+          "frac_resistant": 0.30782169890664424,
+          "mean_prob_r": 0.347993403673172
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 715,
+          "frac_resistant": 0.23776223776223776,
+          "mean_prob_r": 0.29838263988494873
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1464,
+          "frac_resistant": 0.3681693989071038,
+          "mean_prob_r": 0.38744959235191345
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 510,
+          "frac_resistant": 0.16666666666666666,
+          "mean_prob_r": 0.25737693905830383
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.3596457839012146,
+      "n_total_crops": 20201,
+      "max_time_min": 66.2773193359375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 2574,
+          "frac_resistant": 0.574980574980575,
+          "mean_prob_r": 0.5616007447242737
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 2642,
+          "frac_resistant": 0.5333080999242997,
+          "mean_prob_r": 0.5281985998153687
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1591,
+          "frac_resistant": 0.40289126335637965,
+          "mean_prob_r": 0.44634974002838135
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 2094,
+          "frac_resistant": 0.3223495702005731,
+          "mean_prob_r": 0.38670453429222107
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1458,
+          "frac_resistant": 0.38614540466392316,
+          "mean_prob_r": 0.40286651253700256
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1493,
+          "frac_resistant": 0.1982585398526457,
+          "mean_prob_r": 0.28373825550079346
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 855,
+          "frac_resistant": 0.1391812865497076,
+          "mean_prob_r": 0.24033895134925842
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 1381,
+          "frac_resistant": 0.19044170890658943,
+          "mean_prob_r": 0.26149988174438477
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1388,
+          "frac_resistant": 0.17579250720461095,
+          "mean_prob_r": 0.24577423930168152
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1182,
+          "frac_resistant": 0.2225042301184433,
+          "mean_prob_r": 0.27636897563934326
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 1503,
+          "frac_resistant": 0.09115103127079174,
+          "mean_prob_r": 0.17864608764648438
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 750,
+          "frac_resistant": 0.11466666666666667,
+          "mean_prob_r": 0.1797415018081665
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 1133,
+          "frac_resistant": 0.11827007943512798,
+          "mean_prob_r": 0.19515253603458405
+        },
+        {
+          "bin_center_min": 67.5,
+          "n_crops": 157,
+          "frac_resistant": 0.1337579617834395,
+          "mean_prob_r": 0.21909895539283752
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_old_bright": {
+      "exp_prob_r": 0.07398716360330582,
+      "n_total_crops": 114102,
+      "max_time_min": 65.11913248697917,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5845,
+          "frac_resistant": 0.01009409751924722,
+          "mean_prob_r": 0.08663492649793625
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 5158,
+          "frac_resistant": 0.008724311748739822,
+          "mean_prob_r": 0.08673671633005142
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2874,
+          "frac_resistant": 0.004523312456506611,
+          "mean_prob_r": 0.07512404024600983
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 6052,
+          "frac_resistant": 0.00760079312623926,
+          "mean_prob_r": 0.07848450541496277
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 3610,
+          "frac_resistant": 0.009141274238227148,
+          "mean_prob_r": 0.07684436440467834
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 7485,
+          "frac_resistant": 0.007348029392117568,
+          "mean_prob_r": 0.07712948322296143
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 5766,
+          "frac_resistant": 0.0064169268123482484,
+          "mean_prob_r": 0.0739765539765358
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 11999,
+          "frac_resistant": 0.004917076423035253,
+          "mean_prob_r": 0.07189858704805374
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 7776,
+          "frac_resistant": 0.008101851851851851,
+          "mean_prob_r": 0.072316013276577
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 9981,
+          "frac_resistant": 0.004408375914237051,
+          "mean_prob_r": 0.07326618582010269
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 17924,
+          "frac_resistant": 0.004798036152644499,
+          "mean_prob_r": 0.07094878703355789
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9215,
+          "frac_resistant": 0.00727075420510038,
+          "mean_prob_r": 0.06906937807798386
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 19976,
+          "frac_resistant": 0.00775931117340809,
+          "mean_prob_r": 0.0716472789645195
+        },
+        {
+          "bin_center_min": 67.5,
+          "n_crops": 441,
+          "frac_resistant": 0.0,
+          "mean_prob_r": 0.0463741160929203
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.4607694745063782,
+      "n_total_crops": 104308,
+      "max_time_min": 59.969380696614586,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6225,
+          "frac_resistant": 0.5140562248995983,
+          "mean_prob_r": 0.5139816999435425
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 6959,
+          "frac_resistant": 0.6226469320304642,
+          "mean_prob_r": 0.5905570387840271
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 5250,
+          "frac_resistant": 0.5043809523809524,
+          "mean_prob_r": 0.5000360608100891
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 9470,
+          "frac_resistant": 0.533051742344245,
+          "mean_prob_r": 0.5278429388999939
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 5214,
+          "frac_resistant": 0.43690065209052553,
+          "mean_prob_r": 0.4524974524974823
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 10151,
+          "frac_resistant": 0.5017239680819624,
+          "mean_prob_r": 0.5056060552597046
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 8560,
+          "frac_resistant": 0.5956775700934579,
+          "mean_prob_r": 0.5774896740913391
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 9086,
+          "frac_resistant": 0.37464230684569666,
+          "mean_prob_r": 0.4160376489162445
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 9171,
+          "frac_resistant": 0.46985061607240214,
+          "mean_prob_r": 0.481816828250885
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 10122,
+          "frac_resistant": 0.30774550484094054,
+          "mean_prob_r": 0.36527085304260254
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 14610,
+          "frac_resistant": 0.3425051334702259,
+          "mean_prob_r": 0.3940092921257019
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9490,
+          "frac_resistant": 0.2555321390937829,
+          "mean_prob_r": 0.320464551448822
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.3613141179084778,
+      "n_total_crops": 96278,
+      "max_time_min": 60.76708984375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5687,
+          "frac_resistant": 0.3351503428872868,
+          "mean_prob_r": 0.3891962468624115
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 5905,
+          "frac_resistant": 0.38154106689246403,
+          "mean_prob_r": 0.42953625321388245
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 4033,
+          "frac_resistant": 0.28663525911232335,
+          "mean_prob_r": 0.3545199930667877
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 8997,
+          "frac_resistant": 0.3152161831721685,
+          "mean_prob_r": 0.377157986164093
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 5851,
+          "frac_resistant": 0.3035378567766194,
+          "mean_prob_r": 0.3576500713825226
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 8554,
+          "frac_resistant": 0.2895721299976619,
+          "mean_prob_r": 0.35186633467674255
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 6866,
+          "frac_resistant": 0.2832799300903,
+          "mean_prob_r": 0.3494371175765991
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 10832,
+          "frac_resistant": 0.253877400295421,
+          "mean_prob_r": 0.3254939019680023
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 8737,
+          "frac_resistant": 0.314867803593911,
+          "mean_prob_r": 0.371166855096817
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 8650,
+          "frac_resistant": 0.28635838150289017,
+          "mean_prob_r": 0.3482726216316223
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 10453,
+          "frac_resistant": 0.2769539845020568,
+          "mean_prob_r": 0.3432704210281372
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9278,
+          "frac_resistant": 0.32733347704246607,
+          "mean_prob_r": 0.38168835639953613
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 2435,
+          "frac_resistant": 0.24681724845995892,
+          "mean_prob_r": 0.3290961980819702
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.5444652438163757,
+      "n_total_crops": 35568,
+      "max_time_min": 55.776814778645836,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6016,
+          "frac_resistant": 0.8176529255319149,
+          "mean_prob_r": 0.771483302116394
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 7559,
+          "frac_resistant": 0.7044582616748247,
+          "mean_prob_r": 0.660247802734375
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2626,
+          "frac_resistant": 0.6077684691546078,
+          "mean_prob_r": 0.5765594244003296
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 3501,
+          "frac_resistant": 0.5909740074264496,
+          "mean_prob_r": 0.5731965899467468
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 2002,
+          "frac_resistant": 0.5914085914085914,
+          "mean_prob_r": 0.554588258266449
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 2720,
+          "frac_resistant": 0.4886029411764706,
+          "mean_prob_r": 0.4802347421646118
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 2173,
+          "frac_resistant": 0.41003221352968244,
+          "mean_prob_r": 0.42709946632385254
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 3044,
+          "frac_resistant": 0.4517082785808147,
+          "mean_prob_r": 0.45567482709884644
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1554,
+          "frac_resistant": 0.23680823680823682,
+          "mean_prob_r": 0.2728136479854584
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1980,
+          "frac_resistant": 0.1893939393939394,
+          "mean_prob_r": 0.2440192550420761
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2181,
+          "frac_resistant": 0.19807427785419532,
+          "mean_prob_r": 0.24092663824558258
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 212,
+          "frac_resistant": 0.16981132075471697,
+          "mean_prob_r": 0.22838538885116577
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.2433943897485733,
+      "n_total_crops": 34567,
+      "max_time_min": 52.85223388671875,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 3492,
+          "frac_resistant": 0.293241695303551,
+          "mean_prob_r": 0.355763703584671
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4421,
+          "frac_resistant": 0.28952725627686043,
+          "mean_prob_r": 0.35111111402511597
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2983,
+          "frac_resistant": 0.14113308749580958,
+          "mean_prob_r": 0.23437507450580597
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 4715,
+          "frac_resistant": 0.16882290562036056,
+          "mean_prob_r": 0.2411317676305771
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 3145,
+          "frac_resistant": 0.17901430842607313,
+          "mean_prob_r": 0.26052653789520264
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 3306,
+          "frac_resistant": 0.09165154264972777,
+          "mean_prob_r": 0.1906716525554657
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 2636,
+          "frac_resistant": 0.16160849772382396,
+          "mean_prob_r": 0.25062090158462524
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 3479,
+          "frac_resistant": 0.07818338603046852,
+          "mean_prob_r": 0.16830334067344666
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 2610,
+          "frac_resistant": 0.047126436781609195,
+          "mean_prob_r": 0.1550363004207611
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1998,
+          "frac_resistant": 0.08508508508508508,
+          "mean_prob_r": 0.17671193182468414
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 1782,
+          "frac_resistant": 0.0931537598204265,
+          "mean_prob_r": 0.18470944464206696
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated_new": {
+      "exp_prob_r": 0.2698613703250885,
+      "n_total_crops": 29858,
+      "max_time_min": 64.64459635416667,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 4016,
+          "frac_resistant": 0.3777390438247012,
+          "mean_prob_r": 0.40952572226524353
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4117,
+          "frac_resistant": 0.38936118532912317,
+          "mean_prob_r": 0.4237316846847534
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2155,
+          "frac_resistant": 0.27470997679814385,
+          "mean_prob_r": 0.3404671549797058
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 2839,
+          "frac_resistant": 0.3170130327580134,
+          "mean_prob_r": 0.36731821298599243
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1641,
+          "frac_resistant": 0.20109689213893966,
+          "mean_prob_r": 0.28269702196121216
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 2943,
+          "frac_resistant": 0.0944614339109752,
+          "mean_prob_r": 0.1840016394853592
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1360,
+          "frac_resistant": 0.08455882352941177,
+          "mean_prob_r": 0.18505334854125977
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 1191,
+          "frac_resistant": 0.036943744752308987,
+          "mean_prob_r": 0.13533446192741394
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1361,
+          "frac_resistant": 0.03600293901542983,
+          "mean_prob_r": 0.1370813250541687
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1911,
+          "frac_resistant": 0.05442176870748299,
+          "mean_prob_r": 0.15173199772834778
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2719,
+          "frac_resistant": 0.05737403457153365,
+          "mean_prob_r": 0.1753779798746109
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 1396,
+          "frac_resistant": 0.03581661891117478,
+          "mean_prob_r": 0.1412774920463562
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 2209,
+          "frac_resistant": 0.05024898143956542,
+          "mean_prob_r": 0.1462002843618393
+        }
+      ]
+    }
+  },
+  "fold2": {
+    "B1_Ampicillin_16mgL_exp1_old_bright": {
+      "exp_prob_r": 0.0621512308716774,
+      "n_total_crops": 6114,
+      "max_time_min": 3.8144317626953126,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6114,
+          "frac_resistant": 0.008832188420019628,
+          "mean_prob_r": 0.0621512308716774
+        }
+      ]
+    },
+    "B1_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.5512515306472778,
+      "n_total_crops": 57797,
+      "max_time_min": 62.11734212239583,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 2316,
+          "frac_resistant": 0.667098445595855,
+          "mean_prob_r": 0.6238662600517273
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 3208,
+          "frac_resistant": 0.7188279301745636,
+          "mean_prob_r": 0.6646092534065247
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1425,
+          "frac_resistant": 0.7585964912280702,
+          "mean_prob_r": 0.7011201977729797
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 3227,
+          "frac_resistant": 0.600557793616362,
+          "mean_prob_r": 0.5754947066307068
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 2410,
+          "frac_resistant": 0.6008298755186722,
+          "mean_prob_r": 0.5692983865737915
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 4616,
+          "frac_resistant": 0.6765597920277296,
+          "mean_prob_r": 0.630207359790802
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 3644,
+          "frac_resistant": 0.6616355653128431,
+          "mean_prob_r": 0.6252877712249756
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 4421,
+          "frac_resistant": 0.5105179823569328,
+          "mean_prob_r": 0.5047159194946289
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 6915,
+          "frac_resistant": 0.606941431670282,
+          "mean_prob_r": 0.5762885808944702
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 7158,
+          "frac_resistant": 0.49399273540095,
+          "mean_prob_r": 0.49132588505744934
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 9007,
+          "frac_resistant": 0.5077162207172199,
+          "mean_prob_r": 0.49987125396728516
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 5720,
+          "frac_resistant": 0.5131118881118881,
+          "mean_prob_r": 0.5020567774772644
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 3730,
+          "frac_resistant": 0.47560321715817694,
+          "mean_prob_r": 0.47199276089668274
+        }
+      ]
+    },
+    "B1_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.49021509289741516,
+      "n_total_crops": 102340,
+      "max_time_min": 61.267582194010416,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5386,
+          "frac_resistant": 0.6258819160787226,
+          "mean_prob_r": 0.5865774750709534
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 6662,
+          "frac_resistant": 0.6097268087661363,
+          "mean_prob_r": 0.5797738432884216
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2976,
+          "frac_resistant": 0.5514112903225806,
+          "mean_prob_r": 0.5422358512878418
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 6979,
+          "frac_resistant": 0.5201318240435593,
+          "mean_prob_r": 0.5146805644035339
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 4703,
+          "frac_resistant": 0.4686370401871146,
+          "mean_prob_r": 0.47577956318855286
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 8737,
+          "frac_resistant": 0.5221471901110221,
+          "mean_prob_r": 0.5167486667633057
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 5632,
+          "frac_resistant": 0.5060369318181818,
+          "mean_prob_r": 0.5069871544837952
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 8726,
+          "frac_resistant": 0.48647719459087785,
+          "mean_prob_r": 0.48864632844924927
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 8641,
+          "frac_resistant": 0.42066890406202984,
+          "mean_prob_r": 0.44271180033683777
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 9648,
+          "frac_resistant": 0.4363598673300166,
+          "mean_prob_r": 0.45395225286483765
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 18942,
+          "frac_resistant": 0.47339246119733924,
+          "mean_prob_r": 0.47486987709999084
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 10008,
+          "frac_resistant": 0.39098721023181454,
+          "mean_prob_r": 0.4151334762573242
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 5300,
+          "frac_resistant": 0.519811320754717,
+          "mean_prob_r": 0.5121991038322449
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_exp1_old_bright": {
+      "exp_prob_r": 0.08488374948501587,
+      "n_total_crops": 25151,
+      "max_time_min": 59.50413818359375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 4007,
+          "frac_resistant": 0.01771899176441228,
+          "mean_prob_r": 0.08897469937801361
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4073,
+          "frac_resistant": 0.014240117849251166,
+          "mean_prob_r": 0.08817339688539505
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1537,
+          "frac_resistant": 0.009108653220559532,
+          "mean_prob_r": 0.06939363479614258
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 1983,
+          "frac_resistant": 0.01664145234493192,
+          "mean_prob_r": 0.09085194021463394
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1644,
+          "frac_resistant": 0.010948905109489052,
+          "mean_prob_r": 0.07361598312854767
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1891,
+          "frac_resistant": 0.01110523532522475,
+          "mean_prob_r": 0.08974844962358475
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1163,
+          "frac_resistant": 0.0412725709372313,
+          "mean_prob_r": 0.11307940632104874
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 2245,
+          "frac_resistant": 0.01737193763919822,
+          "mean_prob_r": 0.08102495968341827
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1865,
+          "frac_resistant": 0.005361930294906166,
+          "mean_prob_r": 0.07065097242593765
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1397,
+          "frac_resistant": 0.013600572655690766,
+          "mean_prob_r": 0.09331023693084717
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2263,
+          "frac_resistant": 0.007512152010605391,
+          "mean_prob_r": 0.07727529853582382
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 1083,
+          "frac_resistant": 0.013850415512465374,
+          "mean_prob_r": 0.08430095762014389
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.47813698649406433,
+      "n_total_crops": 10920,
+      "max_time_min": 48.06361083984375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 710,
+          "frac_resistant": 0.8098591549295775,
+          "mean_prob_r": 0.7239610552787781
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 1376,
+          "frac_resistant": 0.7776162790697675,
+          "mean_prob_r": 0.7010909914970398
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1178,
+          "frac_resistant": 0.629881154499151,
+          "mean_prob_r": 0.5946704149246216
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 1381,
+          "frac_resistant": 0.498913830557567,
+          "mean_prob_r": 0.4830925166606903
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1034,
+          "frac_resistant": 0.3916827852998066,
+          "mean_prob_r": 0.4198843240737915
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1363,
+          "frac_resistant": 0.4739545121056493,
+          "mean_prob_r": 0.46523377299308777
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1189,
+          "frac_resistant": 0.33389402859545836,
+          "mean_prob_r": 0.3525557518005371
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 715,
+          "frac_resistant": 0.24475524475524477,
+          "mean_prob_r": 0.28909948468208313
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1464,
+          "frac_resistant": 0.35450819672131145,
+          "mean_prob_r": 0.3821568787097931
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 510,
+          "frac_resistant": 0.1627450980392157,
+          "mean_prob_r": 0.23769249022006989
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.37461188435554504,
+      "n_total_crops": 20201,
+      "max_time_min": 66.2773193359375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 2574,
+          "frac_resistant": 0.6181041181041181,
+          "mean_prob_r": 0.5809598565101624
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 2642,
+          "frac_resistant": 0.5859197577592733,
+          "mean_prob_r": 0.5569818019866943
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1591,
+          "frac_resistant": 0.4619736015084852,
+          "mean_prob_r": 0.4639752209186554
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 2094,
+          "frac_resistant": 0.3653295128939828,
+          "mean_prob_r": 0.40437278151512146
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1458,
+          "frac_resistant": 0.39231824417009603,
+          "mean_prob_r": 0.4057518243789673
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1493,
+          "frac_resistant": 0.22371064969859344,
+          "mean_prob_r": 0.29416683316230774
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 855,
+          "frac_resistant": 0.16023391812865498,
+          "mean_prob_r": 0.24634315073490143
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 1381,
+          "frac_resistant": 0.2280955829109341,
+          "mean_prob_r": 0.2754392921924591
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1388,
+          "frac_resistant": 0.22262247838616714,
+          "mean_prob_r": 0.26155874133110046
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1182,
+          "frac_resistant": 0.2428087986463621,
+          "mean_prob_r": 0.28286924958229065
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 1503,
+          "frac_resistant": 0.11909514304723885,
+          "mean_prob_r": 0.19418098032474518
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 750,
+          "frac_resistant": 0.128,
+          "mean_prob_r": 0.18244601786136627
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 1133,
+          "frac_resistant": 0.13857016769638128,
+          "mean_prob_r": 0.20707915723323822
+        },
+        {
+          "bin_center_min": 67.5,
+          "n_crops": 157,
+          "frac_resistant": 0.14012738853503184,
+          "mean_prob_r": 0.21127530932426453
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_old_bright": {
+      "exp_prob_r": 0.07366722077131271,
+      "n_total_crops": 114102,
+      "max_time_min": 65.11913248697917,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5845,
+          "frac_resistant": 0.019161676646706587,
+          "mean_prob_r": 0.09281333535909653
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 5158,
+          "frac_resistant": 0.015703761147731678,
+          "mean_prob_r": 0.0905764102935791
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2874,
+          "frac_resistant": 0.007654836464857342,
+          "mean_prob_r": 0.07806118577718735
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 6052,
+          "frac_resistant": 0.01784534038334435,
+          "mean_prob_r": 0.07990006357431412
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 3610,
+          "frac_resistant": 0.013296398891966758,
+          "mean_prob_r": 0.07874630391597748
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 7485,
+          "frac_resistant": 0.014161656646626587,
+          "mean_prob_r": 0.08204995840787888
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 5766,
+          "frac_resistant": 0.011619840443981963,
+          "mean_prob_r": 0.07564067095518112
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 11999,
+          "frac_resistant": 0.012084340361696809,
+          "mean_prob_r": 0.07161972671747208
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 7776,
+          "frac_resistant": 0.016203703703703703,
+          "mean_prob_r": 0.07358159869909286
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 9981,
+          "frac_resistant": 0.008716561466786895,
+          "mean_prob_r": 0.07200727611780167
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 17924,
+          "frac_resistant": 0.00942869895112698,
+          "mean_prob_r": 0.06865641474723816
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9215,
+          "frac_resistant": 0.011177428106348345,
+          "mean_prob_r": 0.06521391123533249
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 19976,
+          "frac_resistant": 0.013616339607529036,
+          "mean_prob_r": 0.06777574867010117
+        },
+        {
+          "bin_center_min": 67.5,
+          "n_crops": 441,
+          "frac_resistant": 0.0022675736961451248,
+          "mean_prob_r": 0.04025500267744064
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.35665008425712585,
+      "n_total_crops": 104308,
+      "max_time_min": 59.969380696614586,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6225,
+          "frac_resistant": 0.43261044176706825,
+          "mean_prob_r": 0.44085317850112915
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 6959,
+          "frac_resistant": 0.544331082052019,
+          "mean_prob_r": 0.5287781953811646
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 5250,
+          "frac_resistant": 0.37885714285714284,
+          "mean_prob_r": 0.39782068133354187
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 9470,
+          "frac_resistant": 0.4323125659978881,
+          "mean_prob_r": 0.43824633955955505
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 5214,
+          "frac_resistant": 0.34522439585730724,
+          "mean_prob_r": 0.36889761686325073
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 10151,
+          "frac_resistant": 0.39020786129445373,
+          "mean_prob_r": 0.4037565588951111
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 8560,
+          "frac_resistant": 0.4768691588785047,
+          "mean_prob_r": 0.4804116487503052
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 9086,
+          "frac_resistant": 0.2642526964560863,
+          "mean_prob_r": 0.30674970149993896
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 9171,
+          "frac_resistant": 0.32428306618689345,
+          "mean_prob_r": 0.35653603076934814
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 10122,
+          "frac_resistant": 0.19610748863860897,
+          "mean_prob_r": 0.25006532669067383
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 14610,
+          "frac_resistant": 0.20130047912388774,
+          "mean_prob_r": 0.26009127497673035
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9490,
+          "frac_resistant": 0.15258166491043204,
+          "mean_prob_r": 0.21246840059757233
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.3355405032634735,
+      "n_total_crops": 96278,
+      "max_time_min": 60.76708984375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5687,
+          "frac_resistant": 0.35361350448391066,
+          "mean_prob_r": 0.38898611068725586
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 5905,
+          "frac_resistant": 0.41185436071126164,
+          "mean_prob_r": 0.4381404221057892
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 4033,
+          "frac_resistant": 0.2891148028762708,
+          "mean_prob_r": 0.3457745611667633
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 8997,
+          "frac_resistant": 0.32833166611092585,
+          "mean_prob_r": 0.368868887424469
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 5851,
+          "frac_resistant": 0.2970432404717142,
+          "mean_prob_r": 0.3425220847129822
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 8554,
+          "frac_resistant": 0.28583119008650926,
+          "mean_prob_r": 0.3318198323249817
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 6866,
+          "frac_resistant": 0.2742499271773959,
+          "mean_prob_r": 0.33052125573158264
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 10832,
+          "frac_resistant": 0.24196824224519942,
+          "mean_prob_r": 0.29813674092292786
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 8737,
+          "frac_resistant": 0.2955247796726565,
+          "mean_prob_r": 0.3406914472579956
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 8650,
+          "frac_resistant": 0.2529479768786127,
+          "mean_prob_r": 0.30281949043273926
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 10453,
+          "frac_resistant": 0.2474887592078829,
+          "mean_prob_r": 0.30295082926750183
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9278,
+          "frac_resistant": 0.27581375296400085,
+          "mean_prob_r": 0.327548086643219
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 2435,
+          "frac_resistant": 0.1971252566735113,
+          "mean_prob_r": 0.2667580842971802
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.4294249713420868,
+      "n_total_crops": 35568,
+      "max_time_min": 55.776814778645836,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6016,
+          "frac_resistant": 0.6168550531914894,
+          "mean_prob_r": 0.59269779920578
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 7559,
+          "frac_resistant": 0.5663447545971689,
+          "mean_prob_r": 0.5461724400520325
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2626,
+          "frac_resistant": 0.45354150799695353,
+          "mean_prob_r": 0.4492603540420532
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 3501,
+          "frac_resistant": 0.4438731790916881,
+          "mean_prob_r": 0.4463759660720825
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 2002,
+          "frac_resistant": 0.46403596403596403,
+          "mean_prob_r": 0.45326441526412964
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 2720,
+          "frac_resistant": 0.34375,
+          "mean_prob_r": 0.35530704259872437
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 2173,
+          "frac_resistant": 0.291302346985734,
+          "mean_prob_r": 0.3186030983924866
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 3044,
+          "frac_resistant": 0.3340998685939553,
+          "mean_prob_r": 0.3442646563053131
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1554,
+          "frac_resistant": 0.13706563706563707,
+          "mean_prob_r": 0.18610133230686188
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1980,
+          "frac_resistant": 0.16818181818181818,
+          "mean_prob_r": 0.20772472023963928
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2181,
+          "frac_resistant": 0.19303071985327833,
+          "mean_prob_r": 0.22229494154453278
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 212,
+          "frac_resistant": 0.13679245283018868,
+          "mean_prob_r": 0.17745953798294067
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.2149776667356491,
+      "n_total_crops": 34567,
+      "max_time_min": 52.85223388671875,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 3492,
+          "frac_resistant": 0.2789232531500573,
+          "mean_prob_r": 0.32301899790763855
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4421,
+          "frac_resistant": 0.27550327980095,
+          "mean_prob_r": 0.32028064131736755
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2983,
+          "frac_resistant": 0.14616158229969828,
+          "mean_prob_r": 0.20756296813488007
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 4715,
+          "frac_resistant": 0.15885471898197243,
+          "mean_prob_r": 0.21392777562141418
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 3145,
+          "frac_resistant": 0.17774244833068362,
+          "mean_prob_r": 0.23289188742637634
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 3306,
+          "frac_resistant": 0.08318209316394434,
+          "mean_prob_r": 0.15647070109844208
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 2636,
+          "frac_resistant": 0.17678300455235205,
+          "mean_prob_r": 0.23044098913669586
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 3479,
+          "frac_resistant": 0.07329692440356424,
+          "mean_prob_r": 0.14162132143974304
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 2610,
+          "frac_resistant": 0.05440613026819923,
+          "mean_prob_r": 0.12723307311534882
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1998,
+          "frac_resistant": 0.08808808808808809,
+          "mean_prob_r": 0.14570701122283936
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 1782,
+          "frac_resistant": 0.09764309764309764,
+          "mean_prob_r": 0.16065022349357605
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated_new": {
+      "exp_prob_r": 0.2490423619747162,
+      "n_total_crops": 29858,
+      "max_time_min": 64.64459635416667,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 4016,
+          "frac_resistant": 0.3341633466135458,
+          "mean_prob_r": 0.35955482721328735
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4117,
+          "frac_resistant": 0.3570561088170998,
+          "mean_prob_r": 0.3814256489276886
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2155,
+          "frac_resistant": 0.26032482598607887,
+          "mean_prob_r": 0.3064016103744507
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 2839,
+          "frac_resistant": 0.2891863332159211,
+          "mean_prob_r": 0.3294655382633209
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1641,
+          "frac_resistant": 0.17550274223034734,
+          "mean_prob_r": 0.23995661735534668
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 2943,
+          "frac_resistant": 0.09717974855589534,
+          "mean_prob_r": 0.16779449582099915
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1360,
+          "frac_resistant": 0.10441176470588236,
+          "mean_prob_r": 0.1887262463569641
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 1191,
+          "frac_resistant": 0.06465155331654072,
+          "mean_prob_r": 0.16512466967105865
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1361,
+          "frac_resistant": 0.048493754592211606,
+          "mean_prob_r": 0.1323304921388626
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1911,
+          "frac_resistant": 0.07692307692307693,
+          "mean_prob_r": 0.15493589639663696
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2719,
+          "frac_resistant": 0.09268113276940051,
+          "mean_prob_r": 0.1844927966594696
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 1396,
+          "frac_resistant": 0.053724928366762174,
+          "mean_prob_r": 0.1386408805847168
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 2209,
+          "frac_resistant": 0.06428248076052512,
+          "mean_prob_r": 0.1419989913702011
+        }
+      ]
+    }
+  },
+  "fold3": {
+    "B1_Ampicillin_16mgL_exp1_old_bright": {
+      "exp_prob_r": 0.04063040018081665,
+      "n_total_crops": 6114,
+      "max_time_min": 3.8144317626953126,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6114,
+          "frac_resistant": 0.0006542361792607131,
+          "mean_prob_r": 0.04063040018081665
+        }
+      ]
+    },
+    "B1_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.512601912021637,
+      "n_total_crops": 57797,
+      "max_time_min": 62.11734212239583,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 2316,
+          "frac_resistant": 0.542314335060449,
+          "mean_prob_r": 0.5313113927841187
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 3208,
+          "frac_resistant": 0.5960099750623441,
+          "mean_prob_r": 0.5708906650543213
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1425,
+          "frac_resistant": 0.663859649122807,
+          "mean_prob_r": 0.6272507905960083
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 3227,
+          "frac_resistant": 0.5237062286953827,
+          "mean_prob_r": 0.509929358959198
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 2410,
+          "frac_resistant": 0.4850622406639004,
+          "mean_prob_r": 0.4891386330127716
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 4616,
+          "frac_resistant": 0.6126516464471404,
+          "mean_prob_r": 0.5809494256973267
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 3644,
+          "frac_resistant": 0.5968715697036224,
+          "mean_prob_r": 0.5675812363624573
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 4421,
+          "frac_resistant": 0.4646007690567745,
+          "mean_prob_r": 0.47154924273490906
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 6915,
+          "frac_resistant": 0.5647143890093999,
+          "mean_prob_r": 0.5447691082954407
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 7158,
+          "frac_resistant": 0.4695445655210953,
+          "mean_prob_r": 0.4737200140953064
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 9007,
+          "frac_resistant": 0.4765182635727767,
+          "mean_prob_r": 0.47907835245132446
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 5720,
+          "frac_resistant": 0.49230769230769234,
+          "mean_prob_r": 0.48893633484840393
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 3730,
+          "frac_resistant": 0.46273458445040216,
+          "mean_prob_r": 0.46711254119873047
+        }
+      ]
+    },
+    "B1_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.3599853217601776,
+      "n_total_crops": 102340,
+      "max_time_min": 61.267582194010416,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5386,
+          "frac_resistant": 0.30226513182324544,
+          "mean_prob_r": 0.36183226108551025
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 6662,
+          "frac_resistant": 0.3287301110777544,
+          "mean_prob_r": 0.37616580724716187
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2976,
+          "frac_resistant": 0.3346774193548387,
+          "mean_prob_r": 0.39014479517936707
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 6979,
+          "frac_resistant": 0.27554090843960455,
+          "mean_prob_r": 0.3453271985054016
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 4703,
+          "frac_resistant": 0.23474378056559642,
+          "mean_prob_r": 0.3185919523239136
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 8737,
+          "frac_resistant": 0.2935790317042463,
+          "mean_prob_r": 0.3593719005584717
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 5632,
+          "frac_resistant": 0.3029119318181818,
+          "mean_prob_r": 0.3672846853733063
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 8726,
+          "frac_resistant": 0.28856291542516616,
+          "mean_prob_r": 0.35665303468704224
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 8641,
+          "frac_resistant": 0.2692975350075223,
+          "mean_prob_r": 0.3386346399784088
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 9648,
+          "frac_resistant": 0.2955016583747927,
+          "mean_prob_r": 0.36054837703704834
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 18942,
+          "frac_resistant": 0.3074648928307465,
+          "mean_prob_r": 0.36646410822868347
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 10008,
+          "frac_resistant": 0.27378097521982414,
+          "mean_prob_r": 0.34005212783813477
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 5300,
+          "frac_resistant": 0.38358490566037734,
+          "mean_prob_r": 0.42387855052948
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_exp1_old_bright": {
+      "exp_prob_r": 0.035765763372182846,
+      "n_total_crops": 25151,
+      "max_time_min": 59.50413818359375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 4007,
+          "frac_resistant": 0.0002495632642874969,
+          "mean_prob_r": 0.03363940492272377
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4073,
+          "frac_resistant": 0.0004910385465259023,
+          "mean_prob_r": 0.036585137248039246
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1537,
+          "frac_resistant": 0.0006506180871828237,
+          "mean_prob_r": 0.029997115954756737
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 1983,
+          "frac_resistant": 0.0,
+          "mean_prob_r": 0.038619447499513626
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1644,
+          "frac_resistant": 0.0,
+          "mean_prob_r": 0.030414298176765442
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1891,
+          "frac_resistant": 0.0,
+          "mean_prob_r": 0.03426937386393547
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1163,
+          "frac_resistant": 0.0,
+          "mean_prob_r": 0.04135698080062866
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 2245,
+          "frac_resistant": 0.0008908685968819599,
+          "mean_prob_r": 0.04184317961335182
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1865,
+          "frac_resistant": 0.0,
+          "mean_prob_r": 0.0346357487142086
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1397,
+          "frac_resistant": 0.0007158196134574087,
+          "mean_prob_r": 0.03926394507288933
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2263,
+          "frac_resistant": 0.0004418912947414936,
+          "mean_prob_r": 0.034405797719955444
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 1083,
+          "frac_resistant": 0.0,
+          "mean_prob_r": 0.03592254966497421
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.4059194326400757,
+      "n_total_crops": 10920,
+      "max_time_min": 48.06361083984375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 710,
+          "frac_resistant": 0.6295774647887324,
+          "mean_prob_r": 0.5973346829414368
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 1376,
+          "frac_resistant": 0.6337209302325582,
+          "mean_prob_r": 0.5880431532859802
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1178,
+          "frac_resistant": 0.47198641765704585,
+          "mean_prob_r": 0.47626572847366333
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 1381,
+          "frac_resistant": 0.3410572049239681,
+          "mean_prob_r": 0.3821659982204437
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1034,
+          "frac_resistant": 0.2978723404255319,
+          "mean_prob_r": 0.3572131395339966
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1363,
+          "frac_resistant": 0.3749082905355833,
+          "mean_prob_r": 0.399355411529541
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1189,
+          "frac_resistant": 0.2464255677039529,
+          "mean_prob_r": 0.3040728271007538
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 715,
+          "frac_resistant": 0.1902097902097902,
+          "mean_prob_r": 0.2654310166835785
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1464,
+          "frac_resistant": 0.31489071038251365,
+          "mean_prob_r": 0.35855594277381897
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 510,
+          "frac_resistant": 0.1627450980392157,
+          "mean_prob_r": 0.23655186593532562
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.23595333099365234,
+      "n_total_crops": 20201,
+      "max_time_min": 66.2773193359375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 2574,
+          "frac_resistant": 0.3084693084693085,
+          "mean_prob_r": 0.3798575699329376
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 2642,
+          "frac_resistant": 0.26495079485238454,
+          "mean_prob_r": 0.33755287528038025
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1591,
+          "frac_resistant": 0.15273412947831552,
+          "mean_prob_r": 0.2591567039489746
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 2094,
+          "frac_resistant": 0.1294173829990449,
+          "mean_prob_r": 0.24390985071659088
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1458,
+          "frac_resistant": 0.17695473251028807,
+          "mean_prob_r": 0.25856566429138184
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1493,
+          "frac_resistant": 0.07635632953784327,
+          "mean_prob_r": 0.18202556669712067
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 855,
+          "frac_resistant": 0.06432748538011696,
+          "mean_prob_r": 0.15290522575378418
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 1381,
+          "frac_resistant": 0.08761766835626358,
+          "mean_prob_r": 0.17225970327854156
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1388,
+          "frac_resistant": 0.08789625360230548,
+          "mean_prob_r": 0.1785687655210495
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1182,
+          "frac_resistant": 0.11759729272419628,
+          "mean_prob_r": 0.20289549231529236
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 1503,
+          "frac_resistant": 0.0552228875582169,
+          "mean_prob_r": 0.13162057101726532
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 750,
+          "frac_resistant": 0.06266666666666666,
+          "mean_prob_r": 0.12253521382808685
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 1133,
+          "frac_resistant": 0.05030891438658429,
+          "mean_prob_r": 0.1355210393667221
+        },
+        {
+          "bin_center_min": 67.5,
+          "n_crops": 157,
+          "frac_resistant": 0.07643312101910828,
+          "mean_prob_r": 0.16263562440872192
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_old_bright": {
+      "exp_prob_r": 0.041044026613235474,
+      "n_total_crops": 114102,
+      "max_time_min": 65.11913248697917,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5845,
+          "frac_resistant": 0.0006843455945252353,
+          "mean_prob_r": 0.042649175971746445
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 5158,
+          "frac_resistant": 0.00019387359441644047,
+          "mean_prob_r": 0.041836969554424286
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2874,
+          "frac_resistant": 0.0,
+          "mean_prob_r": 0.038285862654447556
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 6052,
+          "frac_resistant": 0.0004957038995373431,
+          "mean_prob_r": 0.04101559892296791
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 3610,
+          "frac_resistant": 0.000554016620498615,
+          "mean_prob_r": 0.03766016662120819
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 7485,
+          "frac_resistant": 0.0004008016032064128,
+          "mean_prob_r": 0.040922168642282486
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 5766,
+          "frac_resistant": 0.0001734304543877905,
+          "mean_prob_r": 0.03816794976592064
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 11999,
+          "frac_resistant": 0.00041670139178264854,
+          "mean_prob_r": 0.04092211648821831
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 7776,
+          "frac_resistant": 0.00038580246913580245,
+          "mean_prob_r": 0.03838017210364342
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 9981,
+          "frac_resistant": 0.00030057108506161706,
+          "mean_prob_r": 0.042487096041440964
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 17924,
+          "frac_resistant": 0.0007252845347020755,
+          "mean_prob_r": 0.040549375116825104
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9215,
+          "frac_resistant": 0.000759631036353771,
+          "mean_prob_r": 0.04055814445018768
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 19976,
+          "frac_resistant": 0.001301561874249099,
+          "mean_prob_r": 0.04352704808115959
+        },
+        {
+          "bin_center_min": 67.5,
+          "n_crops": 441,
+          "frac_resistant": 0.0,
+          "mean_prob_r": 0.03164434805512428
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.39622291922569275,
+      "n_total_crops": 104308,
+      "max_time_min": 59.969380696614586,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6225,
+          "frac_resistant": 0.43582329317269075,
+          "mean_prob_r": 0.4481775164604187
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 6959,
+          "frac_resistant": 0.5395890214111223,
+          "mean_prob_r": 0.5186781883239746
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 5250,
+          "frac_resistant": 0.40476190476190477,
+          "mean_prob_r": 0.4300100803375244
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 9470,
+          "frac_resistant": 0.44878563885955647,
+          "mean_prob_r": 0.45915308594703674
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 5214,
+          "frac_resistant": 0.36229382431914076,
+          "mean_prob_r": 0.3986453115940094
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 10151,
+          "frac_resistant": 0.4142449019801005,
+          "mean_prob_r": 0.43379858136177063
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 8560,
+          "frac_resistant": 0.49848130841121496,
+          "mean_prob_r": 0.49870172142982483
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 9086,
+          "frac_resistant": 0.3149900946511116,
+          "mean_prob_r": 0.3683621883392334
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 9171,
+          "frac_resistant": 0.36179260713117434,
+          "mean_prob_r": 0.3985051214694977
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 10122,
+          "frac_resistant": 0.23226635052361194,
+          "mean_prob_r": 0.31431150436401367
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 14610,
+          "frac_resistant": 0.24106776180698153,
+          "mean_prob_r": 0.3229166269302368
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9490,
+          "frac_resistant": 0.1975763962065332,
+          "mean_prob_r": 0.2815895974636078
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.2838532626628876,
+      "n_total_crops": 96278,
+      "max_time_min": 60.76708984375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5687,
+          "frac_resistant": 0.2118867592755407,
+          "mean_prob_r": 0.29556071758270264
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 5905,
+          "frac_resistant": 0.26773920406435225,
+          "mean_prob_r": 0.3390617072582245
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 4033,
+          "frac_resistant": 0.2018348623853211,
+          "mean_prob_r": 0.2856138348579407
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 8997,
+          "frac_resistant": 0.21862843169945537,
+          "mean_prob_r": 0.3040403127670288
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 5851,
+          "frac_resistant": 0.2115877627755939,
+          "mean_prob_r": 0.28773924708366394
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 8554,
+          "frac_resistant": 0.20563479074117372,
+          "mean_prob_r": 0.2854815125465393
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 6866,
+          "frac_resistant": 0.18773667346344305,
+          "mean_prob_r": 0.2794063687324524
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 10832,
+          "frac_resistant": 0.16709748892171344,
+          "mean_prob_r": 0.25612083077430725
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 8737,
+          "frac_resistant": 0.21632139178207624,
+          "mean_prob_r": 0.29615476727485657
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 8650,
+          "frac_resistant": 0.1876300578034682,
+          "mean_prob_r": 0.2735132873058319
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 10453,
+          "frac_resistant": 0.16904238017793935,
+          "mean_prob_r": 0.26267415285110474
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9278,
+          "frac_resistant": 0.19217503772364733,
+          "mean_prob_r": 0.2853492796421051
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 2435,
+          "frac_resistant": 0.13182751540041068,
+          "mean_prob_r": 0.24378065764904022
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.46307572722435,
+      "n_total_crops": 35568,
+      "max_time_min": 55.776814778645836,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6016,
+          "frac_resistant": 0.6926529255319149,
+          "mean_prob_r": 0.6323443651199341
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 7559,
+          "frac_resistant": 0.601799179785686,
+          "mean_prob_r": 0.5670457482337952
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2626,
+          "frac_resistant": 0.48324447829398326,
+          "mean_prob_r": 0.48068276047706604
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 3501,
+          "frac_resistant": 0.4847186518137675,
+          "mean_prob_r": 0.4837127923965454
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 2002,
+          "frac_resistant": 0.4955044955044955,
+          "mean_prob_r": 0.4764140844345093
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 2720,
+          "frac_resistant": 0.3738970588235294,
+          "mean_prob_r": 0.397086501121521
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 2173,
+          "frac_resistant": 0.33133916244822825,
+          "mean_prob_r": 0.3693516254425049
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 3044,
+          "frac_resistant": 0.37779237844940866,
+          "mean_prob_r": 0.39693358540534973
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1554,
+          "frac_resistant": 0.1821106821106821,
+          "mean_prob_r": 0.23463159799575806
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1980,
+          "frac_resistant": 0.16616161616161615,
+          "mean_prob_r": 0.2285969853401184
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2181,
+          "frac_resistant": 0.1843191196698762,
+          "mean_prob_r": 0.23454220592975616
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 212,
+          "frac_resistant": 0.1792452830188679,
+          "mean_prob_r": 0.24030661582946777
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.19176055490970612,
+      "n_total_crops": 34567,
+      "max_time_min": 52.85223388671875,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 3492,
+          "frac_resistant": 0.2124856815578465,
+          "mean_prob_r": 0.2864891588687897
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4421,
+          "frac_resistant": 0.1952047048179145,
+          "mean_prob_r": 0.27843374013900757
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2983,
+          "frac_resistant": 0.10124036205162588,
+          "mean_prob_r": 0.18799804151058197
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 4715,
+          "frac_resistant": 0.11601272534464475,
+          "mean_prob_r": 0.19142384827136993
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 3145,
+          "frac_resistant": 0.12273449920508744,
+          "mean_prob_r": 0.20859208703041077
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 3306,
+          "frac_resistant": 0.0559588626739262,
+          "mean_prob_r": 0.14625927805900574
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 2636,
+          "frac_resistant": 0.10242792109256449,
+          "mean_prob_r": 0.19728176295757294
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 3479,
+          "frac_resistant": 0.05116412762288014,
+          "mean_prob_r": 0.13129204511642456
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 2610,
+          "frac_resistant": 0.029118773946360154,
+          "mean_prob_r": 0.11727018654346466
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1998,
+          "frac_resistant": 0.04804804804804805,
+          "mean_prob_r": 0.12672048807144165
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 1782,
+          "frac_resistant": 0.06341189674523008,
+          "mean_prob_r": 0.14491142332553864
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated_new": {
+      "exp_prob_r": 0.2151389718055725,
+      "n_total_crops": 29858,
+      "max_time_min": 64.64459635416667,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 4016,
+          "frac_resistant": 0.30502988047808766,
+          "mean_prob_r": 0.3460547626018524
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4117,
+          "frac_resistant": 0.32013602137478747,
+          "mean_prob_r": 0.3678312599658966
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2155,
+          "frac_resistant": 0.23387470997679816,
+          "mean_prob_r": 0.29661300778388977
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 2839,
+          "frac_resistant": 0.25678055653399084,
+          "mean_prob_r": 0.31866568326950073
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1641,
+          "frac_resistant": 0.14381474710542352,
+          "mean_prob_r": 0.22627103328704834
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 2943,
+          "frac_resistant": 0.038396194359497114,
+          "mean_prob_r": 0.12083809822797775
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1360,
+          "frac_resistant": 0.03676470588235294,
+          "mean_prob_r": 0.12911880016326904
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 1191,
+          "frac_resistant": 0.0033585222502099076,
+          "mean_prob_r": 0.09180253744125366
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1361,
+          "frac_resistant": 0.006612784717119765,
+          "mean_prob_r": 0.09030286222696304
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1911,
+          "frac_resistant": 0.01988487702773417,
+          "mean_prob_r": 0.09720612317323685
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2719,
+          "frac_resistant": 0.019492460463405664,
+          "mean_prob_r": 0.11431021988391876
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 1396,
+          "frac_resistant": 0.01790830945558739,
+          "mean_prob_r": 0.09753511101007462
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 2209,
+          "frac_resistant": 0.012675418741511997,
+          "mean_prob_r": 0.09420657902956009
+        }
+      ]
+    }
+  },
+  "fold4": {
+    "B1_Ampicillin_16mgL_exp1_old_bright": {
+      "exp_prob_r": 0.07465977966785431,
+      "n_total_crops": 6114,
+      "max_time_min": 3.8144317626953126,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6114,
+          "frac_resistant": 0.007033038927052666,
+          "mean_prob_r": 0.07465977966785431
+        }
+      ]
+    },
+    "B1_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.5450947880744934,
+      "n_total_crops": 57797,
+      "max_time_min": 62.11734212239583,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 2316,
+          "frac_resistant": 0.5716753022452504,
+          "mean_prob_r": 0.5527565479278564
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 3208,
+          "frac_resistant": 0.6324812967581047,
+          "mean_prob_r": 0.5884153246879578
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1425,
+          "frac_resistant": 0.6996491228070175,
+          "mean_prob_r": 0.6404609084129333
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 3227,
+          "frac_resistant": 0.5550046482801364,
+          "mean_prob_r": 0.5416364669799805
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 2410,
+          "frac_resistant": 0.5759336099585062,
+          "mean_prob_r": 0.5471503138542175
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 4616,
+          "frac_resistant": 0.6635615251299827,
+          "mean_prob_r": 0.6055435538291931
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 3644,
+          "frac_resistant": 0.6523051591657519,
+          "mean_prob_r": 0.6113843321800232
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 4421,
+          "frac_resistant": 0.505315539470708,
+          "mean_prob_r": 0.5051978230476379
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 6915,
+          "frac_resistant": 0.631236442516269,
+          "mean_prob_r": 0.5954977869987488
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 7158,
+          "frac_resistant": 0.5089410449846326,
+          "mean_prob_r": 0.5019661784172058
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 9007,
+          "frac_resistant": 0.5298101476629289,
+          "mean_prob_r": 0.5197376012802124
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 5720,
+          "frac_resistant": 0.5082167832167832,
+          "mean_prob_r": 0.5045172572135925
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 3730,
+          "frac_resistant": 0.486058981233244,
+          "mean_prob_r": 0.48881009221076965
+        }
+      ]
+    },
+    "B1_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.46217337250709534,
+      "n_total_crops": 102340,
+      "max_time_min": 61.267582194010416,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5386,
+          "frac_resistant": 0.4301893798737467,
+          "mean_prob_r": 0.45776158571243286
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 6662,
+          "frac_resistant": 0.4375562894025818,
+          "mean_prob_r": 0.4659852087497711
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2976,
+          "frac_resistant": 0.45161290322580644,
+          "mean_prob_r": 0.4783766567707062
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 6979,
+          "frac_resistant": 0.39504226966614125,
+          "mean_prob_r": 0.44151172041893005
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 4703,
+          "frac_resistant": 0.35700616627684456,
+          "mean_prob_r": 0.419268935918808
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 8737,
+          "frac_resistant": 0.44866659036282475,
+          "mean_prob_r": 0.4713720977306366
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 5632,
+          "frac_resistant": 0.43785511363636365,
+          "mean_prob_r": 0.4685174822807312
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 8726,
+          "frac_resistant": 0.4355947742379097,
+          "mean_prob_r": 0.46773672103881836
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 8641,
+          "frac_resistant": 0.37773405855803727,
+          "mean_prob_r": 0.4328303039073944
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 9648,
+          "frac_resistant": 0.43656716417910446,
+          "mean_prob_r": 0.4678630232810974
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 18942,
+          "frac_resistant": 0.4700665188470067,
+          "mean_prob_r": 0.4871520698070526
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 10008,
+          "frac_resistant": 0.3750999200639488,
+          "mean_prob_r": 0.4268524646759033
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 5300,
+          "frac_resistant": 0.4981132075471698,
+          "mean_prob_r": 0.5018874406814575
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_exp1_old_bright": {
+      "exp_prob_r": 0.051417816430330276,
+      "n_total_crops": 25151,
+      "max_time_min": 59.50413818359375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 4007,
+          "frac_resistant": 0.0049912652857499375,
+          "mean_prob_r": 0.04563043266534805
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4073,
+          "frac_resistant": 0.0031917505524183647,
+          "mean_prob_r": 0.05100354552268982
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1537,
+          "frac_resistant": 0.001951854261548471,
+          "mean_prob_r": 0.04125891998410225
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 1983,
+          "frac_resistant": 0.018154311649016642,
+          "mean_prob_r": 0.06998034566640854
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1644,
+          "frac_resistant": 0.006082725060827251,
+          "mean_prob_r": 0.04446554183959961
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1891,
+          "frac_resistant": 0.0010576414595452142,
+          "mean_prob_r": 0.04940202832221985
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1163,
+          "frac_resistant": 0.01117798796216681,
+          "mean_prob_r": 0.06961335986852646
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 2245,
+          "frac_resistant": 0.0017817371937639199,
+          "mean_prob_r": 0.0542105957865715
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1865,
+          "frac_resistant": 0.002680965147453083,
+          "mean_prob_r": 0.05124669522047043
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1397,
+          "frac_resistant": 0.0035790980672870437,
+          "mean_prob_r": 0.05565955117344856
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2263,
+          "frac_resistant": 0.0013256738842244808,
+          "mean_prob_r": 0.04569720849394798
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 1083,
+          "frac_resistant": 0.003693444136657433,
+          "mean_prob_r": 0.05033889040350914
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.3924967348575592,
+      "n_total_crops": 10920,
+      "max_time_min": 48.06361083984375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 710,
+          "frac_resistant": 0.6619718309859155,
+          "mean_prob_r": 0.5993025898933411
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 1376,
+          "frac_resistant": 0.6402616279069767,
+          "mean_prob_r": 0.5878223180770874
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1178,
+          "frac_resistant": 0.49575551782682514,
+          "mean_prob_r": 0.48958805203437805
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 1381,
+          "frac_resistant": 0.3439536567704562,
+          "mean_prob_r": 0.3857192099094391
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1034,
+          "frac_resistant": 0.293036750483559,
+          "mean_prob_r": 0.345453679561615
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1363,
+          "frac_resistant": 0.3499633162142333,
+          "mean_prob_r": 0.3832690715789795
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1189,
+          "frac_resistant": 0.2043734230445753,
+          "mean_prob_r": 0.27053582668304443
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 715,
+          "frac_resistant": 0.17902097902097902,
+          "mean_prob_r": 0.24197353422641754
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1464,
+          "frac_resistant": 0.26366120218579236,
+          "mean_prob_r": 0.31542128324508667
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 510,
+          "frac_resistant": 0.12352941176470589,
+          "mean_prob_r": 0.20834048092365265
+        }
+      ]
+    },
+    "B2_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.2892373502254486,
+      "n_total_crops": 20201,
+      "max_time_min": 66.2773193359375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 2574,
+          "frac_resistant": 0.42773892773892774,
+          "mean_prob_r": 0.45580798387527466
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 2642,
+          "frac_resistant": 0.3796366389099167,
+          "mean_prob_r": 0.42786023020744324
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 1591,
+          "frac_resistant": 0.2526712759270899,
+          "mean_prob_r": 0.3385792374610901
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 2094,
+          "frac_resistant": 0.22349570200573066,
+          "mean_prob_r": 0.3222343921661377
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1458,
+          "frac_resistant": 0.20781893004115226,
+          "mean_prob_r": 0.3132615089416504
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 1493,
+          "frac_resistant": 0.1245813797722706,
+          "mean_prob_r": 0.23410412669181824
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 855,
+          "frac_resistant": 0.10058479532163743,
+          "mean_prob_r": 0.2028835564851761
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 1381,
+          "frac_resistant": 0.10789283128167994,
+          "mean_prob_r": 0.21135422587394714
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1388,
+          "frac_resistant": 0.10014409221902017,
+          "mean_prob_r": 0.19778253138065338
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1182,
+          "frac_resistant": 0.15905245346869712,
+          "mean_prob_r": 0.2258533388376236
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 1503,
+          "frac_resistant": 0.049234863606121095,
+          "mean_prob_r": 0.14037956297397614
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 750,
+          "frac_resistant": 0.064,
+          "mean_prob_r": 0.14121302962303162
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 1133,
+          "frac_resistant": 0.06796116504854369,
+          "mean_prob_r": 0.15087351202964783
+        },
+        {
+          "bin_center_min": 67.5,
+          "n_crops": 157,
+          "frac_resistant": 0.08280254777070063,
+          "mean_prob_r": 0.15840645134449005
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_old_bright": {
+      "exp_prob_r": 0.0701591894030571,
+      "n_total_crops": 114102,
+      "max_time_min": 65.11913248697917,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5845,
+          "frac_resistant": 0.013173652694610778,
+          "mean_prob_r": 0.0718023031949997
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 5158,
+          "frac_resistant": 0.006010081426909655,
+          "mean_prob_r": 0.06883751600980759
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2874,
+          "frac_resistant": 0.004523312456506611,
+          "mean_prob_r": 0.060027118772268295
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 6052,
+          "frac_resistant": 0.010244547257105089,
+          "mean_prob_r": 0.0686488002538681
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 3610,
+          "frac_resistant": 0.006371191135734072,
+          "mean_prob_r": 0.06242433935403824
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 7485,
+          "frac_resistant": 0.006412825651302605,
+          "mean_prob_r": 0.064201220870018
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 5766,
+          "frac_resistant": 0.0060700659035726676,
+          "mean_prob_r": 0.06135650724172592
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 11999,
+          "frac_resistant": 0.007750645887157263,
+          "mean_prob_r": 0.06971385329961777
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 7776,
+          "frac_resistant": 0.006301440329218107,
+          "mean_prob_r": 0.06227030232548714
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 9981,
+          "frac_resistant": 0.008215609658350867,
+          "mean_prob_r": 0.07358435541391373
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 17924,
+          "frac_resistant": 0.009149743360856952,
+          "mean_prob_r": 0.0716845840215683
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9215,
+          "frac_resistant": 0.007704829083016821,
+          "mean_prob_r": 0.06986439973115921
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 19976,
+          "frac_resistant": 0.012865438526231478,
+          "mean_prob_r": 0.07887114584445953
+        },
+        {
+          "bin_center_min": 67.5,
+          "n_crops": 441,
+          "frac_resistant": 0.0,
+          "mean_prob_r": 0.05336771532893181
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.3225939869880676,
+      "n_total_crops": 104308,
+      "max_time_min": 59.969380696614586,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6225,
+          "frac_resistant": 0.3905220883534137,
+          "mean_prob_r": 0.4140366017818451
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 6959,
+          "frac_resistant": 0.5230636585716338,
+          "mean_prob_r": 0.5154196619987488
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 5250,
+          "frac_resistant": 0.33066666666666666,
+          "mean_prob_r": 0.3604545593261719
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 9470,
+          "frac_resistant": 0.37877507919746567,
+          "mean_prob_r": 0.40219277143478394
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 5214,
+          "frac_resistant": 0.3126198695818949,
+          "mean_prob_r": 0.3514017164707184
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 10151,
+          "frac_resistant": 0.32450004925623094,
+          "mean_prob_r": 0.3638792037963867
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 8560,
+          "frac_resistant": 0.4098130841121495,
+          "mean_prob_r": 0.4312930703163147
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 9086,
+          "frac_resistant": 0.20768214836011445,
+          "mean_prob_r": 0.2654145061969757
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 9171,
+          "frac_resistant": 0.25700577908625016,
+          "mean_prob_r": 0.30698058009147644
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 10122,
+          "frac_resistant": 0.15342817624975302,
+          "mean_prob_r": 0.2204349786043167
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 14610,
+          "frac_resistant": 0.1593429158110883,
+          "mean_prob_r": 0.2287270426750183
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9490,
+          "frac_resistant": 0.11738672286617492,
+          "mean_prob_r": 0.18610796332359314
+        }
+      ]
+    },
+    "B3_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.3661852478981018,
+      "n_total_crops": 96278,
+      "max_time_min": 60.76708984375,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 5687,
+          "frac_resistant": 0.34165640935466857,
+          "mean_prob_r": 0.40554824471473694
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 5905,
+          "frac_resistant": 0.40829805249788315,
+          "mean_prob_r": 0.44837284088134766
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 4033,
+          "frac_resistant": 0.2982891148028763,
+          "mean_prob_r": 0.3759840428829193
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 8997,
+          "frac_resistant": 0.33722351895076136,
+          "mean_prob_r": 0.40315136313438416
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 5851,
+          "frac_resistant": 0.310374294992309,
+          "mean_prob_r": 0.379213809967041
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 8554,
+          "frac_resistant": 0.29191021744213236,
+          "mean_prob_r": 0.3689733147621155
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 6866,
+          "frac_resistant": 0.2991552577920186,
+          "mean_prob_r": 0.37538743019104004
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 10832,
+          "frac_resistant": 0.26375553914327915,
+          "mean_prob_r": 0.34670087695121765
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 8737,
+          "frac_resistant": 0.30021746594941057,
+          "mean_prob_r": 0.3699469268321991
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 8650,
+          "frac_resistant": 0.24809248554913294,
+          "mean_prob_r": 0.3236813545227051
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 10453,
+          "frac_resistant": 0.2621257055390797,
+          "mean_prob_r": 0.34040001034736633
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 9278,
+          "frac_resistant": 0.2646044406122009,
+          "mean_prob_r": 0.34267544746398926
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 2435,
+          "frac_resistant": 0.17618069815195073,
+          "mean_prob_r": 0.27951768040657043
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated": {
+      "exp_prob_r": 0.44719916582107544,
+      "n_total_crops": 35568,
+      "max_time_min": 55.776814778645836,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 6016,
+          "frac_resistant": 0.6743683510638298,
+          "mean_prob_r": 0.6489458084106445
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 7559,
+          "frac_resistant": 0.576663579838603,
+          "mean_prob_r": 0.546271562576294
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2626,
+          "frac_resistant": 0.47562833206397565,
+          "mean_prob_r": 0.4681784212589264
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 3501,
+          "frac_resistant": 0.4832904884318766,
+          "mean_prob_r": 0.4738833010196686
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 2002,
+          "frac_resistant": 0.4935064935064935,
+          "mean_prob_r": 0.479611873626709
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 2720,
+          "frac_resistant": 0.3665441176470588,
+          "mean_prob_r": 0.37117883563041687
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 2173,
+          "frac_resistant": 0.32213529682466635,
+          "mean_prob_r": 0.3456193804740906
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 3044,
+          "frac_resistant": 0.33344283837056504,
+          "mean_prob_r": 0.34672263264656067
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1554,
+          "frac_resistant": 0.148005148005148,
+          "mean_prob_r": 0.2023477703332901
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1980,
+          "frac_resistant": 0.15555555555555556,
+          "mean_prob_r": 0.20945551991462708
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2181,
+          "frac_resistant": 0.15589179275561668,
+          "mean_prob_r": 0.2022804617881775
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 212,
+          "frac_resistant": 0.13679245283018868,
+          "mean_prob_r": 0.1771910935640335
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated2": {
+      "exp_prob_r": 0.26618167757987976,
+      "n_total_crops": 34567,
+      "max_time_min": 52.85223388671875,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 3492,
+          "frac_resistant": 0.24627720504009165,
+          "mean_prob_r": 0.32885634899139404
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4421,
+          "frac_resistant": 0.27143180275955664,
+          "mean_prob_r": 0.34962424635887146
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2983,
+          "frac_resistant": 0.17029835735836407,
+          "mean_prob_r": 0.277119904756546
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 4715,
+          "frac_resistant": 0.16521739130434782,
+          "mean_prob_r": 0.27328434586524963
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 3145,
+          "frac_resistant": 0.20985691573926868,
+          "mean_prob_r": 0.30071213841438293
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 3306,
+          "frac_resistant": 0.10768300060496068,
+          "mean_prob_r": 0.22937342524528503
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 2636,
+          "frac_resistant": 0.19119878603945373,
+          "mean_prob_r": 0.2828306257724762
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 3479,
+          "frac_resistant": 0.08968094279965508,
+          "mean_prob_r": 0.1998697966337204
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 2610,
+          "frac_resistant": 0.06130268199233716,
+          "mean_prob_r": 0.19493626058101654
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1998,
+          "frac_resistant": 0.0945945945945946,
+          "mean_prob_r": 0.19410356879234314
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 1782,
+          "frac_resistant": 0.10437710437710437,
+          "mean_prob_r": 0.19659018516540527
+        }
+      ]
+    },
+    "B4_Ampicillin_16mgL_preincubated_new": {
+      "exp_prob_r": 0.26320183277130127,
+      "n_total_crops": 29858,
+      "max_time_min": 64.64459635416667,
+      "bin_timeseries": [
+        {
+          "bin_center_min": 2.5,
+          "n_crops": 4016,
+          "frac_resistant": 0.3274402390438247,
+          "mean_prob_r": 0.37666353583335876
+        },
+        {
+          "bin_center_min": 7.5,
+          "n_crops": 4117,
+          "frac_resistant": 0.33665290259897984,
+          "mean_prob_r": 0.3859598934650421
+        },
+        {
+          "bin_center_min": 12.5,
+          "n_crops": 2155,
+          "frac_resistant": 0.26496519721577727,
+          "mean_prob_r": 0.35198408365249634
+        },
+        {
+          "bin_center_min": 17.5,
+          "n_crops": 2839,
+          "frac_resistant": 0.3004579077139838,
+          "mean_prob_r": 0.3601146936416626
+        },
+        {
+          "bin_center_min": 22.5,
+          "n_crops": 1641,
+          "frac_resistant": 0.20901889092017062,
+          "mean_prob_r": 0.30276989936828613
+        },
+        {
+          "bin_center_min": 27.5,
+          "n_crops": 2943,
+          "frac_resistant": 0.0689772341148488,
+          "mean_prob_r": 0.18421751260757446
+        },
+        {
+          "bin_center_min": 32.5,
+          "n_crops": 1360,
+          "frac_resistant": 0.06470588235294118,
+          "mean_prob_r": 0.19736436009407043
+        },
+        {
+          "bin_center_min": 37.5,
+          "n_crops": 1191,
+          "frac_resistant": 0.022670025188916875,
+          "mean_prob_r": 0.16278785467147827
+        },
+        {
+          "bin_center_min": 42.5,
+          "n_crops": 1361,
+          "frac_resistant": 0.036737692872887584,
+          "mean_prob_r": 0.15596427023410797
+        },
+        {
+          "bin_center_min": 47.5,
+          "n_crops": 1911,
+          "frac_resistant": 0.04186289900575615,
+          "mean_prob_r": 0.15470069646835327
+        },
+        {
+          "bin_center_min": 52.5,
+          "n_crops": 2719,
+          "frac_resistant": 0.03126149319602795,
+          "mean_prob_r": 0.15190543234348297
+        },
+        {
+          "bin_center_min": 57.5,
+          "n_crops": 1396,
+          "frac_resistant": 0.04297994269340974,
+          "mean_prob_r": 0.16112332046031952
+        },
+        {
+          "bin_center_min": 62.5,
+          "n_crops": 2209,
+          "frac_resistant": 0.03712086917157085,
+          "mean_prob_r": 0.14891760051250458
+        }
+      ]
+    }
+  }
+}

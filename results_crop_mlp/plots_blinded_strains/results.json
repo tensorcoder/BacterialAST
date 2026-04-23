@@ -1,0 +1,243 @@
+{
+  "pipeline": {
+    "crop_size": 128,
+    "border_mode": "BORDER_REFLECT_101",
+    "conf_threshold": 0.25,
+    "dino_img_size": 128,
+    "dino_mean": 0.3387,
+    "dino_std": 0.1173
+  },
+  "brightness": {
+    "B1_Ampicillin_16mgL_exp1_old_bright": {
+      "mean": 90.82524652099609,
+      "std": 13.176570114369682
+    },
+    "B1_Ampicillin_16mgL_preincubated": {
+      "mean": 58.17284393310547,
+      "std": 10.658558992498282
+    },
+    "B1_Ampicillin_16mgL_preincubated2": {
+      "mean": 67.05127917480469,
+      "std": 12.977647732199971
+    },
+    "B2_Ampicillin_16mgL_exp1_old_bright": {
+      "mean": 93.47820324707031,
+      "std": 16.614987468938036
+    },
+    "B2_Ampicillin_16mgL_preincubated": {
+      "mean": 61.50406280517578,
+      "std": 12.5232890995364
+    },
+    "B2_Ampicillin_16mgL_preincubated2": {
+      "mean": 68.34430096435547,
+      "std": 12.519916920648786
+    },
+    "B3_Ampicillin_16mgL_old_bright": {
+      "mean": 91.59102545166016,
+      "std": 14.973400463729947
+    },
+    "B3_Ampicillin_16mgL_preincubated": {
+      "mean": 57.68943414306641,
+      "std": 9.720246259086066
+    },
+    "B3_Ampicillin_16mgL_preincubated2": {
+      "mean": 66.5794425048828,
+      "std": 11.164553251842307
+    },
+    "B4_Ampicillin_16mgL_preincubated": {
+      "mean": 46.94991424560547,
+      "std": 9.630457032762386
+    },
+    "B4_Ampicillin_16mgL_preincubated2": {
+      "mean": 63.84209094238281,
+      "std": 9.863261257803055
+    },
+    "B4_Ampicillin_16mgL_preincubated_new": {
+      "mean": 59.871144836425785,
+      "std": 10.05134900731438
+    }
+  },
+  "n_folds": 5,
+  "experiments": {
+    "B1_Ampicillin_16mgL_exp1_old_bright": {
+      "strain": "B1",
+      "ensemble_prob_r": 0.09236636757850647,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.21542607247829437,
+        0.06896435469388962,
+        0.0621512308716774,
+        0.04063040018081665,
+        0.07465977966785431
+      ],
+      "std": 0.06260101155939815,
+      "brightness_mean": 90.82524652099609,
+      "brightness_std": 13.176570114369682
+    },
+    "B1_Ampicillin_16mgL_preincubated": {
+      "strain": "B1",
+      "ensemble_prob_r": 0.5481737732887269,
+      "ensemble_pred": "Resistant",
+      "fold_probs": [
+        0.5791215896606445,
+        0.5527990460395813,
+        0.5512515306472778,
+        0.512601912021637,
+        0.5450947880744934
+      ],
+      "std": 0.02127660941279134,
+      "brightness_mean": 58.17284393310547,
+      "brightness_std": 10.658558992498282
+    },
+    "B1_Ampicillin_16mgL_preincubated2": {
+      "strain": "B1",
+      "ensemble_prob_r": 0.46007625460624696,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.512553334236145,
+        0.4754541516304016,
+        0.49021509289741516,
+        0.3599853217601776,
+        0.46217337250709534
+      ],
+      "std": 0.05276602300419424,
+      "brightness_mean": 67.05127917480469,
+      "brightness_std": 12.977647732199971
+    },
+    "B2_Ampicillin_16mgL_exp1_old_bright": {
+      "strain": "B2",
+      "ensemble_prob_r": 0.08199474513530731,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.1599595993757248,
+        0.07794679701328278,
+        0.08488374948501587,
+        0.035765763372182846,
+        0.051417816430330276
+      ],
+      "std": 0.042837642443872476,
+      "brightness_mean": 93.47820324707031,
+      "brightness_std": 16.614987468938036
+    },
+    "B2_Ampicillin_16mgL_preincubated": {
+      "strain": "B2",
+      "ensemble_prob_r": 0.44261268973350526,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.46556928753852844,
+        0.4709410071372986,
+        0.47813698649406433,
+        0.4059194326400757,
+        0.3924967348575592
+      ],
+      "std": 0.03591511843025525,
+      "brightness_mean": 61.50406280517578,
+      "brightness_std": 12.5232890995364
+    },
+    "B2_Ampicillin_16mgL_preincubated2": {
+      "strain": "B2",
+      "ensemble_prob_r": 0.3226826012134552,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.3539646565914154,
+        0.3596457839012146,
+        0.37461188435554504,
+        0.23595333099365234,
+        0.2892373502254486
+      ],
+      "std": 0.05231069763870507,
+      "brightness_mean": 68.34430096435547,
+      "brightness_std": 12.519916920648786
+    },
+    "B3_Ampicillin_16mgL_old_bright": {
+      "strain": "B3",
+      "ensemble_prob_r": 0.09107592850923538,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.1965220421552658,
+        0.07398716360330582,
+        0.07366722077131271,
+        0.041044026613235474,
+        0.0701591894030571
+      ],
+      "std": 0.054138106831201606,
+      "brightness_mean": 91.59102545166016,
+      "brightness_std": 14.973400463729947
+    },
+    "B3_Ampicillin_16mgL_preincubated": {
+      "strain": "B3",
+      "ensemble_prob_r": 0.40295236706733706,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.4785253703594208,
+        0.4607694745063782,
+        0.35665008425712585,
+        0.39622291922569275,
+        0.3225939869880676
+      ],
+      "std": 0.05949916444767512,
+      "brightness_mean": 57.68943414306641,
+      "brightness_std": 9.720246259086066
+    },
+    "B3_Ampicillin_16mgL_preincubated2": {
+      "strain": "B3",
+      "ensemble_prob_r": 0.3563310086727142,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.4347619116306305,
+        0.3613141179084778,
+        0.3355405032634735,
+        0.2838532626628876,
+        0.3661852478981018
+      ],
+      "std": 0.0489052404737926,
+      "brightness_mean": 66.5794425048828,
+      "brightness_std": 11.164553251842307
+    },
+    "B4_Ampicillin_16mgL_preincubated": {
+      "strain": "B4",
+      "ensemble_prob_r": 0.48007491827011106,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.5162094831466675,
+        0.5444652438163757,
+        0.4294249713420868,
+        0.46307572722435,
+        0.44719916582107544
+      ],
+      "std": 0.04332903304225526,
+      "brightness_mean": 46.94991424560547,
+      "brightness_std": 9.630457032762386
+    },
+    "B4_Ampicillin_16mgL_preincubated2": {
+      "strain": "B4",
+      "ensemble_prob_r": 0.24676083028316498,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.3174898624420166,
+        0.2433943897485733,
+        0.2149776667356491,
+        0.19176055490970612,
+        0.26618167757987976
+      ],
+      "std": 0.043419576225402226,
+      "brightness_mean": 63.84209094238281,
+      "brightness_std": 9.863261257803055
+    },
+    "B4_Ampicillin_16mgL_preincubated_new": {
+      "strain": "B4",
+      "ensemble_prob_r": 0.2670980989933014,
+      "ensemble_pred": "Susceptible",
+      "fold_probs": [
+        0.3382459580898285,
+        0.2698613703250885,
+        0.2490423619747162,
+        0.2151389718055725,
+        0.26320183277130127
+      ],
+      "std": 0.04027553835851221,
+      "brightness_mean": 59.871144836425785,
+      "brightness_std": 10.05134900731438
+    }
+  }
+}

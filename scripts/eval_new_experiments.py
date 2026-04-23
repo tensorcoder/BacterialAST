@@ -54,11 +54,36 @@ DINO_IMG_SIZE = 128
 DINO_MEAN = 0.3387
 DINO_STD = 0.1173
 
-COLORS = [
-    "#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00",
-    "#a65628", "#f781bf", "#1b9e77", "#d95f02", "#7570b3",
-    "#e7298a", "#66a61e", "#e6ab02", "#a6761d", "#666666",
-]
+STRAIN_COLORS = {
+    "B1": "#e41a1c",  # red
+    "B2": "#377eb8",  # blue
+    "B3": "#4daf4a",  # green
+    "B4": "#984ea3",  # purple
+}
+FALLBACK_COLOR = "#666666"
+LINE_STYLES = ["-", "--", ":"]
+
+
+def parse_strain(exp_id: str) -> str:
+    return exp_id.split("_")[0]
+
+
+def build_within_strain_index(exp_ids) -> dict[str, int]:
+    """Assign 0,1,2,... to experiments within each strain (sorted by name)."""
+    groups: dict[str, list[str]] = {}
+    for e in exp_ids:
+        groups.setdefault(parse_strain(e), []).append(e)
+    idx: dict[str, int] = {}
+    for strain, exps in groups.items():
+        for i, e in enumerate(sorted(exps)):
+            idx[e] = i
+    return idx
+
+
+def style_for(exp_id: str, within_idx: dict[str, int]) -> tuple[str, str]:
+    color = STRAIN_COLORS.get(parse_strain(exp_id), FALLBACK_COLOR)
+    linestyle = LINE_STYLES[within_idx.get(exp_id, 0) % len(LINE_STYLES)]
+    return color, linestyle
 
 
 # ---------------------------------------------------------------------------
@@ -276,9 +301,8 @@ def run_inference(
 # Brightness stats
 # ---------------------------------------------------------------------------
 
-def get_brightness(h5_paths: list[Path], n_sample: int = 1000) -> dict[str, float]:
-    """Return {exp_id: raw_pixel_mean} for each experiment."""
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+def get_brightness(h5_paths: list[Path], n_sample: int = 1000) -> dict[str, dict[str, float]]:
+    """Return {exp_id: {"mean": raw_pixel_mean, "std": raw_pixel_std}}."""
     brightness = {}
     for h5_path in h5_paths:
         if not h5_path.exists():
@@ -286,7 +310,10 @@ def get_brightness(h5_paths: list[Path], n_sample: int = 1000) -> dict[str, floa
         with h5py.File(h5_path, "r") as h:
             n = min(n_sample, h["crops"].shape[0])
             crops = h["crops"][:n]
-        brightness[h5_path.stem] = float(crops.mean())
+        brightness[h5_path.stem] = {
+            "mean": float(crops.mean()),
+            "std": float(crops.std()),
+        }
     return brightness
 
 
@@ -297,26 +324,30 @@ def get_brightness(h5_paths: list[Path], n_sample: int = 1000) -> dict[str, floa
 def plot_fold_timeseries(
     fold_idx: int,
     fold_result: dict,
-    brightness: dict[str, float],
+    brightness: dict[str, dict[str, float]],
     output_dir: Path,
-) -> None:  
+) -> None:
     if not fold_result:
         return
 
+    within_idx = build_within_strain_index(fold_result.keys())
     fig, ax = plt.subplots(figsize=(14, 7))
-    for i, (exp_id, exp_data) in enumerate(sorted(fold_result.items())):
+    for exp_id, exp_data in sorted(fold_result.items()):
         bins = exp_data["bin_timeseries"]
         times = [b["bin_center_min"] for b in bins if b["mean_prob_r"] is not None]
         probs = [b["mean_prob_r"] for b in bins if b["mean_prob_r"] is not None]
         if not times:
             continue
 
-        color = COLORS[i % len(COLORS)]
-        bri = brightness.get(exp_id, 0)
-        label = f"{exp_id} (raw \u03bc={bri:.0f}, P(R)={exp_data['exp_prob_r']:.2f})"
+        color, linestyle = style_for(exp_id, within_idx)
+        bri = brightness.get(exp_id, {"mean": 0.0, "std": 0.0})
+        label = (
+            f"{exp_id} (raw \u03bc={bri['mean']:.0f}\u00b1{bri['std']:.0f}, "
+            f"P(R)={exp_data['exp_prob_r']:.2f})"
+        )
 
-        ax.plot(times, probs, color=color, marker="o", markersize=3,
-                linewidth=1.8, alpha=0.85, label=label)
+        ax.plot(times, probs, color=color, linestyle=linestyle, marker="o",
+                markersize=3, linewidth=1.8, alpha=0.85, label=label)
 
     ax.axhline(0.5, color="gray", linestyle=":", linewidth=1, alpha=0.5)
     ax.axhspan(0.5, 1.0, alpha=0.05, color="red")
@@ -338,24 +369,26 @@ def plot_fold_timeseries(
 def plot_fold_crop_fractions(
     fold_idx: int,
     fold_result: dict,
-    brightness: dict[str, float],
+    brightness: dict[str, dict[str, float]],
     output_dir: Path,
 ) -> None:
     if not fold_result:
         return
 
+    within_idx = build_within_strain_index(fold_result.keys())
     fig, ax = plt.subplots(figsize=(14, 7))
-    for i, (exp_id, exp_data) in enumerate(sorted(fold_result.items())):
+    for exp_id, exp_data in sorted(fold_result.items()):
         bins = exp_data["bin_timeseries"]
         times = [b["bin_center_min"] for b in bins if b["n_crops"] > 0]
         frac_r = [b["frac_resistant"] for b in bins if b["n_crops"] > 0]
         if not times:
             continue
 
-        color = COLORS[i % len(COLORS)]
-        bri = brightness.get(exp_id, 0)
-        ax.plot(times, frac_r, color=color, marker="o", markersize=3,
-                linewidth=1.8, alpha=0.85, label=f"{exp_id} (\u03bc={bri:.0f})")
+        color, linestyle = style_for(exp_id, within_idx)
+        bri = brightness.get(exp_id, {"mean": 0.0, "std": 0.0})
+        ax.plot(times, frac_r, color=color, linestyle=linestyle, marker="o",
+                markersize=3, linewidth=1.8, alpha=0.85,
+                label=f"{exp_id} (\u03bc={bri['mean']:.0f}\u00b1{bri['std']:.0f})")
 
     ax.axhline(0.5, color="gray", linestyle=":", linewidth=1, alpha=0.5)
     ax.set_xlabel("Time (minutes)", fontsize=12)
@@ -371,7 +404,7 @@ def plot_fold_crop_fractions(
 
 def plot_aggregate(
     all_fold_results: dict[int, dict],
-    brightness: dict[str, float],
+    brightness: dict[str, dict[str, float]],
     output_dir: Path,
 ) -> None:
     """Ensemble mean P(R) over time per experiment (mean +/- std across folds)."""
@@ -385,17 +418,19 @@ def plot_aggregate(
                     t = b["bin_center_min"]
                     exp_bin_probs[exp_id].setdefault(t, []).append(b["mean_prob_r"])
 
+    within_idx = build_within_strain_index(exp_bin_probs.keys())
     fig, ax = plt.subplots(figsize=(14, 7))
-    for i, exp_id in enumerate(sorted(exp_bin_probs.keys())):
-        color = COLORS[i % len(COLORS)]
+    for exp_id in sorted(exp_bin_probs.keys()):
+        color, linestyle = style_for(exp_id, within_idx)
         bin_probs = exp_bin_probs[exp_id]
         times = sorted(bin_probs.keys())
         means = np.array([np.mean(bin_probs[t]) for t in times])
         stds = np.array([np.std(bin_probs[t]) for t in times])
 
-        bri = brightness.get(exp_id, 0)
-        ax.plot(times, means, "o-", color=color, linewidth=1.8, markersize=3,
-                label=f"{exp_id} (\u03bc={bri:.0f})")
+        bri = brightness.get(exp_id, {"mean": 0.0, "std": 0.0})
+        ax.plot(times, means, color=color, linestyle=linestyle, marker="o",
+                linewidth=1.8, markersize=3,
+                label=f"{exp_id} (\u03bc={bri['mean']:.0f}\u00b1{bri['std']:.0f})")
         ax.fill_between(times, means - stds, means + stds, alpha=0.12, color=color)
 
     ax.axhline(0.5, color="gray", linestyle=":", linewidth=1, alpha=0.5)
@@ -494,7 +529,9 @@ def main() -> None:
     logger.info("\n=== Brightness Stats ===")
     brightness = get_brightness(h5_paths)
     for exp_id, bri in sorted(brightness.items()):
-        logger.info(f"  {exp_id}: raw pixel mean = {bri:.1f}")
+        logger.info(
+            f"  {exp_id}: raw pixel mean={bri['mean']:.1f}, std={bri['std']:.1f}"
+        )
 
     # Stage 3
     logger.info("\n=== Stage 3: CropMLP Inference ===")
@@ -530,12 +567,15 @@ def main() -> None:
             if exp_id in fold_result:
                 fold_probs.append(fold_result[exp_id]["exp_prob_r"])
         if fold_probs:
+            bri = brightness.get(exp_id, {"mean": None, "std": None})
             results["experiments"][exp_id] = {
+                "strain": parse_strain(exp_id),
                 "ensemble_prob_r": float(np.mean(fold_probs)),
                 "ensemble_pred": "Resistant" if np.mean(fold_probs) > 0.5 else "Susceptible",
                 "fold_probs": fold_probs,
                 "std": float(np.std(fold_probs)),
-                "brightness": brightness.get(exp_id),
+                "brightness_mean": bri.get("mean"),
+                "brightness_std": bri.get("std"),
             }
 
     # Per-fold details
@@ -551,10 +591,12 @@ def main() -> None:
     logger.info("RESULTS")
     logger.info(f"{'='*60}")
     for exp_id, res in results["experiments"].items():
-        bri = res.get("brightness", 0) or 0
+        b_mean = res.get("brightness_mean") or 0
+        b_std = res.get("brightness_std") or 0
         logger.info(
             f"  {exp_id}: P(R)={res['ensemble_prob_r']:.3f} \u00b1 {res['std']:.3f} "
-            f"\u2192 {res['ensemble_pred']} (brightness={bri:.0f})"
+            f"\u2192 {res['ensemble_pred']} "
+            f"(raw \u03bc={b_mean:.0f}\u00b1{b_std:.0f})"
         )
     logger.info(f"\nPlots: {output_dir}")
 

@@ -1,0 +1,11 @@
+Experiment: B3_Ampicillin_16mgL_preincubated
+N crops: 104308
+ensemble P(R): mean=0.4030 median=0.3531
+fraction > 0.5 (crop-level): 0.3494
+
+Spearman correlations of P(R) with simple stats:
+  crop_mean (raw brightness)           rho=+0.0276  p=5.26e-19
+  crop_std (raw contrast)              rho=+0.1321  p=0.00e+00
+  bbox area (w*h, px^2)                rho=-0.0113  p=2.79e-04
+  time within experiment (min)         rho=-0.2620  p=0.00e+00
+  YOLO confidence                      rho=+0.1404  p=0.00e+00
