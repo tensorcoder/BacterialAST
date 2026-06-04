@@ -318,8 +318,9 @@ def evaluate_fold(
     bin_width_sec: float = 300.0,
 ) -> dict:
     """Evaluate on held-out strains: per-crop predictions across all time points."""
-    model = CropMLP().to(device)
     ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
+    in_dim = ckpt["model_state_dict"]["net.0.weight"].shape[1]
+    model = CropMLP(in_dim=in_dim).to(device)
     model.load_state_dict(ckpt["model_state_dict"])
     model.eval()
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import math
 from pathlib import Path
+from typing import Optional
 
 import torch
 import torch.nn as nn
@@ -33,8 +34,45 @@ def cosine_schedule(base_value: float, final_value: float, epochs: int, warmup_e
     return schedule
 
 
-def train_dino(config: FullConfig) -> Path:
-    """Run DINO pretraining and return path to saved backbone checkpoint."""
+def _full_state(
+    epoch: int,
+    avg_loss: float,
+    best_loss: float,
+    dino: DINOWrapper,
+    dino_loss_fn: DINOLoss,
+    optimizer: torch.optim.Optimizer,
+    scaler: torch.amp.GradScaler,
+    cfg: DINOConfig,
+) -> dict:
+    """Everything needed to bit-resume training at the next epoch.
+
+    Backbone-only consumers (eval, downstream models) still read
+    ``student_state_dict`` / ``teacher_state_dict`` — those keys are preserved.
+    """
+    return {
+        "epoch": epoch,
+        "best_loss": best_loss,
+        "loss": avg_loss,
+        "student_state_dict": dino.student_backbone.state_dict(),
+        "teacher_state_dict": dino.teacher_backbone.state_dict(),
+        "student_head_state_dict": dino.student_head.state_dict(),
+        "teacher_head_state_dict": dino.teacher_head.state_dict(),
+        "dino_loss_state_dict": dino_loss_fn.state_dict(),
+        "optimizer_state_dict": optimizer.state_dict(),
+        "scaler_state_dict": scaler.state_dict(),
+        "config": cfg,
+    }
+
+
+def train_dino(config: FullConfig, resume_from: Optional[Path] = None) -> Path:
+    """Run DINO pretraining and return path to saved backbone checkpoint.
+
+    If ``resume_from`` is given, the run continues from that checkpoint's
+    ``epoch + 1`` with all state (both backbones, both heads, optimiser,
+    AMP scaler, DINO centre, best_loss) restored. The checkpoint must come
+    from a previous call to this function — backbone-only checkpoints from
+    older versions cannot be cleanly resumed.
+    """
     cfg = config.dino
     device = torch.device(config.device)
 
@@ -138,14 +176,59 @@ def train_dino(config: FullConfig) -> Path:
 
     scaler = torch.amp.GradScaler("cuda")
 
+    best_loss = float("inf")
+    start_epoch = 0
+
+    if resume_from is not None:
+        resume_path = Path(resume_from)
+        if not resume_path.exists():
+            raise FileNotFoundError(f"Resume checkpoint not found: {resume_path}")
+        logger.info(f"Resuming DINO training from {resume_path}")
+        ckpt = torch.load(resume_path, map_location=device, weights_only=False)
+        required = {
+            "student_state_dict",
+            "teacher_state_dict",
+            "student_head_state_dict",
+            "teacher_head_state_dict",
+            "dino_loss_state_dict",
+            "optimizer_state_dict",
+            "scaler_state_dict",
+            "epoch",
+        }
+        missing = required - set(ckpt.keys())
+        if missing:
+            raise KeyError(
+                f"Checkpoint {resume_path} is missing keys required for clean "
+                f"resume: {sorted(missing)}. This checkpoint was likely saved "
+                "by an older version that only stored backbone weights — clean "
+                "resume is not possible from it."
+            )
+        dino.student_backbone.load_state_dict(ckpt["student_state_dict"])
+        dino.teacher_backbone.load_state_dict(ckpt["teacher_state_dict"])
+        dino.student_head.load_state_dict(ckpt["student_head_state_dict"])
+        dino.teacher_head.load_state_dict(ckpt["teacher_head_state_dict"])
+        dino_loss_fn.load_state_dict(ckpt["dino_loss_state_dict"])
+        optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+        scaler.load_state_dict(ckpt["scaler_state_dict"])
+        best_loss = float(ckpt.get("best_loss", float("inf")))
+        start_epoch = int(ckpt["epoch"]) + 1
+        if start_epoch >= cfg.epochs:
+            raise ValueError(
+                f"Checkpoint already at epoch {start_epoch} but cfg.epochs="
+                f"{cfg.epochs}. Increase cfg.epochs to continue training."
+            )
+        logger.info(
+            f"Resumed at epoch {start_epoch}/{cfg.epochs} "
+            f"(prev avg_loss={ckpt.get('loss', 'n/a')}, best_loss={best_loss:.4f})"
+        )
+
     logger.info(
         f"Starting DINO pretraining: {len(dataset)} crops, "
-        f"{len(dataloader)} batches/epoch, {cfg.epochs} epochs"
+        f"{len(dataloader)} batches/epoch, "
+        f"epochs {start_epoch}..{cfg.epochs - 1}"
     )
 
-    best_loss = float("inf")
-
-    for epoch in range(cfg.epochs):
+    for epoch in range(start_epoch, cfg.epochs):
         # Update learning rate and weight decay
         for param_group in optimizer.param_groups:
             param_group["lr"] = lr_schedule[epoch]
@@ -216,28 +299,24 @@ def train_dino(config: FullConfig) -> Path:
             best_loss = avg_loss
             save_path = ckpt_dir / "best_backbone.pt"
             torch.save(
-                {
-                    "epoch": epoch,
-                    "student_state_dict": dino.student_backbone.state_dict(),
-                    "teacher_state_dict": dino.teacher_backbone.state_dict(),
-                    "optimizer_state_dict": optimizer.state_dict(),
-                    "loss": avg_loss,
-                    "config": cfg,
-                },
+                _full_state(epoch, avg_loss, best_loss, dino, dino_loss_fn,
+                            optimizer, scaler, cfg),
                 save_path,
             )
             logger.info(f"Saved best backbone to {save_path}")
 
+        # Rolling "last" checkpoint — always overwritten, used for resume
+        torch.save(
+            _full_state(epoch, avg_loss, best_loss, dino, dino_loss_fn,
+                        optimizer, scaler, cfg),
+            ckpt_dir / "last.pt",
+        )
+
         # Periodic checkpoint
         if (epoch + 1) % 10 == 0:
             torch.save(
-                {
-                    "epoch": epoch,
-                    "student_state_dict": dino.student_backbone.state_dict(),
-                    "teacher_state_dict": dino.teacher_backbone.state_dict(),
-                    "optimizer_state_dict": optimizer.state_dict(),
-                    "loss": avg_loss,
-                },
+                _full_state(epoch, avg_loss, best_loss, dino, dino_loss_fn,
+                            optimizer, scaler, cfg),
                 ckpt_dir / f"checkpoint_epoch{epoch+1}.pt",
             )
 

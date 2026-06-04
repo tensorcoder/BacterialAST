@@ -1,0 +1,12 @@
+Experiment: EC33_Ampicillin_16mgL_routine_preincubated3
+Label: Susceptible
+N crops: 25679
+ensemble P(R): mean=0.4315 median=0.4074
+fraction > 0.5 (crop-level): 0.4130
+
+Spearman correlations of P(R) with simple stats:
+  crop_mean (raw brightness)           rho=-0.1663  p=1.43e-158
+  crop_std (raw contrast)              rho=+0.1835  p=2.31e-193
+  bbox area (w*h, px^2)                rho=-0.0980  p=7.39e-56
+  time within experiment (min)         rho=-0.4856  p=0.00e+00
+  YOLO confidence                      rho=+0.1616  p=7.29e-150
