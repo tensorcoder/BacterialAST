@@ -730,7 +730,12 @@ def main() -> None:
         "--bin-width-sec", type=float, default=300.0,
         help="Evaluation bin width in seconds (default: 300 = 5 min)",
     )
+    parser.add_argument(
+        "--exclude-strains", type=str, nargs="*", default=[],
+        help="EC strains to drop from train/val/test (e.g. --exclude-strains EC35)",
+    )
     args = parser.parse_args()
+    excluded = {s.upper() for s in args.exclude_strains}
 
     config = FullConfig()
     config.device = args.device
@@ -754,6 +759,15 @@ def main() -> None:
     groups = build_strain_grouped_experiments(
         config.paths.features_dir, config.paths.data_root,
     )
+    if excluded:
+        for label in groups:
+            for ec in list(groups[label]):
+                if ec in excluded:
+                    dropped = groups[label].pop(ec)
+                    logger.info(
+                        f"Excluding {ec} ({len(dropped)} experiments, "
+                        f"label={'R' if label == 1 else 'S'})"
+                    )
     for label, strain_dict in groups.items():
         label_name = "Resistant" if label == 1 else "Susceptible"
         for ec, exps in sorted(strain_dict.items()):
